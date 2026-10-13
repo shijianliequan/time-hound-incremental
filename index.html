@@ -772,12 +772,50 @@
     .challenge-quit { flex: 0 0 auto; width: auto; min-width: 98px; min-height: 34px; font-size: 12px; }
     .challenge-run .challenge-progress { margin: 12px 0 6px; }
     .challenge-run-hint { margin: 0; font-size: 12px; line-height: 1.55; color: var(--muted); }
-    .possibility-placeholder {
-      margin-top: 14px; padding: 36px 16px; text-align: center;
-      border: 1px dashed var(--line); color: var(--muted);
+    .possibility-note { margin: 0 0 12px; font-size: 13px; line-height: 1.7; color: var(--muted); }
+    .mv-current {
+      margin: 10px 0 14px; padding: 10px 12px;
+      border: 1px dashed rgba(159, 138, 224, 0.45); border-radius: 10px;
+      font-size: 13px; line-height: 1.7;
     }
-    .possibility-placeholder span { display: block; font-size: 34px; margin-bottom: 10px; opacity: 0.8; }
-    .possibility-placeholder p { margin: 0; font-size: 13px; }
+    .mv-current b { color: var(--purple); }
+    .mv-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0 4px; }
+    .mv-cost { font-size: 12px; color: var(--muted); }
+    .universe-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 12px; }
+    .universe-card {
+      display: flex; flex-direction: column; gap: 8px;
+      padding: 12px 14px; border: 1px solid rgba(159, 138, 224, 0.4);
+      border-radius: 10px; background: rgba(30, 24, 48, 0.45);
+    }
+    .universe-card .universe-name { font-size: 14px; font-weight: 700; color: var(--purple); }
+    .universe-card .universe-mods { flex: 1; font-size: 12.5px; line-height: 1.8; color: var(--text); }
+    .universe-card .universe-mods .mod-cap { color: var(--green); }
+    .gene-points { font-size: 13px; margin: 0 0 10px; color: var(--muted); }
+    .gene-points b { color: var(--purple); }
+    .gene-list { display: grid; gap: 8px; margin-top: 12px; }
+    .gene-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+      padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px;
+      background: var(--panel-light); font-size: 13px;
+    }
+    .gene-main { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .gene-tier { font-weight: 700; }
+    .gene-lv { color: var(--muted); font-size: 12px; }
+    .gene-ops { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex: 0 0 auto; }
+    .gene-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .gene-tools button { width: auto; min-height: 30px; padding: 3px 12px; font-size: 12px; }
+    .gene-pick {
+      flex: 0 0 auto; width: 26px; min-width: 26px; height: 26px; min-height: 26px; padding: 0;
+      border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+      font-size: 14px; line-height: 1; cursor: pointer;
+    }
+    .gene-pick.on { color: var(--cyan); border-color: var(--cyan); }
+    .gene-item.picked { border-color: rgba(103, 232, 249, 0.5); background: rgba(18, 40, 46, 0.5); }
+    .part-soft { display: block; margin-top: 4px; color: var(--muted); font-size: 11.5px; line-height: 1.5; }
+    .gene-item .gene-name { color: var(--text); }
+    .gene-item .gene-val { color: var(--green); font-weight: 700; }
+    .gene-item button { flex: 0 0 auto; width: auto; min-height: 28px; padding: 2px 10px; font-size: 12px; }
+    .gene-empty { margin-top: 12px; font-size: 13px; color: var(--muted); }
 
     /* ===== 时间碎片 ===== */
     .shard-summary {
@@ -2305,7 +2343,7 @@
         <p class="eyebrow">CHRONOLOGY / SURVIVAL</p>
         <h1>时间猎犬增量</h1>
         <p class="subtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
-        <span class="version-badge" id="versionBadge" title="游戏版本">V0.59</span>
+        <span class="version-badge" id="versionBadge" title="游戏版本">V0.67</span>
       </div>
 
       <div class="header-stats">
@@ -2363,7 +2401,7 @@
             <div class="core-left">
             <div class="resource-row">
               <div class="resource-main">
-                <div class="resource-label">当前时间尘埃</div>
+                <div class="resource-label" id="dustLabel">当前时间尘埃</div>
                 <div class="resource-value" id="dust">0</div>
               </div>
               <div class="resource-rate">
@@ -3066,18 +3104,28 @@
     </section>
 
     <section id="possibilityScreen" class="screen">
-      <div class="panel">
-        <div class="section-title">
-          <h2 style="color: var(--purple); margin: 0;">🌌 可能性</h2>
-          <small>尚未定义</small>
+      <div class="sub-tab-bar">
+        <button class="sub-tab active" id="subTabMultiverse" data-subtab="multiverse">🌌 多元宇宙</button>
+        <button class="sub-tab" id="subTabGene" data-subtab="gene">🧬 基因改造</button>
+      </div>
+
+      <div id="possSubMultiverse" class="sub-pane active">
+        <div class="panel">
+          <div class="section-title">
+            <h2 style="color: var(--purple); margin: 0;">🌌 多元宇宙</h2>
+            <small id="mvStatusText">—</small>
+          </div>
+          <div id="mvBody"></div>
         </div>
-        <p class="inventory-note">
-          五个挑战全部完成了——门后这团雾还没有成形。
-          这里将来会承载一整套新玩法，<b style="color: var(--muted);">内容暂留空，等设计定下再填。</b>
-        </p>
-        <div class="possibility-placeholder">
-          <span>🌌</span>
-          <p>可能性 · 待定义</p>
+      </div>
+
+      <div id="possSubGene" class="sub-pane">
+        <div class="panel">
+          <div class="section-title">
+            <h2 style="color: var(--purple); margin: 0;">🧬 基因改造</h2>
+            <small id="geneStatusText">—</small>
+          </div>
+          <div id="geneBody"></div>
         </div>
       </div>
     </section>
@@ -3208,6 +3256,13 @@
 
       <div class="settings-option">
         <div>
+          <div class="so-title">本存档时长</div>
+          <div class="so-hint" id="playTimeText">在线 — · 离线 —</div>
+        </div>
+      </div>
+
+      <div class="settings-option">
+        <div>
           <div class="so-title">存档</div>
         </div>
         <div class="settings-choice">
@@ -3250,7 +3305,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.59";
+    const GAME_VERSION = "V0.67";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -3555,6 +3610,15 @@
     // 关键：上限必须大于正常战斗的「每 tick 行动数」，否则闸门永远清不空，
     // 攻速高的一方会一直处于就绪状态，把攻速低的一方彻底饿死（旧版 12 就是这个坑）。
     const MAX_BATTLE_ACTIONS_PER_TICK = 64;
+    // 自动狩猎每 tick 最多结算多少次行动。手动战斗仍用上面的 64（自己点的，快无妨），
+    // 但自动狩猎以前会在一两个 tick 里把整场打完 —— 几十次出手全挤在 0.2 秒里，
+    // 日志刷屏、过程完全看不见。压到 8 之后，打满 50 回合至少也要 7 个 tick（约 1.4 秒），
+    // 过程能看清了。总伤害与胜负完全不变（战斗只是被拉长，出手总次数由血量决定）。
+    // ⚠️ 只有当某一方每 tick 需要的出手数超过这个值（攻速 > 8000）时才会被限速，
+    //    那时双方一起变慢，所以相对强弱不受影响。
+    const AUTO_HUNT_ACTIONS_PER_TICK = 8;
+    // 战斗日志的「战况快照」间隔：每 N 回合记一条（血量对比），取代原来「每次出手都记一条」。
+    const BATTLE_SNAPSHOT_EVERY = 12;
     // 单场战斗的回合上限（1 回合 = 任意一方出一次手）。
     // 存在意义：双方互相破不了防、或伤害远远赶不上血量的战斗会无限拖下去，
     // 以前只能眼睁睁看它卡在那里。打到上限就强制脱离：不判负、不会死，
@@ -3730,6 +3794,64 @@
         unlock: "解锁「自动化诱饵转盘」：库存诱饵自动投入转盘，转出的诱饵等级直接到手",
         check: () => (save.baitDrops || 0) >= BAIT_COLLECT_TARGET,
         progress: () => `${Math.min(save.baitDrops || 0, BAIT_COLLECT_TARGET)} / ${BAIT_COLLECT_TARGET} 个`
+      },
+      // ===== V0.64 新增：可能性（多元宇宙 / 基因）与时长统计 =====
+      {
+        id: "first_multiverse",
+        name: "初次越界",
+        icon: "🌌",
+        description: "第一次进入多元宇宙。",
+        reward: { origin: 0.10 },
+        check: () => (save.possibility.entries || 0) >= 1,
+        progress: () => `${Math.min(save.possibility.entries || 0, 1)} / 1 次`
+      },
+      {
+        id: "gene_first",
+        name: "基因初植",
+        icon: "🧬",
+        description: "植入第一条基因。",
+        reward: { dust: 0.05 },
+        check: () => (save.possibility.genes || []).length >= 1,
+        progress: () => `${Math.min((save.possibility.genes || []).length, 1)} / 1 条`
+      },
+      {
+        id: "gene_five",
+        name: "基因图谱",
+        icon: "🧫",
+        description: "同时持有 5 条基因。",
+        reward: { speed: 0.05 },
+        check: () => (save.possibility.genes || []).length >= 5,
+        progress: () => `${Math.min((save.possibility.genes || []).length, 5)} / 5 条`
+      },
+      {
+        id: "gene_strong",
+        name: "基因强化",
+        icon: "⬆",
+        description: "把任意一条基因强化到 Lv.5。",
+        reward: { origin: 0.10 },
+        check: () => (save.possibility.genes || []).some(g => (g && g.level || 1) >= 5),
+        progress: () => {
+          const best = (save.possibility.genes || []).reduce((m, g) => Math.max(m, (g && g.level) || 1), 1);
+          return `Lv.${Math.min(best, 5)} / Lv.5`;
+        }
+      },
+      {
+        id: "play_1h",
+        name: "时光旅人",
+        icon: "⏱",
+        description: "本存档累计在线游玩 1 小时。",
+        reward: { dust: 0.05 },
+        check: () => (save.playMs || 0) >= 3600 * 1000,
+        progress: () => `${formatPlayTime(Math.min(save.playMs || 0, 3600 * 1000))} / 1 小时`
+      },
+      {
+        id: "offline_1h",
+        name: "静置时光",
+        icon: "🕰",
+        description: "本存档累计离线挂机 1 小时。",
+        reward: { speed: 0.05 },
+        check: () => (save.offlineMs || 0) >= 3600 * 1000,
+        progress: () => `${formatPlayTime(Math.min(save.offlineMs || 0, 3600 * 1000))} / 1 小时`
       }
     ];
 
@@ -3748,8 +3870,7 @@
     const RUN_UPGRADE_TARGET = 45;   // 挑战二：两项升级都到 Lv.45
     const RUN_PARADOX_TARGET = 1;    // 挑战三：本次会话里发动悖论重置的次数（进入挑战时那一次强制重置不算）
     const RUN_HOUND_FORGE_LEVEL = 30;// 挑战四：把「从 Lv.1 养起」的那条猎犬练到的目标等级
-    const RUN_FINAL_UPGRADE = 85;    // 挑战五：两项升级都到 Lv.85
-    const RUN_FINAL_SHARD = 25;      // 挑战五：碎片总等级增量
+    const RUN_FINAL_DUST_E = 100;    // 挑战五：一次性持有 1E100 尘埃（存的是 log10 指数，1E100 的 100）
 
     const CHALLENGES = [
       {
@@ -3795,20 +3916,14 @@
       },
       {
         id: "ch_paradox", name: "悖论终章", icon: "✵", stars: 5,
-        env: { upgradeCostMult: 1.8, houndExpMult: 0.6, shardDropMult: 0.5 },
-        desc: `这次挑战里同时做到：两项升级都到 Lv.${RUN_FINAL_UPGRADE}、碎片总等级净增 ${RUN_FINAL_SHARD} 级、` +
-          `并让 1 只猎犬回归。`,
-        hint: "尘埃经济、猎犬循环、战斗掉落——前四关的验收，而且这次三条链同时被削，缺一不可。",
+        env: { upgradeCostMult: 2.5, progressSpeedMult: 0.25, captureMult: 2 },
+        desc: `这次挑战里环境依然恶劣：升级造价 ×2.5、时间进度 ÷4、被捕获概率 ×2——` +
+          `在这样的世界里，一次性持有 1E100 时间尘埃。`,
+        hint: "不再考验猎犬回归——这一次只验收最纯粹的尘埃经济：收益要堆到极限，捕获要压到最低，手上的每一分尘埃都不能随便花掉（花出去的就不算持有了）。别忘了尘埃本身还有 1E1000 的天花板。",
         unlock: "paradoxFreeUpgrade",
-        ratio: run => Math.min(
-          Math.min(1, runMinUpgrade() / RUN_FINAL_UPGRADE),
-          Math.min(1, runShardDelta(run) / RUN_FINAL_SHARD),
-          Math.min(1, runTranscendDelta(run) / 1)),
-        check: run => runMinUpgrade() >= RUN_FINAL_UPGRADE &&
-          runShardDelta(run) >= RUN_FINAL_SHARD && runTranscendDelta(run) >= 1,
-        progress: run => `${Math.min(runMinUpgrade(), RUN_FINAL_UPGRADE)}/${RUN_FINAL_UPGRADE} 级 · ` +
-          `${Math.min(runShardDelta(run), RUN_FINAL_SHARD)}/${RUN_FINAL_SHARD} 碎片 · ` +
-          `${Math.min(runTranscendDelta(run), 1)}/1 回归`
+        ratio: () => Math.max(0, Math.min(1, bigLog10(save.dust) / RUN_FINAL_DUST_E)),
+        check: () => bigCmp(save.dust, bigFromLog10(RUN_FINAL_DUST_E)) >= 0,
+        progress: () => `${formatNumber(save.dust)} / ${formatNumber(bigFromLog10(RUN_FINAL_DUST_E))} 尘埃`
       }
     ];
 
@@ -3879,9 +3994,6 @@
     function runMinUpgrade() {
       return Math.min(save.upgrades.speed || 0, save.upgrades.dust || 0);
     }
-    function runTranscendDelta(run) {
-      return Math.max(0, (save.transcendedHounds || []).length - ((run && run.baseline.transcended) || 0));
-    }
     // 「猎群远征」：本次会话里发动过几次悖论重置。
     // 进入挑战时那一次强制重置已经算进 baseline（见 confirmStartChallenge），所以不会白送。
     function runParadoxDelta(run) {
@@ -3903,9 +4015,6 @@
         if (lv > best) best = lv;
       });
       return best;
-    }
-    function runShardDelta(run) {
-      return Math.max(0, getShardTotalLevel() - ((run && run.baseline.shardLevel) || 0));
     }
     // 生存计时：被捕获一次就从头计（在 checkChallenges 里同步）
     function getRunSurvivalSeconds(run) {
@@ -3942,6 +4051,9 @@
     }
     // 五个挑战全部完成 → 「可能性」子页解锁
     function isPossibilityUnlocked() {
+      // V0.64：进入多元宇宙会清空挑战进度，所以解锁要另记一个永久标记 save.possibility.tabUnlocked，
+      // 否则挑战一清，「可能性」页签会自己被锁回去。
+      if (save.possibility && save.possibility.tabUnlocked) return true;
       return CHALLENGES.every(c => isChallengeDone(c.id));
     }
     // 进行中的挑战会话。不落盘的临时对象一律走这里，所以它随存档一起存。
@@ -4102,6 +4214,8 @@
       logEvent(c.icon, `完成挑战「<b>${c.name}</b>」 ${"★".repeat(c.stars)}`, "gold");
       showToast(`<b>挑战达成</b>：${c.name} —— ${challengeRewardText(c)}`);
       if (isPossibilityUnlocked()) {
+        // 永久解锁标记：进入多元宇宙会清空挑战进度，这个标记保证页签不会自己锁回去
+        getPossibility().tabUnlocked = true;
         logEvent("🌌", "五个挑战全部完成，新页面「<b>可能性</b>」已解锁", "purple");
         showToast("<b>可能性</b>已解锁：导航栏「⚔ 挑战」右边多了一个页签");
       }
@@ -4171,6 +4285,54 @@
       }
     };
     // 永恒部件的装备上限（当前恰好等于部件总数）
+    // ===== V0.65：部件加成改为「软上限」曲线 =====
+    // 老版是 def.value × 等级（纯线性、无上限）。部件等级来自「每次被捕获的成长能量」，
+    // 而成长能量上限 = 8 + 6×关键值 会随被捕获次数一路涨，于是后期光靠部件就能顶到尘埃上限——
+    // 基因改造变得毫无意义（用户反馈）。
+    // 新曲线：有效等级 = CAP × 等级 / (等级 + CAP)
+    //   · 等级 ≪ CAP 时 ≈ 等级（早期手感不变）
+    //   · 等级 = CAP 时 → CAP/2
+    //   · 等级 → ∞ 时趋近 CAP（加成封顶 = def.value × CAP）
+    // heart 的 CAP 特意压得很低：它乘的是「升级的每级倍率」，会随升级等级指数级放大，最危险。
+    // 软上限 = 这条曲线的「拐点」：拐点之内每级满效率，拐点之外每级效率递减（仍为正）。
+    // ⚠️ heart 的拐点刻意压到最低——它乘的不是收益本身，而是【升级的每级倍率】，
+    //    会被「升级等级」次方放大（step^level），所以它每多一点都极其昂贵。
+    const PART_BONUS_CAP = { fang: 150, claw: 150, heart: 12, hourglass: 100 };
+    // 超出软上限之后的「衰减缓急」：越大衰减越慢（→∞ 就退化成完全线性）。
+    // 超限第 k 级的边际效率 = 1 / (1 + 超出量 / (SOFTNESS × 软上限))，永不归零、只是越来越低。
+    const PART_OVERFLOW_SOFTNESS = 2;
+    // 软上限被基因放大时的保险丝（防止连乘溢出成 Infinity）
+    const PART_CAP_MULT_MAX = 1e9;
+
+    // 该部件的软上限等级（基础值 × 基因/宇宙的「部件软上限」倍率）
+    function getPartCap(type) {
+      const base = PART_BONUS_CAP[type] || 100;
+      let mul = 1;
+      try { mul = getUniverseMult("partCap"); } catch (e) { mul = 1; }
+      if (!isFinite(mul) || mul < 1) mul = 1;
+      return base * Math.min(mul, PART_CAP_MULT_MAX);
+    }
+    // 有效等级（超限部分递减折算）：
+    //   等级 ≤ 软上限 → 原样计入（100% 效率，手感与旧版一致）
+    //   等级 > 软上限 → cap × (1 + k·ln(1 + 超出/cap/k))，在软上限处斜率恰好 = 1（无缝衔接），
+    //                    之后每级效率逐渐下降但始终为正（不是归零、也没有硬顶）。
+    function getPartEffectiveLevel(type) {
+      const part = save.parts ? save.parts[type] : null;
+      const lv = part && typeof part.level === "number" ? part.level : 0;
+      if (lv <= 0) return 0;
+      const cap = getPartCap(type);
+      if (lv <= cap) return lv;
+      const k = PART_OVERFLOW_SOFTNESS;
+      return cap * (1 + k * Math.log(1 + (lv - cap) / (k * cap)));
+    }
+    // 超限部分的「当前每级效率」（0~1，展示用）
+    function getPartOverflowRate(type) {
+      const part = save.parts ? save.parts[type] : null;
+      const lv = part && typeof part.level === "number" ? part.level : 0;
+      const cap = getPartCap(type);
+      if (lv <= cap || cap <= 0) return 1;
+      return 1 / (1 + (lv - cap) / (PART_OVERFLOW_SOFTNESS * cap));
+    }
     const PART_EQUIP_LIMIT = 4;
 
     // ===== 诱饵系统 =====
@@ -4310,6 +4472,28 @@
       challenges: [],
       // 进行中的挑战会话 { id, startedAt, baseline:{captures,kills,transcended,shardLevel} } 或 null
       challengeRun: null,
+      // 可能性（V0.61）：多元宇宙 / 基因改造的持久进度
+      possibility: {
+        // 可能性页签是否已永久解锁（挑战被清空后仍保留，否则页签会自己锁回去）
+        tabUnlocked: false,
+        // 多元宇宙是否已解锁（花 1E1000 尘埃）
+        multiverse: false,
+        // 进入过多元宇宙的次数（宇宙随机值的放大系数跟着它走）
+        entries: 0,
+        // 进入宇宙时刷出来、还没选的候选 [{name, mods:[{k,label,mult}]}] 或 null
+        pending: null,
+        // 当前栖息的宇宙 {name, mods:[{k,label,mult}]} 或 null
+        universe: null,
+        // 基因点数（每进入一次宇宙 +1，用于植入基因）
+        genePoints: 0,
+        // 基因修饰点数（进入宇宙时由被清空的进度折算，用于强化基因）
+        modPoints: 0,
+        // 已植入的基因（永久作用于所有宇宙）[{k,label,tier,level}]
+        genes: []
+      },
+      // 本存档的在线游玩时长 / 离线挂机时长（毫秒，纯统计，设置面板里展示）
+      playMs: 0,
+      offlineMs: 0,
       savedAt: 0
     };
 
@@ -4525,7 +4709,9 @@
       a = bigOf(a);
       if (a.m === 0) return "0";
       const e = a.e;
-      if (e >= -1e4 && e < 1e4) return `${bigMantissa(a.m)}E${e}`;
+      // V0.63：指数一直写到 99999 都用单个 E（如 1E30080 直接念得出来），
+      // 到 1E100000 起才收成「1.23EE6」（EE 后面的数字 = 指数有几位）。
+      if (e >= -1e4 && e < 1e5) return `${bigMantissa(a.m)}E${e}`;
       if (e < 0) return "0";
       const d1 = Math.floor(Math.log10(e)) + 1;      // 指数有几位数字
       if (d1 < 1e4) return `${bigMantissa(a.m)}EE${d1}`;
@@ -4567,6 +4753,24 @@
       choice.querySelectorAll("[data-mode]").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.mode === numberMode);
       });
+      renderPlayTime();
+    }
+    // 本存档时长（毫秒 → 中文可读）。也是新成就「时光旅人 / 静置时光」的读数来源。
+    function formatPlayTime(ms) {
+      const s = Math.max(0, (ms || 0) / 1000);
+      if (s < 1) return "0 秒";
+      if (s < 60) return `${Math.floor(s)} 秒`;
+      if (s < 3600) return `${Math.floor(s / 60)} 分钟`;
+      if (s < 86400) {
+        const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+        return m > 0 ? `${h} 小时 ${m} 分钟` : `${h} 小时`;
+      }
+      const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600);
+      return h > 0 ? `${d} 天 ${h} 小时` : `${d} 天`;
+    }
+    function renderPlayTime() {
+      setText("playTimeText",
+        `在线 ${formatPlayTime(save.playMs || 0)} · 离线 ${formatPlayTime(save.offlineMs || 0)}`);
     }
     // 切换数字显示方式（设置面板）：改偏好 → 落盘 → 全量重绘
     function applyNumberMode(mode) {
@@ -4748,6 +4952,77 @@
       };
     }
 
+    // 可能性（V0.61）存档清洗：宇宙/基因条目只收「字符串键 + 有限正数倍率 + 字符串文案」，
+    // 条目数也都限量，脏存档塞不进大对象。
+    function sanitizePossibility(raw) {
+      const d = structuredCloneSafe(DEFAULT_SAVE.possibility);
+      if (!raw || typeof raw !== "object") return d;
+      // ⚠️ 这两个上限刻意写字面量：loadSave 在脚本启动时（let save = loadSave()）就执行，
+      //    而 GENE_MAX / GENE_TIERS 声明在下方可能性代码段，直接引用会踩 TDZ →
+      //    异常被 loadSave 的 catch 吞掉、静默回退默认存档。改 GENE_MAX / 加稀有度要同步这里。
+      const GENE_COUNT_CAP = 12;
+      const GENE_TIER_CAP = 6;
+      // 各档基础倍率（与 GENE_TIERS[].mult 同步，仅用于老存档迁移）
+      const GENE_TIER_BASE = [1.02, 1.05, 1.09, 1.14, 1.20, 1.28];
+      const num = v => (typeof v === "number" && isFinite(v) && v > 0 ? v : 0);
+      const cleanMods = list => {
+        if (!Array.isArray(list)) return [];
+        const out = [];
+        for (const m of list) {
+          if (out.length >= 8) break;
+          if (!m || typeof m !== "object") continue;
+          if (typeof m.k !== "string" || typeof m.label !== "string") continue;
+          const mult = num(m.mult);
+          if (!mult) continue;
+          out.push({ k: m.k.slice(0, 24), label: m.label.slice(0, 32), mult });
+        }
+        return out;
+      };
+      // 基因：{k,label,tier,level}（V0.64 起带稀有度与强化等级）
+      const cleanGenes = list => {
+        if (!Array.isArray(list)) return [];
+        const out = [];
+        for (const g of list) {
+          if (out.length >= GENE_COUNT_CAP) break;
+          if (!g || typeof g !== "object") continue;
+          if (typeof g.k !== "string" || typeof g.label !== "string") continue;
+          let tier = typeof g.tier === "number" && isFinite(g.tier) ? Math.floor(g.tier) : -1;
+          if (tier < 0) {
+            // 老存档（V0.61–V0.63）的基因只有 mult、没有稀有度：按最接近的基础倍率归档
+            const om = typeof g.mult === "number" && isFinite(g.mult) ? g.mult : 1.05;
+            tier = 0;
+            let best = Infinity;
+            for (let i = 0; i < GENE_TIER_BASE.length; i++) {
+              const d = Math.abs(GENE_TIER_BASE[i] - om);
+              if (d < best) { best = d; tier = i; }
+            }
+          }
+          tier = Math.max(0, Math.min(GENE_TIER_CAP - 1, tier));
+          const level = Math.max(1, Math.floor(typeof g.level === "number" && isFinite(g.level) ? g.level : 1));
+          out.push({ k: g.k.slice(0, 24), label: g.label.slice(0, 32), tier, level });
+        }
+        return out;
+      };
+      const cleanUniverse = u => {
+        if (!u || typeof u !== "object" || typeof u.name !== "string") return null;
+        return { name: u.name.slice(0, 32), mods: cleanMods(u.mods) };
+      };
+      const pending = Array.isArray(raw.pending)
+        ? raw.pending.slice(0, 4).map(cleanUniverse).filter(Boolean)
+        : null;
+      const intOf = v => Math.max(0, Math.floor(typeof v === "number" && isFinite(v) ? v : 0));
+      return {
+        tabUnlocked: !!raw.tabUnlocked,
+        multiverse: !!raw.multiverse,
+        entries: intOf(raw.entries),
+        pending: pending && pending.length ? pending : null,
+        universe: cleanUniverse(raw.universe),
+        genePoints: intOf(raw.genePoints),
+        modPoints: intOf(raw.modPoints),
+        genes: cleanGenes(raw.genes)
+      };
+    }
+
     // 永恒部件存档清洗：丢弃图鉴里已不存在的键（例如旧版的「猎犬之眼」「猎犬之魂」
     // 「猎犬之声」「裂隙之核」），只保留当前 PART_DEFINITIONS 内的部件，等级取整且 > 0。
     function sanitizeParts(raw) {
@@ -4859,6 +5134,11 @@
           challenges: sanitizeChallenges(parsed.challenges),
           // 进行中的挑战会话（老存档没有 → null，即当前没有挑战在跑）
           challengeRun: sanitizeChallengeRun(parsed.challengeRun),
+          // 可能性（V0.61）：老存档没有 → 默认全关
+          possibility: sanitizePossibility(parsed.possibility),
+          // 在线 / 离线时长（毫秒，纯统计）
+          playMs: Math.max(0, typeof parsed.playMs === "number" && isFinite(parsed.playMs) ? parsed.playMs : 0),
+          offlineMs: Math.max(0, typeof parsed.offlineMs === "number" && isFinite(parsed.offlineMs) ? parsed.offlineMs : 0),
           savedAt: typeof parsed.savedAt === "number" && isFinite(parsed.savedAt) ? parsed.savedAt : 0
         };
         delete merged.upgrades.risk;
@@ -4880,6 +5160,12 @@
           merged.activeHoundId = null;
           merged.houndLocked = false;
         }
+        // 尘埃持有上限（可能性 V0.61）：老存档可能已超过当前层上限
+        // （如解锁多元宇宙前持有 1E1000+），载入即钳到当层天花板。
+        // ⚠️ 这里刻意写字面量 1000/30080：loadSave 在脚本启动时就被调用，
+        //    而 DUST_CAP_E/MULTIVERSE_CAP_E 声明在下方可能性代码段，直接引用会踩 TDZ。
+        merged.dust = bigMin(merged.dust,
+          bigFromLog10(merged.possibility && merged.possibility.multiverse ? 30080 : 1000));
         return merged;
       } catch (e) {
         return structuredCloneSafe(DEFAULT_SAVE);
@@ -4916,6 +5202,420 @@
     window.addEventListener("beforeunload", () => {
       if (saveDirty) saveGame(true);
     });
+
+    // ===================== 可能性（V0.61）：多元宇宙 + 基因改造 =====================
+    // 五个挑战全通后解锁的新页面。核心是「换一个宇宙重新来过」：
+    // 花 1E1000 尘埃打开多元宇宙 → 随机刷 4 个带正面加成的新宇宙 → 选一个进入，
+    // 进入会清空除【时间碎片 / 诱饵 / 可能性】之外的全部进度（比悖论重置更彻底），
+    // 换来 +1 基因点数；宇宙加成与基因加成从此常驻。
+    // 尘埃上限（新设定）：未解锁多元宇宙前，尘埃被锁死在 1E1000；解锁后放宽到 1E30080。
+    const DUST_CAP_E = 1000;        // 第一层尘埃上限（未解锁多元宇宙）
+    const MULTIVERSE_CAP_E = 30080; // 第二层尘埃上限（解锁多元宇宙之后）
+    const MULTIVERSE_COST_E = 1000; // 解锁 + 每次进入多元宇宙的花费（1E1000 尘埃）
+    const GENE_MAX = 12;            // 基因改造：基因数量上限
+    // ===== V0.65 基因数值重做 =====
+    // ① 每级改成【乘法】：倍率 = 档位基础倍率 ^ 等级（旧版是「1 + (基础-1)×等级」的线性）。
+    // ② 强化花费【与稀有度无关】，所以高稀有度基因的「性价比」严格优于普通基因——
+    //    这是刻意的：让玩家主动去强化高级词条，而不是把所有点数摊在普通基因上。
+    // ③ 单条基因的效果上限 GENE_EFFECT_MAX：乘法会指数爆炸，必须封顶（否则 Number 会变 Infinity
+    //    并顺着收益链传染）。等级上限由它反推：geneLevelCap(tier) = floor(log(MAX)/log(tier.mult))。
+    const GENE_UPGRADE_BASE = 12;   // 强化花费：首级 12 点基因修饰点数
+    const GENE_UPGRADE_GROWTH = 1.5; // 每级花费 ×1.5
+    const GENE_EFFECT_MAX = 1e9;    // 单条基因的倍率上限（12 条同类叠乘 ≈ 1e108，安全）
+
+    function getPossibility() { return save.possibility; }
+    function isMultiverseOn() { return !!getPossibility().multiverse; }
+    function getDustCap() { return bigFromLog10(isMultiverseOn() ? MULTIVERSE_CAP_E : DUST_CAP_E); }
+
+    // 宇宙加成池：全部正面。dustPow 是指数（尘埃数量^N）。
+    // ⚠️ V0.63 按用户要求移除了「被捕获概率」——他不认为这是个正面属性。
+    const UNIVERSE_MOD_POOL = [
+      { k: "shard",    label: "时间碎片强度", min: 1.30, max: 2.20 },
+      { k: "speed",    label: "时间流速",     min: 1.30, max: 2.20 },
+      { k: "dust",     label: "尘埃收益",     min: 1.50, max: 3.00 },
+      { k: "dustPow",  label: "尘埃数量指数", min: 1.02, max: 1.08 },
+      { k: "origin",   label: "本源收益",     min: 1.50, max: 2.50 },
+      { k: "houndExp", label: "猎犬经验",     min: 1.50, max: 2.50 },
+      { k: "bait",     label: "诱饵效果",     min: 1.30, max: 2.00 }
+    ];
+    const GENE_POOL = [
+      { k: "dust",     label: "尘埃收益",     min: 1.05, max: 1.15 },
+      { k: "speed",    label: "时间流速",     min: 1.05, max: 1.15 },
+      { k: "origin",   label: "本源收益",     min: 1.06, max: 1.18 },
+      { k: "houndExp", label: "猎犬经验",     min: 1.06, max: 1.18 },
+      { k: "shard",    label: "时间碎片强度", min: 1.05, max: 1.12 },
+      { k: "bait",     label: "诱饵效果",     min: 1.05, max: 1.12 },
+      // V0.66：乘法抬高永恒部件的「软上限等级」——部件被限住之后，这是唯一的突破口
+      { k: "partCap",  label: "部件软上限",   min: 1.05, max: 1.12 }
+    ];
+    // 基因稀有度（V0.64，参考转盘/猎犬品质的六档）：越稀有基础倍率越高。
+    // mult 是「1 级时的倍率」，也是强化时每级相乘的倍率（乘法成长 ⇒ 高档位天然更强）。
+    // 强化花费与档位无关，所以「每点修饰点买到的倍率」高档位全面占优。
+    const GENE_TIERS = [
+      { id: 0, name: "普通", color: "var(--q-common)", weight: 46, mult: 1.02 },
+      { id: 1, name: "优秀", color: "var(--q-good)",   weight: 26, mult: 1.05 },
+      { id: 2, name: "稀有", color: "var(--q-rare)",   weight: 15, mult: 1.09 },
+      { id: 3, name: "史诗", color: "var(--q-epic)",   weight: 8,  mult: 1.14 },
+      { id: 4, name: "传说", color: "var(--q-legend)", weight: 4,  mult: 1.20 },
+      { id: 5, name: "神话", color: "var(--q-myth)",   weight: 1,  mult: 1.28 }
+    ];
+    const UNIVERSE_NAME_A = ["碎星", "凝时", "烬灭", "霜晶", "洪流", "幽壤", "黎光", "深渊", "回声", "燧火"];
+    const UNIVERSE_NAME_B = ["宇宙", "晶壁", "泡境", "潮汐", "序列", "雾海", "环带", "圣殿", "荒野", "茧层"];
+
+    function formatMod(mod) {
+      const v = mod.mult;
+      const head = mod.k === "dustPow" ? "^" : "×";
+      return `${mod.label} ${head}${v.toFixed(2)}`;
+    }
+
+    // 随机刷 4 个宇宙。随机值的「体量」随进入次数放大：entries 越多，roll 出来的加成越夸张。
+    function rollMultiverseUniverses() {
+      const entries = getPossibility().entries || 0;
+      const scale = 1 + 0.25 * entries;
+      const out = [];
+      for (let i = 0; i < 4; i++) {
+        const mods = [];
+        const pool = UNIVERSE_MOD_POOL.slice();
+        // 每个宇宙 1~3 条加成
+        const count = 1 + (Math.random() < 0.5 ? 1 : 0) + (Math.random() < 0.25 ? 1 : 0);
+        for (let j = 0; j < count && pool.length; j++) {
+          const def = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+          // 数值随进入次数放大（1 起，上不封顶地拉到 ×4 封顶）
+          const v = Math.min(4, 1 + (def.min + Math.random() * (def.max - def.min) - 1) * scale);
+          mods.push({ k: def.k, label: def.label, mult: Number(v.toFixed(3)) });
+        }
+        out.push({ name: pick(UNIVERSE_NAME_A) + pick(UNIVERSE_NAME_B), mods });
+      }
+      return out;
+    }
+
+    function rollGene() {
+      const def = pick(GENE_POOL);
+      // 按权重抽稀有度（越稀有越难出、基础倍率越高）
+      const total = GENE_TIERS.reduce((s, t) => s + t.weight, 0);
+      let roll = Math.random() * total, tier = GENE_TIERS[0];
+      for (const t of GENE_TIERS) { roll -= t.weight; if (roll <= 0) { tier = t; break; } }
+      return { k: def.k, label: def.label, tier: tier.id, level: 1 };
+    }
+    function geneTierOf(g) {
+      const id = g && typeof g.tier === "number" ? Math.floor(g.tier) : 0;
+      return GENE_TIERS[Math.max(0, Math.min(GENE_TIERS.length - 1, id))];
+    }
+    // 基因的实际倍率（V0.65 起为乘法）：档位基础倍率 ^ 等级，并封顶在 GENE_EFFECT_MAX。
+    // 例：神话(1.28) Lv.10 → ×11.81；普通(1.02) Lv.10 → ×1.22。
+    function geneEffect(g) {
+      const t = geneTierOf(g);
+      const lv = Math.max(1, Math.floor(g && typeof g.level === "number" ? g.level : 1));
+      const v = Math.pow(t.mult, lv);
+      return v > GENE_EFFECT_MAX ? GENE_EFFECT_MAX : v;
+    }
+    // 该档位的等级上限（到顶后倍率不再涨，UI 会禁用强化）
+    function geneLevelCap(g) {
+      const t = geneTierOf(g);
+      return Math.max(1, Math.floor(Math.log(GENE_EFFECT_MAX) / Math.log(t.mult)));
+    }
+    // 强化花费（基因修饰点数）：与稀有度无关，只随等级 ×1.5
+    function geneUpgradeCost(g) {
+      const lv = Math.max(1, Math.floor(g && typeof g.level === "number" ? g.level : 1));
+      return Math.ceil(GENE_UPGRADE_BASE * Math.pow(GENE_UPGRADE_GROWTH, lv - 1));
+    }
+    // 连续强化 n 级的总花费
+    function geneUpgradeBulkCost(g, n) {
+      let lv = Math.max(1, Math.floor(g && typeof g.level === "number" ? g.level : 1));
+      let sum = 0;
+      const cap = geneLevelCap(g);
+      for (let i = 0; i < n && lv < cap; i++) {
+        sum += Math.ceil(GENE_UPGRADE_BASE * Math.pow(GENE_UPGRADE_GROWTH, lv - 1));
+        lv++;
+      }
+      return sum;
+    }
+    // 效果的可读文本（大数走 E 记法，避免 toFixed 在 1e21 以上变成 "1e+21"）
+    function geneEffectText(g) {
+      const lg = Math.log10(geneTierOf(g).mult) * Math.max(1, Math.floor(g && g.level || 1));
+      if (lg < 6) return Math.pow(10, lg).toFixed(2);
+      const e = Math.floor(lg);
+      return `${Math.pow(10, lg - e).toFixed(2)}E${e}`;
+    }
+    function geneText(g) {
+      const t = geneTierOf(g);
+      const head = g.k === "dustPow" ? "^" : "×";
+      return `${g.label} ${head}${geneEffectText(g)}`;
+    }
+
+    // 宇宙加成 × 基因加成（按 key 连乘）。基因永久作用于所有宇宙，宇宙是当前栖息的那一个有生效。
+    function getUniverseMult(k) {
+      const p = save.possibility;
+      let m = 1;
+      if (p.universe && Array.isArray(p.universe.mods)) {
+        p.universe.mods.forEach(mo => { if (mo && mo.k === k && typeof mo.mult === "number") m *= mo.mult; });
+      }
+      if (Array.isArray(p.genes)) {
+        p.genes.forEach(g => { if (g && g.k === k) m *= geneEffect(g); });
+      }
+      return m;
+    }
+    function getDustPowMult() { return getUniverseMult("dustPow"); }
+
+    // ===== 进入宇宙：把「当前轮回的全部加成」折算成基因修饰点数 =====
+    // 折算刻意用对数刻度：尘埃、本源这类能涨到 1E1000+，线性求和会瞬间爆表；
+    // 等级 / 次数这类本来就是小数字，线性加就行。数值整体当作「进度分」，1 分 = 1 点基因修饰点数。
+    function getTotalPartLevels() {
+      let n = 0;
+      const parts = save.parts || {};
+      Object.keys(parts).forEach(k => { n += (parts[k] && parts[k].level) || 0; });
+      return n;
+    }
+    function getTotalBaitLevels() {
+      let n = 0;
+      BAIT_TYPES.forEach(t => { n += getBaitLevel(t.id); });
+      return n;
+    }
+    function getTotalHoundLevels() {
+      return (save.hounds || []).reduce((s, h) => s + (h && typeof h.level === "number" ? h.level : 0), 0);
+    }
+    function getTranscendLevelSum() {
+      return (save.transcendedHounds || []).reduce((s, t) => s + (t && typeof t.returnLevel === "number" ? t.returnLevel : 0), 0);
+    }
+    function getOriginShopLevelSum() {
+      const o = getOriginShop();
+      return (o.huntCd || 0) + (o.harvestSpeed || 0) + (o.huntSpeed || 0);
+    }
+    const WIPE_SCORE_ITEMS = [
+      { label: "持有尘埃", fn: () => bigLog10(save.dust) * 1.0 },
+      { label: "升级等级", fn: () => ((save.upgrades.speed || 0) + (save.upgrades.dust || 0)) * 0.5 },
+      { label: "部件等级", fn: () => getTotalPartLevels() * 1.2 },
+      { label: "碎片总等级", fn: () => getShardTotalLevel() * 1.5 },
+      { label: "诱饵等级", fn: () => getTotalBaitLevels() * 1.2 },
+      { label: "猎犬等级和", fn: () => getTotalHoundLevels() * 0.8 },
+      { label: "回归等级和", fn: () => getTranscendLevelSum() * 1.0 },
+      { label: "累计本源", fn: () => bigLog10(save.originLifetime) * 0.8 },
+      { label: "本源商店", fn: () => getOriginShopLevelSum() * 2 },
+      { label: "命运扭曲", fn: () => (save.luckBoost || 0) * 1.5 },
+      { label: "轮回与狩猎次数", fn: () => ((save.captures || 0) + (save.invasions || 0) + (save.paradoxCount || 0)) * 0.2 }
+    ];
+    // V0.65：整套「进度分」最后统一除以此数才变成基因修饰点数。
+    // V0.67：分母 40 → 150。校准目标：刚解锁多元宇宙的第一次进入（尘埃刚好 1E1000）**只够买 1 级强化**。
+    // 想整体放松/收紧就改这一个数。
+    const WIPE_POINT_DIVISOR = 150;
+    // 先求和、再除以 WIPE_POINT_DIVISOR 得到总点数，最后按各分项占比分配回明细——
+    // 这样「明细相加 = 总点数」恒成立，也不像逐项取整那样把零头全部丢掉（分母大时尤其明显）。
+    function getWipeScoreBreakdown() {
+      const raw = WIPE_SCORE_ITEMS.map(it => {
+        let v = 0;
+        try { v = it.fn(); } catch (e) { v = 0; }
+        if (!isFinite(v) || v < 0) v = 0;
+        return { label: it.label, raw: v };
+      });
+      const sum = raw.reduce((a, b) => a + b.raw, 0);
+      if (!(sum > 0)) return [];
+      const total = Math.floor(sum / WIPE_POINT_DIVISOR);
+      if (total <= 0) return [];
+      const out = raw.map(it => ({ label: it.label, value: Math.floor(total * it.raw / sum) }));
+      // 取整产生的余数，从「原始分值最大」的项开始逐个 +1，保证合计不差分毫
+      let left = total - out.reduce((a, b) => a + b.value, 0);
+      const order = out.map((_, i) => i).sort((a, b) => raw[b].raw - raw[a].raw);
+      for (let k = 0; left > 0 && order.length > 0; k = (k + 1) % order.length, left--) out[order[k]].value++;
+      return out.filter(it => it.value > 0);
+    }
+    function getWipeModPoints() {
+      return getWipeScoreBreakdown().reduce((a, b) => a + b.value, 0);
+    }
+
+    // 进入所选宇宙：**清空整个轮回**（连挑战进度一起清，所以挑战要重打），
+    // 只带走过：成就、自动化开关、可能性（含基因/点数）、显示偏好、时长统计。
+    // 被清空的进度折算成基因修饰点数，另 +1 基因点数。
+    function performMultiverseEntry(choice, idx) {
+      const p = getPossibility();
+      const modGain = getWipeModPoints();
+      // 先把本次进入的结果写进可能性（p 对象在重建存档时被原样带过去）
+      p.entries = (p.entries || 0) + 1;
+      p.genePoints = (p.genePoints || 0) + 1;
+      p.modPoints = (p.modPoints || 0) + modGain;
+      p.universe = { name: choice.name, mods: choice.mods };
+      p.tabUnlocked = true;
+      // V0.63：只消耗「被选中的那一个」，其余候选保留（玩家不能靠重进来刷新候选）。
+      // 4 个用完（pending 清空）后再付 1E1000 才会刷新的一批。
+      const rest = Array.isArray(p.pending) ? p.pending.slice() : [];
+      if (typeof idx === "number" && idx >= 0 && idx < rest.length) rest.splice(idx, 1);
+      p.pending = rest.length ? rest : null;
+      p.multiverse = true;
+
+      // 保留项：成就 / 自动化 / 可能性 / 显示偏好 / 时长统计
+      const keepAchievements = save.achievements || {};
+      const keepAuto = save.auto || {};
+      const keepNumberMode = save.numberMode;
+      const keepPlayMs = save.playMs || 0;
+      const keepOfflineMs = save.offlineMs || 0;
+
+      save = structuredCloneSafe(DEFAULT_SAVE);
+      save.possibility = p;
+      save.achievements = keepAchievements;
+      save.auto = keepAuto;
+      save.numberMode = keepNumberMode;
+      save.playMs = keepPlayMs;
+      save.offlineMs = keepOfflineMs;
+
+      // 运行时状态复位（仿 resetSave）
+      numberMode = save.numberMode === "sci" ? "sci" : "kmbt";
+      isCaptured = false;
+      stopBattleLoop();
+      activeBattle = null;
+      pendingSelectId = null;
+      pendingInvadeLineId = null;
+      baitSpinning = false;
+      baitWheelSig = "";
+      hunt = null;
+      el("houndLockModal").classList.remove("show");
+      el("invadeModal").classList.remove("show");
+      el("achievementModal").classList.remove("show");
+      el("autoModal").classList.remove("show");
+      el("baitModal").classList.remove("show");
+      ensureLines();
+      return { entries: p.entries, modGain };
+    }
+
+    // ---- 多元宇宙 / 基因 操作 ----
+    function canAffordMultiverse() { return bigCmp(save.dust, bigFromLog10(MULTIVERSE_COST_E)) >= 0; }
+    // 刷新候选：只在「手上没有候选宇宙」时才允许。花 1E1000 尘埃换一批 4 个。
+    // ⚠️ 候选一旦刷出就一直留着（存进存档），进一个少一个——玩家无法靠反复点按钮刷新候选。
+    function beginMultiverseEntry() {
+      const p = getPossibility();
+      if (p.pending && p.pending.length) return;
+      if (!canAffordMultiverse()) {
+        showToast(`进入多元宇宙需要 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃。`);
+        return;
+      }
+      // 解锁与每次进入同价：花 1E1000 尘埃，刷出 4 个候选宇宙
+      save.dust = bigSub(save.dust, bigFromLog10(MULTIVERSE_COST_E));
+      p.multiverse = true;
+      p.pending = rollMultiverseUniverses();
+      saveGame(true);
+      renderPossibility();
+    }
+    function chooseMultiverseUniverse(idx) {
+      const p = getPossibility();
+      if (!p.pending || !p.pending[idx]) return;
+      const u = p.pending[idx];
+      const modGain = getWipeModPoints();
+      if (!confirm(`确定进入「${u.name}」吗？\n\n进入后将清空【整个轮回】：\n` +
+        `· 尘埃 / 升级 / 部件 / 碎片 / 诱饵 / 猎犬 / 本源 / 商店 全部归零\n` +
+        `· 挑战进度一并清空（可能性页签保留，挑战要重打）\n` +
+        `· 只保留：成就、自动化开关、可能性本身\n\n` +
+        `作为交换：获得 1 点基因点数，清空的进度折算为约 ${modGain} 点基因修饰点数，` +
+        `并栖息于「${u.name}」。\n（尘埃上限放宽到 ${formatNumber(bigFromLog10(MULTIVERSE_CAP_E))}）`)) return;
+      const res = performMultiverseEntry(u, idx);
+      saveGame(true);
+      logEvent("🌌", `进入宇宙「<b>${u.name}</b>」——第 ${res.entries} 次触碰可能性`, "purple");
+      showToast(`已进入「<b>${u.name}</b>」：<b>+1</b> 基因点数 · <b>+${res.modGain}</b> 基因修饰点数`);
+      render();
+      switchTab("possibility");
+    }
+    function addGene() {
+      const p = getPossibility();
+      if ((p.genePoints || 0) < 1) { showToast("基因点数不足——进入一次多元宇宙可以获得 1 点。"); return; }
+      if (!Array.isArray(p.genes)) p.genes = [];
+      if (p.genes.length >= GENE_MAX) { showToast(`基因数量已达上限（${GENE_MAX} 条）。`); return; }
+      const g = rollGene();
+      const t = geneTierOf(g);
+      p.genes.push(g);
+      p.genePoints -= 1;
+      saveGame(true);
+      logEvent("🧬", `植入基因：<b style="color:${t.color}">${t.name}</b>·${geneText(g)}`, "purple");
+      showToast(`植入 <b style="color:${t.color}">${t.name}</b> 基因：${geneText(g)}`);
+      renderPossibility();
+    }
+    // ===== 基因操作（V0.65：确认移除 / 多选移除 / 批量强化）=====
+    // 多选状态刻意不落盘（和 fusionSelection 一样）：换页/读档后重新选，省得索引错位。
+    let geneSelection = new Set();
+    function pruneGeneSelection() {
+      const genes = getPossibility().genes || [];
+      let changed = false;
+      geneSelection.forEach(i => { if (i < 0 || i >= genes.length) { geneSelection.delete(i); changed = true; } });
+      return changed;
+    }
+    // 一条基因上已投入的修饰点数（V0.67 起只用于「提醒移除会损失多少」，不再退还）
+    function geneInvested(g) {
+      const lv = Math.max(1, Math.floor(g && typeof g.level === "number" ? g.level : 1));
+      let sum = 0;
+      for (let i = 1; i < lv; i++) {
+        sum += Math.ceil(GENE_UPGRADE_BASE * Math.pow(GENE_UPGRADE_GROWTH, i - 1));
+      }
+      return sum;
+    }
+    function toggleGenePick(idx) {
+      const genes = getPossibility().genes || [];
+      if (idx < 0 || idx >= genes.length) return;
+      if (geneSelection.has(idx)) geneSelection.delete(idx); else geneSelection.add(idx);
+      renderPossibility();
+    }
+    function toggleGenePickAll() {
+      const genes = getPossibility().genes || [];
+      if (genes.length && geneSelection.size === genes.length) geneSelection.clear();
+      else geneSelection = new Set(genes.map((_, i) => i));
+      renderPossibility();
+    }
+    function removeSelectedGenes() {
+      const idxs = [...geneSelection];
+      if (!idxs.length) { showToast("没有选中任何基因——先点每条基因左边的方框。"); return; }
+      removeGenesByIdx(idxs);
+    }
+    // 批量移除（单条也走这条路，所以一定有二次确认）
+    // ⚠️ V0.67：移除【不退还】任何点数（基因点与已投入的修饰点都直接失去）。
+    //    原因：基因是随机 roll 出来的（属性 + 稀有度都随机），只要退还点数就等于「免费重抽」——
+    //    玩家会反复「植入 → 不满意 → 移除」刷到神话为止，等于无限刷基因。
+    function removeGenesByIdx(idxs) {
+      const p = getPossibility();
+      const genes = p.genes || [];
+      const list = idxs.filter(i => i >= 0 && i < genes.length);
+      if (!list.length) return;
+      const names = list.map(i => {
+        const g = genes[i];
+        return `· ${geneTierOf(g).name}·${g.label} ${geneText(g)}（Lv.${g.level}）`;
+      });
+      const lostMod = list.reduce((s, i) => s + geneInvested(genes[i]), 0);
+      if (!confirm(`确定【永久移除】以下 ${list.length} 条基因吗？\n\n${names.join("\n")}\n\n` +
+        `⚠️ 不退还任何点数：将失去 ${list.length} 个基因点数` +
+        (lostMod > 0 ? `，以及已投入的 ${lostMod} 点基因修饰点数` : "") + `。`)) return;
+      // 从后往前删，避免索引位移
+      list.slice().sort((a, b) => b - a).forEach(i => { genes.splice(i, 1); });
+      geneSelection.clear();
+      saveGame(true);
+      logEvent("🧬", `永久移除 ${list.length} 条基因（不退还点数）`, "purple");
+      showToast(`已永久移除 ${list.length} 条基因：失去 <b>${list.length}</b> 基因点` +
+        (lostMod > 0 ? ` + <b>${lostMod}</b> 修饰点` : "") + `（不退还）`);
+      renderPossibility();
+    }
+    function removeGeneAt(idx) { removeGenesByIdx([idx]); }
+    // 强化基因：times = 1 / 10 / 100 / "max"。到档位等级上限或点数不够时自动停下。
+    function upgradeGene(idx, times) {
+      const p = getPossibility();
+      if (!Array.isArray(p.genes) || idx < 0 || idx >= p.genes.length) return;
+      const g = p.genes[idx];
+      const cap = geneLevelCap(g);
+      if (Math.floor(g.level || 1) >= cap) {
+        showToast(`${geneTierOf(g).name}基因已达等级上限（Lv.${cap}，倍率封顶 ×${GENE_EFFECT_MAX.toExponential(0)}）。`);
+        return;
+      }
+      const want = (times === "max" || times === undefined) ? Infinity : Math.max(1, Math.floor(Number(times) || 1));
+      let done = 0, spent = 0;
+      while (done < want && Math.floor(g.level) < cap) {
+        const cost = geneUpgradeCost(g);
+        if ((p.modPoints || 0) < cost) break;
+        p.modPoints -= cost;
+        spent += cost;
+        g.level = Math.floor(g.level) + 1;
+        done++;
+        if (done >= 10000) break;   // 保险丝
+      }
+      if (done === 0) {
+        showToast(`基因修饰点数不足（强化 1 级需要 ${geneUpgradeCost(g)} 点，当前 ${p.modPoints || 0} 点）。`);
+        return;
+      }
+      saveGame(true);
+      showToast(`${geneTierOf(g).name}·${g.label} 强化 ×${done} → <b>Lv.${g.level}</b>（${geneText(g)}，花费 ${spent} 点）`);
+      renderPossibility();
+    }
 
     // ===================== 存档导出 / 载入（加密文本）=====================
     // 为什么不是明文 JSON：明文导出等于把存档直接交给玩家改——改尘埃、改等级、
@@ -5323,10 +6023,9 @@
 
     function getPartBonus(type) {
       if (!save.equipped.includes(type)) return 0;
-      const part = save.parts[type];
       const def = PART_DEFINITIONS[type];
-      if (!part || !def) return 0;
-      return def.value * part.level;
+      if (!def) return 0;
+      return def.value * getPartEffectiveLevel(type);
     }
 
     // ===== 诱饵加成 =====
@@ -5344,6 +6043,9 @@
         Math.max(0, (boldDef && boldDef.sub ? boldDef.sub : 0) * getEffectiveBaitLevel("bold"));
       B.baitLuck = Math.max(0, B.luck || 0);
       B.paradoxCut = Math.max(0, Math.min(0.9, -(B.paradox || 0)));
+      // 宇宙 / 基因「诱饵效果」：整体放大每一味诱饵的加成
+      const baitMult = getUniverseMult("bait");
+      if (baitMult !== 1) Object.keys(B).forEach(key => { B[key] *= baitMult; });
       return B;
     }
     function getBaitOwnedCount() {
@@ -5405,7 +6107,8 @@
       else if (stance === "bold") rate = base * (1 + getBoldBoost());
       else rate = base * (1 - getNormalReduction()) * getShardCaptureMult();
       // 挑战环境可能整体放大捕获概率（例：「静默潜行」×10）——放在最后乘，任何姿态都躲不掉
-      return rate * getChallengeEnvMult("captureMult");
+      // 宇宙 / 基因的「被捕获概率」加成（倍率 <1）也在同一层相乘。
+      return rate * getChallengeEnvMult("captureMult") * getUniverseMult("capture");
     }
 
     // 是否已获得「静默十分钟」——普通升级不再消耗尘埃（但仍需持有足额尘埃）
@@ -5541,7 +6244,7 @@
       // 这里是所有「线性碎片加成」的唯一出口，所以挑战「千锤百炼」的
       // 整页失效只需在这一处折掉（凝滞/双生隙/聚饵/势能核等派生量全部跟着归零）。
       // 注意：碎片「等级」本身不受影响——「碎片共鸣」挑战的进度读数照样准确。
-      return (getShardBonuses()[stat] || 0) * getHoundBonusMult();
+      return (getShardBonuses()[stat] || 0) * getHoundBonusMult() * getUniverseMult("shard");
     }
     // 分裂的四个出口，避免每处调用各自算一遍
     function getShardProgressMult() { return 1 + getShardBonus("progress"); }
@@ -5858,9 +6561,9 @@
     function getHoundExpBonus() {
       const bait = getBaitBonuses();
       // 挑战环境可能压低猎犬成长（例：「猎群远征」×0.6）
-      // V0.59：全局加成（展示柜）也作用于猎犬经验——「本源加成」那一项是另一条来源，没重复。
+      // V0.58：全局加成（展示柜）也作用于猎犬经验——「本源加成」那一项是另一条来源，没重复。
       return (1 + getOriginBonus()) * (1 + (bait.houndexp || 0)) * getShardExpMult() *
-        getHoundGlobalMult() * getChallengeEnvMult("houndExpMult");
+        getHoundGlobalMult() * getChallengeEnvMult("houndExpMult") * getUniverseMult("houndExp");
     }
 
     // 寿命：普通（tier 0）基础 20 点，品质越高越长
@@ -5969,7 +6672,8 @@
       const speedMult = bigMul(
         getUpgradeFactor("speed", save.upgrades.speed),
         (1 + getPartBonus("claw")) * (1 + transcendedBonus) * (1 + achv.speed) *
-        (1 + chv.speed) * chGlobal * (1 + (bait.speed || 0)) * globalBait * getShardProgressMult() * speedEnv);
+        (1 + chv.speed) * chGlobal * (1 + (bait.speed || 0)) * globalBait * getShardProgressMult() * speedEnv *
+        getUniverseMult("speed"));
       // 开局顺风只乘在【在线实时速度】上。baseSpeed 是去掉顺风的持久速度，
       // 离线结算读的是 baseSpeed——否则「刚被捕获就把页面关掉」会白拿 12 小时的 ×3 收益。
       const baseSpeed = bigMul(SPEED_BASE, speedMult);
@@ -5978,7 +6682,8 @@
       const dustMult = bigMul(
         getUpgradeFactor("dust", save.upgrades.dust),
         (1 + getPartBonus("fang")) * (1 + transcendedBonus) * (1 + achv.dust) *
-        (1 + chv.dust) * chGlobal * (1 + (bait.dust || 0)) * globalBait * getShardDustMult());
+        (1 + chv.dust) * chGlobal * (1 + (bait.dust || 0)) * globalBait * getShardDustMult() *
+        getUniverseMult("dust"));
       const multiplier = dustMult;
       const riskReduction = getNormalReduction();
       const rewardBonus = getPartBonus("hourglass");
@@ -6031,10 +6736,11 @@
       return (1 + (bait.origin || 0)) * (1 + (bait.global || 0));
     }
     function calcOriginGain(base) {
-      // V0.59：超越展示柜的「全局加成」也吃在本源收益上（原先只作用于尘埃与进度速度）。
+      // V0.58：超越展示柜的「全局加成」也吃在本源收益上（原先只作用于尘埃与进度速度）。
       // 注意别和 getBaitOriginMult() 里的诱饵「全局收益」搞混：那是另一条独立来源。
       const v = bigOf(base * (1 + getAchievementBonus("origin")) * getBaitOriginMult()
-        * (1 + getTranscendedBonus()) * getShardOriginMult() * (1 + getChallengeBonus("origin")));
+        * (1 + getTranscendedBonus()) * getShardOriginMult() * (1 + getChallengeBonus("origin"))
+        * getUniverseMult("origin"));
       return bigCmp(v, 1) < 0 ? bigOf(1) : bigFloor(v);
     }
     function getCost(type, level) {
@@ -6086,10 +6792,13 @@
     }
     // 猎影期间赚到的尘埃先存进独立池子（落袋），被捕获时不会被清零
     function creditDust(amount) {
-      const add = bigOf(amount);
+      let add = bigOf(amount);
       if (add.m === 0) return;
+      // 宇宙「尘埃数量指数」：入账前先取幂（尘埃数量 ^N）
+      const powMult = getDustPowMult();
+      if (powMult > 1) add = bigPow(add, powMult);
       if (isHunting()) save.huntPool = bigAdd(save.huntPool, add);
-      else save.dust = bigAdd(save.dust, add);
+      else save.dust = bigMin(bigAdd(save.dust, add), getDustCap());
     }
     function startHunt() {
       if (isCaptured) { showToast("被捕获中，无法挑衅。"); return; }
@@ -6134,13 +6843,16 @@
       if (!(isAutoUnlocked("harvest") && save.auto.harvest)) return false;
       if (save.progress < 100) return false;
       const cycle = getCycleTimeSeconds();
-      return isFinite(cycle) && cycle > 0 && cycle < CONTINUOUS_HARVEST_CYCLE_S;
+      // cycle === 0 是「速度溢出、单圈瞬时完成」的合法情形，也要按持续收割处理；
+      // 否则会掉进「每帧结算一整圈再把进度归零」的退化分支（进度条看着永远是空的）。
+      return isFinite(cycle) && cycle >= 0 && cycle < CONTINUOUS_HARVEST_CYCLE_S;
     }
-    // 持续收割的每秒尘埃：满档单次收益 ÷ 单圈耗时 —— 与「归零重爬」的平均收益严格相等
+    // 持续收割的每秒尘埃：满档单次收益 ÷ 单圈耗时 —— 与「归零重爬」的平均收益严格相等。
+    // 全程走大数、不经过 cycle（cycle 在速度溢出时会变成 0），避免除零得到 Infinity。
     function getContinuousHarvestPerSecond() {
-      const cycle = getCycleTimeSeconds();
-      if (!isFinite(cycle) || cycle <= 0) return BIG_ZERO;
-      return bigDiv(bigMul(calculateRewardAt(100), getAutoHarvestMult()), cycle);
+      const perSecond = getProgressPerSecond();
+      if (bigIsZero(perSecond)) return BIG_ZERO;
+      return bigDiv(bigMul(bigMul(calculateRewardAt(100), getAutoHarvestMult()), perSecond), bigOf(100));
     }
     function getHarvestSpeedCost(level) {
       const lv = level === undefined ? (getOriginShop().harvestSpeed || 0) : level;
@@ -6235,9 +6947,13 @@
     }
 
     // 单圈耗时（秒）：用于升级卡的即时反馈
+    // ⚠️ 速度极大时 bigNum() 会溢出成 Infinity（cycle 被算成 0），那会让「持续收割」判定失效、
+    // 进度条每帧被归零、收益也退化成「每帧只结算一圈」。所以超过 1e305 圈/秒一律按 cycle = 0
+    // 处理（语义仍是「瞬间完成」），由 isContinuousHarvest() 放行、收益走对数空间的连续公式。
     function getCycleTimeSeconds() {
       const perSecond = getProgressPerSecond();
       if (bigIsZero(perSecond)) return Infinity;
+      if (bigLog10(perSecond) > 305) return 0;
       return 100 / bigNum(perSecond);
     }
 
@@ -6283,7 +6999,7 @@
       hound.lifespan = maxLifespan;
       return hound;
     }
-    // 全局加成对猎犬的倍率（V0.59）：超越展示柜的「全局加成」现在作用于**全部收益**，
+    // 全局加成对猎犬的倍率（V0.58）：超越展示柜的「全局加成」现在作用于**全部收益**，
     // 猎犬这一侧包含「猎犬经验获取」与「猎犬四维（攻 / 血 / 防 / 攻速）」。
     // 纸面战力（houndPower）与战斗副本都用这一个函数，保证「能不能打过」的显示与实际战斗一致。
     function getHoundGlobalMult() {
@@ -6591,7 +7307,7 @@
 
       // 碎片加成只作用在本场战斗的副本上，不回写存档里的猎犬本体——
       // 否则「永久属性 × 碎片倍率」会在每次升级时被反复复利放大。
-      // 全局加成（V0.59）则不同：它是永久加成，纸面战力也算进去，所以两处都乘。
+      // 全局加成（V0.58）则不同：它是永久加成，纸面战力也算进去，所以两处都乘。
       const bh = structuredCloneSafe(hound);
       const gMult = getHoundGlobalMult();
       bh.atk = Math.max(1, Math.round(bh.atk * getShardHoundMult("atk") * gMult));
@@ -6611,6 +7327,8 @@
         rampCount: 0,
         // 已进行的回合数（任意一方每出一次手 +1），到 BATTLE_MAX_ROUNDS 强制脱离
         rounds: 0,
+        // 本场累计统计：逐次出手不再单独记日志，改用这些数字在「战况快照」里交代
+        allyHits: 0, allyDmg: 0, allyCrits: 0, enemyHits: 0, enemyDmg: 0,
         logs: [],
         over: false,
         tickCount: 0,
@@ -6679,7 +7397,9 @@
       // 闸门累积与行动预算同步乘以倍率，等价于「一个 tick 里连跑 speed 次结算」，
       // 既加快了战斗推进，也保持了「上限 > 每 tick 实际出手数」这条不变量。
       const speed = b.autoHunt ? getHuntSpeedMult() : 1;
-      const actionBudget = MAX_BATTLE_ACTIONS_PER_TICK * speed;
+      // 自动狩猎把每 tick 的行动预算压低（见 AUTO_HUNT_ACTIONS_PER_TICK），
+      // 买「狩猎速度」时预算同步成倍放大，加速依然有效。
+      const actionBudget = (b.autoHunt ? AUTO_HUNT_ACTIONS_PER_TICK : MAX_BATTLE_ACTIONS_PER_TICK) * speed;
       b.allyGauge += b.hound.aspd / 10 * speed;
       b.enemyGauge += b.enemy.aspd / 10 * speed;
 
@@ -6714,6 +7434,9 @@
         b.rounds++;
         if (useAlly) { allyAttack(); b.allyGauge -= ACTION_GAUGE_MAX; }
         else { enemyAttack(); b.enemyGauge -= ACTION_GAUGE_MAX; }
+        // 战况快照：每 BATTLE_SNAPSHOT_EVERY 回合记一条血量对比，
+        // 取代原来「每一次出手都记一条」的日志（那会在一瞬间刷出几十条）。
+        if (!b.over && b.rounds % BATTLE_SNAPSHOT_EVERY === 0) battleSnapshot();
         if (b.over) break;
         // 回合保险丝：打到上限还没分出胜负就强制脱离（判平局，见 endBattle）
         if (b.rounds >= BATTLE_MAX_ROUNDS) { endBattle(false, "timeout"); break; }
@@ -6721,6 +7444,9 @@
       renderBattle();
       if (b.over) stopBattleLoop();
     }
+    // 逐次出手不再单独记日志（一瞬间能刷出几十条、把战斗过程彻底淹没），
+    // 只把数据累加进统计，由 battleSnapshot() 按回合间隔输出「战况快照」，
+    // 结果由 endBattle() 汇总。
     function allyAttack() {
       const b = activeBattle;
       if (!b) return;
@@ -6728,14 +7454,19 @@
       const crit = Math.random() < 0.12;
       const final = crit ? Math.round(dmg * 1.8) : dmg;
       b.enemy.hp -= final;
-      logBattle(`${b.hound.name} 攻击，造成 ${formatNumber(final)} 伤害${crit ? "（暴击）" : ""}`, "good");
+      b.allyHits = (b.allyHits || 0) + 1;
+      b.allyDmg = (b.allyDmg || 0) + final;
+      if (crit) b.allyCrits = (b.allyCrits || 0) + 1;
 
-      // 「势能核」：每出手一次，本场攻击速度再乘 1.1，层数上限 = 碎片等级
+      // 「势能核」：每出手一次，本场攻击速度再乘 1.1，层数上限 = 碎片等级。
+      // 只在「叠满」的那一刻报一条，避免每次起振都刷屏。
       const rampMax = getShardRampStacks();
       if (rampMax > 0 && (b.rampCount || 0) < rampMax) {
         b.rampCount = (b.rampCount || 0) + 1;
         b.hound.aspd = b.hound.aspd * SHARD_RAMP_STEP;
-        logBattle(`势能核起振 ×${b.rampCount}，本场攻速提升至 ${Math.round(b.hound.aspd)}。`, "sys");
+        if (b.rampCount === rampMax) {
+          logBattle(`势能核已叠满 ×${b.rampCount}，本场攻速提升至 ${formatNumber(Math.round(b.hound.aspd))}。`, "sys");
+        }
       }
 
       if (b.enemy.hp <= 0) { b.enemy.hp = 0; endBattle(true); }
@@ -6745,8 +7476,20 @@
       if (!b) return;
       const dmg = Math.max(1, Math.round(b.enemy.atk - b.hound.def * 0.6));
       b.hound.hp -= dmg;
-      logBattle(`${b.enemy.name} 反击，造成 ${formatNumber(dmg)} 伤害`, "bad");
+      b.enemyHits = (b.enemyHits || 0) + 1;
+      b.enemyDmg = (b.enemyDmg || 0) + dmg;
       if (b.hound.hp <= 0) { b.hound.hp = 0; endBattle(false); }
+    }
+    // 战况快照：一条日志交代双方血量与累计输出，取代逐次出手的刷屏日志。
+    function battleSnapshot() {
+      const b = activeBattle;
+      if (!b) return;
+      logBattle(
+        `⚔ 第 ${b.rounds} 回合 · ${b.hound.name} ${formatNumber(Math.max(0, Math.round(b.hound.hp)))}/${formatNumber(b.hound.maxHp)}` +
+        ` · ${b.enemy.name} ${formatNumber(Math.max(0, Math.round(b.enemy.hp)))}/${formatNumber(b.enemy.maxHp)}` +
+        `（我方出手 ${b.allyHits || 0} 次 · 累计 ${formatNumber(b.allyDmg || 0)} 伤害${b.allyCrits ? ` · 暴击 ${b.allyCrits}` : ""}）`,
+        "sys"
+      );
     }
     function logBattle(text, type) {
       const b = activeBattle;
@@ -7104,6 +7847,8 @@
       renderParadox();
       renderTranscended();
       renderInertia();
+      renderPossibility();
+      renderPlayTime();
       saveGame();
     }
 
@@ -7148,6 +7893,12 @@
         progress < 80 ? "var(--gold)" : "var(--red)";
 
       setText("dust", formatNumber(save.dust));
+      // 尘埃上限（可能性 V0.61）：顶到天花板时在标签上点明，免得玩家以为收益坏了
+      {
+        const cap = getDustCap();
+        const atCap = bigCmp(save.dust, cap) >= 0;
+        setText("dustLabel", atCap ? `当前时间尘埃（已达上限 ${formatNumber(cap)}）` : "当前时间尘埃");
+      }
       setText("progressText", `${progress.toFixed(1)}%`);
       setStyle("progressFill", "width", `${progress}%`);
       setStyle("progressFill", "background", `linear-gradient(90deg, ${progressColor}, ${progressColor})`);
@@ -7369,6 +8120,14 @@
         const def = PART_DEFINITIONS[key];
         if (!def) return "";
         const equipped = save.equipped.includes(key);
+        const eff = getPartEffectiveLevel(key);
+        const cap = getPartCap(key);
+        const baseCap = PART_BONUS_CAP[key] || 100;
+        const rate = getPartOverflowRate(key);
+        const soft = rate < 0.999;
+        const capNote = cap > baseCap + 1e-6
+          ? `软上限 Lv.${cap.toFixed(0)}（含基因 ×${(cap / baseCap).toFixed(2)}）`
+          : `软上限 Lv.${cap.toFixed(0)}`;
         return `
           <article class="part-card ${equipped ? "equipped" : ""}">
             ${equipped ? '<span class="equipped-tag">已装备</span>' : ""}
@@ -7377,7 +8136,11 @@
             <p>
               Lv.${part.level}<br>
               ${def.description}<br>
-              <strong>${def.format(def.value * part.level)}</strong>
+              <strong>${def.format(def.value * eff)}</strong><br>
+              ${soft
+                ? `<small class="part-soft">${capNote}</small><br>` +
+                  `<small class="part-soft">超出部分递减 · 每级 ≈ ${(rate * 100).toFixed(0)}% 效率 · 等效 Lv.${eff.toFixed(0)}</small>`
+                : `<small class="part-soft" style="opacity:.6">${capNote}</small>`}
             </p>
             <button class="${equipped ? "danger-button" : "secondary-button"}" data-equip="${key}">
               ${equipped ? "卸下部件" : "装备部件"}
@@ -8174,6 +8937,167 @@
       }).join(""));
     }
 
+    // ---- 可能性页（V0.61）：多元宇宙 / 基因改造 ----
+    let possSubTab = "multiverse";
+    function switchPossibilitySub(name) {
+      if (name !== "multiverse" && name !== "gene") name = "multiverse";
+      possSubTab = name;
+      const isGene = name === "gene";
+      el("possSubMultiverse").classList.toggle("active", !isGene);
+      el("possSubGene").classList.toggle("active", isGene);
+      el("subTabMultiverse").classList.toggle("active", !isGene);
+      el("subTabGene").classList.toggle("active", isGene);
+      renderPossibility();
+    }
+
+    function renderPossibilityMultiverse() {
+      const p = getPossibility();
+      const capText = formatNumber(getDustCap());
+      setText("mvStatusText", `进入次数 ${p.entries || 0} · 当前尘埃上限 ${capText}`);
+      // 折算预览：进入会把当前进度换成多少基因修饰点数（让玩家看得见代价与收益）
+      const breakdown = getWipeScoreBreakdown();
+      const modGain = breakdown.reduce((a, b) => a + b.value, 0);
+      const breakdownText = breakdown.length
+        ? breakdown.map(it => `${it.label} ${it.value}`).join(" · ")
+        : "当前没有可折算的进度";
+      const wipeText =
+        `进入后将<b style="color: var(--red);">清空整个轮回</b>：尘埃 / 升级 / 部件 / 时间碎片 / 诱饵 / 猎犬 / 本源 / 本源商店全部归零，` +
+        `<b>挑战进度也一并清空（挑战要重打）</b>；只保留<b>成就、自动化开关与可能性本身</b>。`;
+
+      // 已刷出候选宇宙：让玩家挑一个进入
+      if (p.pending && p.pending.length) {
+        const curLine = p.universe && p.universe.name
+          ? `<div class="mv-current">当前栖息：<b>🌌 ${p.universe.name}</b>（${(p.universe.mods || []).map(m => formatMod(m)).join(" · ")}）</div>`
+          : "";
+        setHTML("mvBody", `
+          <p class="possibility-note">宇宙在你面前展开——<b style="color: var(--purple);">选择一个进入</b>。${wipeText}<br>
+          作为交换：<b>+1 基因点数</b>，当前进度折算为 <b style="color: var(--cyan);">${modGain}</b> 点基因修饰点数。<br>
+          <span style="color: var(--muted);">折算明细：${breakdownText}</span><br>
+          <span style="color: var(--muted);">候选只有 ${p.pending.length} 个了：进去一个就少一个，用完才能刷新下一批。</span></p>
+          ${curLine}
+          <div class="universe-grid">
+            ${p.pending.map((u, i) => `
+              <div class="universe-card">
+                <div class="universe-name">🌌 ${u.name}</div>
+                <div class="universe-mods">${u.mods.map(m => `<div>${formatMod(m)}</div>`).join("")}</div>
+                <button class="primary-button" data-mv-choose="${i}">进入此宇宙</button>
+              </div>`).join("")}
+          </div>`);
+        return;
+      }
+
+      // 未解锁：展示门槛与代价
+      if (!p.multiverse) {
+        const afford = canAffordMultiverse();
+        setHTML("mvBody", `
+          <p class="possibility-note">
+            这个世界的尘埃被锁在 <b>${capText}</b> 的天花板下，怎么攒都突破不了。<br>
+            支付 <b style="color: var(--gold);">${formatNumber(bigFromLog10(MULTIVERSE_COST_E))}</b> 时间尘埃，可以撬开通往多元宇宙的门：
+            门后每次都会随机浮现 <b>4 个新宇宙</b>（每个宇宙 1~3 条正面加成，加成数值随进入次数越来越夸张）。<br>
+            ${wipeText}<br>
+            交换：<b>+1 基因点数</b> + 当前进度折算的<b>基因修饰点数</b>，
+            尘埃上限随之放宽到 <b>${formatNumber(bigFromLog10(MULTIVERSE_CAP_E))}</b>。
+          </p>
+          <div class="mv-actions">
+            <button class="primary-button" data-mv-begin="1" ${afford ? "" : "disabled"}>支付并窥探多元宇宙</button>
+            <span class="mv-cost">需要持有 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃（当前 ${formatNumber(save.dust)}）</span>
+          </div>`);
+        return;
+      }
+
+      // 已解锁、候选已用尽：展示当前宇宙 + 「开启新的一批」
+      const cur = p.universe && Array.isArray(p.universe.mods) && p.universe.mods.length
+        ? `<div class="mv-current">当前栖息：<b>🌌 ${p.universe.name}</b>（${p.universe.mods.map(m => formatMod(m)).join(" · ")}）</div>`
+        : `<div class="mv-current">你还没有栖息在任何宇宙里。</div>`;
+      const afford = canAffordMultiverse();
+      setHTML("mvBody", `
+        <p class="possibility-note">
+          尘埃上限已放宽到 <b>${capText}</b>。候选宇宙已经<b>用完</b>——再付 <b style="color: var(--gold);">${formatNumber(bigFromLog10(MULTIVERSE_COST_E))}</b> 尘埃，
+          多元宇宙会刷出<b>新的一批 4 个</b>候选。${wipeText}<br>
+          每次进入 <b>+1 点基因点数</b>，当前进度此刻可折算 <b style="color: var(--cyan);">${modGain}</b> 点基因修饰点数；
+          宇宙的随机数值也会随进入次数继续放大。<br>
+          <span style="color: var(--muted);">折算明细：${breakdownText}</span>
+        </p>
+        ${cur}
+        <div class="mv-actions">
+          <button class="primary-button" data-mv-begin="1" ${afford ? "" : "disabled"}>刷新新的一批宇宙</button>
+          <span class="mv-cost">需要持有 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃（当前 ${formatNumber(save.dust)}）</span>
+        </div>`);
+    }
+
+    function renderPossibilityGene() {
+      const p = getPossibility();
+      const genes = Array.isArray(p.genes) ? p.genes : [];
+      pruneGeneSelection();
+      const mp = p.modPoints || 0;
+      setText("geneStatusText",
+        `基因点数 ${p.genePoints || 0} · 基因 ${genes.length} / ${GENE_MAX} · 修饰点 ${mp}`);
+      const canAdd = (p.genePoints || 0) >= 1 && genes.length < GENE_MAX;
+      const pickedCount = geneSelection.size;
+
+      const list = genes.length
+        ? `
+        <div class="gene-tools">
+          <button class="secondary-button" data-gene-pick-all="1">${pickedCount === genes.length ? "取消全选" : "全选"}</button>
+          <button class="danger-button" data-gene-remove-picked="1" ${pickedCount ? "" : "disabled"}>移除选中（${pickedCount}）</button>
+          <span class="mv-cost">点每条基因左边的方框可以多选；移除会把该基因与已投入的点数一起销毁（<b style="color: var(--red, #e0554f);">不退还</b>），删前还会再确认一次。</span>
+        </div>
+        <div class="gene-list">${genes.map((g, i) => {
+            const t = geneTierOf(g);
+            const picked = geneSelection.has(i);
+            const cap = geneLevelCap(g);
+            const atCap = Math.floor(g.level || 1) >= cap;
+            const c1 = geneUpgradeCost(g);
+            const c10 = geneUpgradeBulkCost(g, 10);
+            const c100 = geneUpgradeBulkCost(g, 100);
+            const inv = geneInvested(g);
+            const upBtn = (times, label, cost, enabled) =>
+              `<button class="secondary-button gene-up" data-gene-upgrade="${i}" data-gene-times="${times}" ` +
+              `${enabled ? "" : "disabled"} title="${cost > 0 ? `共花费 ${cost} 点` : "需要更多修饰点"}">${label}</button>`;
+            return `
+            <div class="gene-item${picked ? " picked" : ""}">
+              <button class="gene-pick${picked ? " on" : ""}" data-gene-pick="${i}" title="选中以便批量移除">${picked ? "☑" : "☐"}</button>
+              <div class="gene-main">
+                <span class="gene-tier" style="color:${t.color}">${t.name}</span>
+                <span class="gene-name">${g.label}</span>
+                <span class="gene-val">×${geneEffectText(g)}</span>
+                <span class="gene-lv">Lv.${g.level}${atCap ? "（满级）" : ""} · 每级 ×${t.mult.toFixed(2)}${inv > 0 ? ` · 已投入 ${inv} 点` : ""}</span>
+              </div>
+              <div class="gene-ops">
+                ${upBtn(1, "×1", c1, !atCap && mp >= c1)}
+                ${upBtn(10, "×10", c10, !atCap && mp >= c10)}
+                ${upBtn(100, "×100", c100, !atCap && mp >= c100)}
+                ${upBtn("max", "最大", c1, !atCap && mp >= c1)}
+                <button class="secondary-button gene-del" data-gene-remove="${i}" title="移除后【不退还】任何点数：将失去 1 基因点${inv > 0 ? ` + 已投入的 ${inv} 修饰点` : ""}">移除</button>
+              </div>
+            </div>`;
+          }).join("")}</div>`
+        : `<div class="gene-empty">还没有基因。植入第一条吧——它永久作用于所有宇宙，进入任何宇宙都带着。</div>`;
+      setHTML("geneBody", `
+        <p class="possibility-note">
+          每进入一次多元宇宙获得 <b>1 点基因点数</b>；把点数植入成基因，基因有<b>六个稀有度档位</b>
+          （普通 / 优秀 / 稀有 / 史诗 / 传说 / 神话）。<br>
+          被清空的进度会折算成 <b>基因修饰点数</b>，用来给基因<b>强化</b>：<b style="color: var(--purple);">每 +1 级是乘法</b>
+          （倍率 = 档位倍率<sup>等级</sup>），而强化花费<b>与稀有度无关</b>——所以
+          <b style="color: var(--purple);">强化高档位基因的性价比全面优于普通基因</b>，值得优先投。
+          ⚠️ 移除基因<b style="color: var(--purple);">不退还任何点数</b>：该基因的 1 基因点数与它已投入的修饰点数都会一并失去——
+          基因是随机 roll 出来的，所以植入之前想清楚、强化之前也算清楚。
+        </p>
+        <div class="gene-points">基因点数：<b>${p.genePoints || 0}</b> · 基因修饰点数：<b style="color: var(--cyan);">${mp}</b></div>
+        <div class="mv-actions">
+          <button class="primary-button" data-gene-add="1" ${canAdd ? "" : "disabled"}>植入基因（1 点）</button>
+          ${canAdd ? "" : `<span class="mv-cost">${genes.length >= GENE_MAX ? `已达上限 ${GENE_MAX} 条` : "基因点数不足"}</span>`}
+        </div>
+        ${list}`);
+    }
+
+    function renderPossibility() {
+      // 页面未解锁时不渲染（页签本身也是隐藏的）
+      if (!isPossibilityUnlocked()) return;
+      renderPossibilityMultiverse();
+      renderPossibilityGene();
+    }
+
     function renderTranscended() {
       const list = save.transcendedHounds;
       setText("transcendedCountText", `${list.length} 只`);
@@ -8759,7 +9683,8 @@
 
       // 成就「静默十分钟」：普通升级不消耗尘埃。
       // 但「本次升级所需的尘埃」仍必须 ≤ 当前持有，否则依然无法升级——
-      // 只是这一笔尘埃不会被扣走，也不会计入本循环消耗。
+      // 只是这一笔尘埃不会被扣走。⚠️ 但「本循环消耗」照常累加：
+      // 它是「成长能量 → 每次被捕获加多少部件等级」的来源，不累加会让部件成长整个停摆（V0.63 修）。
       if (isFreeNormalUpgrade()) {
         const plan = isMax ? getMaxPlan(type) : getBulkPlan(type, Number(save.bulkLevel));
         if (plan.bought <= 0) {
@@ -8767,7 +9692,8 @@
           return;
         }
         save.upgrades[type] += plan.bought;
-        showToast(`${names[type]} +${plan.bought} 级（不消耗，未扣除 ${formatNumber(plan.total)} 尘埃），Lv.${save.upgrades[type]}`);
+        save.currentSpent = bigAdd(save.currentSpent, plan.total);
+        showToast(`${names[type]} +${plan.bought} 级（不扣尘埃，但照常计入本循环消耗 ${formatNumber(plan.total)}），Lv.${save.upgrades[type]}`);
         showUpgradeEffect(type, before);
         render();
         return;
@@ -8843,7 +9769,7 @@
       save.upgrades = { speed: 0, dust: 0 };
       save.currentSpent = 0;
       // 猎影收益落袋：必须在清零之后并入，否则会被这次捕获一起抹掉
-      save.dust = bigAdd(save.dust, save.huntPool);
+      save.dust = bigMin(bigAdd(save.dust, save.huntPool), getDustCap());
       save.huntPool = 0;
       saveGame(true);
 
@@ -8870,6 +9796,8 @@
       const rawMs = Date.now() - last;
       if (!isFinite(rawMs) || rawMs < OFFLINE_MIN_MS) return null;
       const cappedMs = Math.min(rawMs, OFFLINE_MAX_MS);
+      // 离线挂机时长（统计的是真实离开时长，不是被上限截过的收益时长）
+      save.offlineMs = (save.offlineMs || 0) + rawMs;
       const stats = getStats();
       // 用 baseSpeed（不含开局顺风）：顺风只按在线时长衰减，离线不该吃到它
       const perSecond = bigMul(stats.baseSpeed, 0.1);    // 每秒完成的圈数
@@ -8877,7 +9805,7 @@
       const cycles = bigMul(perSecond, cappedMs / 1000);
       const gained = bigFloor(bigMul(calculateRewardRaw(100), bigMul(cycles, OFFLINE_EFFICIENCY)));
       if (bigIsZero(gained)) return null;
-      save.dust = bigAdd(save.dust, gained);
+      save.dust = bigMin(bigAdd(save.dust, gained), getDustCap());
       return { elapsedMs: rawMs, cappedMs: cappedMs, gained: gained, cycles: cycles };
     }
     function showOfflineModal(info) {
@@ -9240,6 +10168,7 @@
       if (name === "paradox") renderParadox();
       if (name === "bait") renderBait();
       if (name === "challenge") renderChallenge();
+      if (name === "possibility") renderPossibility();
     }
 
     on("harvestButton", () => harvest());
@@ -9350,6 +10279,18 @@
     // 挑战：进入（确认弹窗）/ 退出
     delegate("challengeList", "[data-challenge-start]", btn => openChallengeConfirm(btn.dataset.challengeStart));
     delegate("challengeList", "[data-challenge-quit]", () => quitChallenge());
+
+    // ===== 可能性（V0.61）：子页签 / 多元宇宙 / 基因改造 =====
+    on("subTabMultiverse", () => switchPossibilitySub("multiverse"));
+    on("subTabGene", () => switchPossibilitySub("gene"));
+    delegate("mvBody", "[data-mv-begin]", () => beginMultiverseEntry());
+    delegate("mvBody", "[data-mv-choose]", btn => chooseMultiverseUniverse(Number(btn.dataset.mvChoose)));
+    delegate("geneBody", "[data-gene-add]", () => addGene());
+    delegate("geneBody", "[data-gene-pick]", btn => toggleGenePick(Number(btn.dataset.genePick)));
+    delegate("geneBody", "[data-gene-pick-all]", () => toggleGenePickAll());
+    delegate("geneBody", "[data-gene-remove-picked]", () => removeSelectedGenes());
+    delegate("geneBody", "[data-gene-upgrade]", btn => upgradeGene(Number(btn.dataset.geneUpgrade), btn.dataset.geneTimes));
+    delegate("geneBody", "[data-gene-remove]", btn => removeGeneAt(Number(btn.dataset.geneRemove)));
     on("challengeQuit", quitChallenge);
     on("challengeStartCancel", () => {
       pendingChallengeId = null;
@@ -9412,9 +10353,11 @@
         if (free) {
           // 不消耗模式：与手动升级同一套规则——本次升级所需尘埃仍须 ≤ 当前持有，
           // 只是不扣除尘埃。买满当前可支付的档位后自然停下。
+          // ⚠️ 「本循环消耗」照常累加（成长能量 / 部件成长的来源），V0.63 修。
           const plan = getMaxPlan(type);
           if (plan.bought <= 0) return;
           save.upgrades[type] += plan.bought;
+          save.currentSpent = bigAdd(save.currentSpent, plan.total);
           return;
         }
         const plan = getMaxPlan(type);
@@ -9594,6 +10537,8 @@
 
       // 连续生存计时（被捕获时归零）
       save.survivalSeconds = (save.survivalSeconds || 0) + dtSeconds;
+      // 在线游玩时长（纯统计，设置面板里展示）
+      save.playMs = (save.playMs || 0) + dtSeconds * 1000;
       // 开局顺风按【在线时长】衰减，被捕获时由 capture() 清零重来。
       // 封顶到「当前上限时长」即视为结束（上限会被被捕获次数削弱，也可能被「长流」碎片拉长）。
       {
