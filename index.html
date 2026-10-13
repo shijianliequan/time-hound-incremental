@@ -2343,7 +2343,7 @@
         <p class="eyebrow">CHRONOLOGY / SURVIVAL</p>
         <h1>时间猎犬增量</h1>
         <p class="subtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
-        <span class="version-badge" id="versionBadge" title="游戏版本">V0.67</span>
+        <span class="version-badge" id="versionBadge" title="游戏版本">V0.69</span>
       </div>
 
       <div class="header-stats">
@@ -3305,7 +3305,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.67";
+    const GAME_VERSION = "V0.69";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -3388,6 +3388,9 @@
     const SILENT_SURVIVE_SECONDS = 600;
     // 诱饵自然生成：每秒 1/500 概率落下一枚
     const BAIT_DROP_PER_SECOND = 1 / 500;
+    // 每秒掉落个数的硬上限（V0.69：由 1 放宽到 5，给「诱饵爆率」基因留出空间；
+    // 同时挡住基因强化到极高等级时把概率顶成天文数字——虽然 tickBaitDrop 还有 20/帧的保险丝）
+    const BAIT_DROP_CHANCE_CAP = 5;
     // 掉落品质权重（普通 → 传说），品质越高越稀有
     const BAIT_DROP_WEIGHTS = [60, 25, 10, 4, 1];
     // 成就「诱饵收藏家」的门槛：累计自然掉落 100 枚（1/500 每秒 → 约 14 小时起步）
@@ -3449,6 +3452,13 @@
     const TRANSCEND_TOP_TIER_MULT_STEP = 3.0; // 神话之上每高一级追加的倍率
     // 本源加成上限：与全局加成同源，每级按百分比相加（不再每级加固定数值）
     const TRANSCEND_ORIGIN_CAP_PCT_PER_LEVEL = 0.005;
+    // ⚠️ V0.69：回归加成原本是「Σ(回归等级 × 品质倍率)」的纯线性求和、**毫无上限**。
+    //    一旦开放「自动悖论」，回归次数会持续堆积，这一项能把全局加成与本源加成上限一起顶到天上。
+    //    现在给它一道软上限（曲线形态与部件软上限完全一致，见 softCapValue）：
+    //      原始量 ≤ 拐点 → 满效率原样计入；超出部分按对数继续增长（永不归零、也没有硬顶），
+    //      只是每一点越来越不值钱。想整体放松/收紧只改这两个数。
+    const TRANSCEND_SOFT_CAP = 15;   // 拐点：原始量 15 = 全局加成 +1500%
+    const TRANSCEND_SOFT_K = 2;      // 衰减缓急（越大越慢，→∞ 退化为纯线性）
 
     // ===== 时间惯性：用展示柜猎犬喂养的乘法加成 =====
     const INERTIA_UNLOCK_COST = 50000;   // 解锁消耗的时间本源
@@ -4304,6 +4314,16 @@
     // 软上限被基因放大时的保险丝（防止连乘溢出成 Infinity）
     const PART_CAP_MULT_MAX = 1e9;
 
+    // 通用「软上限」曲线（永恒部件有效等级 & 回归猎犬加成共用）：
+    //   x ≤ cap → 原样返回（满效率）
+    //   x > cap → cap × (1 + k·ln(1 + 超出/(k·cap)))
+    // 拐点处斜率恰为 1（无缝衔接）、严格单调递增、永不归零，也没有硬顶。
+    function softCapValue(x, cap, k) {
+      if (!isFinite(x) || x <= 0) return 0;
+      if (!(cap > 0) || x <= cap) return x;
+      return cap * (1 + k * Math.log(1 + (x - cap) / (k * cap)));
+    }
+
     // 该部件的软上限等级（基础值 × 基因/宇宙的「部件软上限」倍率）
     function getPartCap(type) {
       const base = PART_BONUS_CAP[type] || 100;
@@ -4314,16 +4334,12 @@
     }
     // 有效等级（超限部分递减折算）：
     //   等级 ≤ 软上限 → 原样计入（100% 效率，手感与旧版一致）
-    //   等级 > 软上限 → cap × (1 + k·ln(1 + 超出/cap/k))，在软上限处斜率恰好 = 1（无缝衔接），
-    //                    之后每级效率逐渐下降但始终为正（不是归零、也没有硬顶）。
+    //   等级 > 软上限 → 走通用软上限曲线（拐点处斜率恰好 = 1，之后每级递减但始终为正）
     function getPartEffectiveLevel(type) {
       const part = save.parts ? save.parts[type] : null;
       const lv = part && typeof part.level === "number" ? part.level : 0;
       if (lv <= 0) return 0;
-      const cap = getPartCap(type);
-      if (lv <= cap) return lv;
-      const k = PART_OVERFLOW_SOFTNESS;
-      return cap * (1 + k * Math.log(1 + (lv - cap) / (k * cap)));
+      return softCapValue(lv, getPartCap(type), PART_OVERFLOW_SOFTNESS);
     }
     // 超限部分的「当前每级效率」（0~1，展示用）
     function getPartOverflowRate(type) {
@@ -5246,7 +5262,13 @@
       { k: "shard",    label: "时间碎片强度", min: 1.05, max: 1.12 },
       { k: "bait",     label: "诱饵效果",     min: 1.05, max: 1.12 },
       // V0.66：乘法抬高永恒部件的「软上限等级」——部件被限住之后，这是唯一的突破口
-      { k: "partCap",  label: "部件软上限",   min: 1.05, max: 1.12 }
+      { k: "partCap",  label: "部件软上限",   min: 1.05, max: 1.12 },
+      // V0.69：三种「概率 / 峰值」类加成。
+      // ⚠️ 注意与上面两条的区别：「时间碎片强度」「诱饵效果」管的是数值大小，
+      //    而这三条管的是【掉不掉得下来】与「洪流能冲多高」，是新的维度。
+      { k: "shardDrop", label: "碎片爆率",   min: 1.06, max: 1.16 },
+      { k: "baitDrop",  label: "诱饵爆率",   min: 1.06, max: 1.16 },
+      { k: "rushPeak",  label: "洪流峰值",   min: 1.05, max: 1.14 }
     ];
     // 基因稀有度（V0.64，参考转盘/猎犬品质的六档）：越稀有基础倍率越高。
     // mult 是「1 级时的倍率」，也是强化时每级相乘的倍率（乘法成长 ⇒ 高档位天然更强）。
@@ -5425,7 +5447,7 @@
     // 进入所选宇宙：**清空整个轮回**（连挑战进度一起清，所以挑战要重打），
     // 只带走过：成就、自动化开关、可能性（含基因/点数）、显示偏好、时长统计。
     // 被清空的进度折算成基因修饰点数，另 +1 基因点数。
-    function performMultiverseEntry(choice, idx) {
+    function performMultiverseEntry(choice) {
       const p = getPossibility();
       const modGain = getWipeModPoints();
       // 先把本次进入的结果写进可能性（p 对象在重建存档时被原样带过去）
@@ -5434,11 +5456,9 @@
       p.modPoints = (p.modPoints || 0) + modGain;
       p.universe = { name: choice.name, mods: choice.mods };
       p.tabUnlocked = true;
-      // V0.63：只消耗「被选中的那一个」，其余候选保留（玩家不能靠重进来刷新候选）。
-      // 4 个用完（pending 清空）后再付 1E1000 才会刷新的一批。
-      const rest = Array.isArray(p.pending) ? p.pending.slice() : [];
-      if (typeof idx === "number" && idx >= 0 && idx < rest.length) rest.splice(idx, 1);
-      p.pending = rest.length ? rest : null;
+      // V0.68：选定一个宇宙之后，**其余候选全部消散**（不能接着挑剩下的）。
+      // 想换宇宙必须重新攒够 1E1000 尘埃、重新开启新的一批四个。
+      p.pending = null;
       p.multiverse = true;
 
       // 保留项：成就 / 自动化 / 可能性 / 显示偏好 / 时长统计
@@ -5486,7 +5506,9 @@
         showToast(`进入多元宇宙需要 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃。`);
         return;
       }
-      // 解锁与每次进入同价：花 1E1000 尘埃，刷出 4 个候选宇宙
+      // 解锁与每次进入同价：花 1E1000 尘埃、刷出 4 个候选宇宙。
+      // ⚠️ 有候选在场时这个函数会被守卫挡住（按钮也不会渲染），
+      //    所以「开启新的一批」只可能发生在上一批已消散（pending === null）之后。
       save.dust = bigSub(save.dust, bigFromLog10(MULTIVERSE_COST_E));
       p.multiverse = true;
       p.pending = rollMultiverseUniverses();
@@ -5503,8 +5525,11 @@
         `· 挑战进度一并清空（可能性页签保留，挑战要重打）\n` +
         `· 只保留：成就、自动化开关、可能性本身\n\n` +
         `作为交换：获得 1 点基因点数，清空的进度折算为约 ${modGain} 点基因修饰点数，` +
-        `并栖息于「${u.name}」。\n（尘埃上限放宽到 ${formatNumber(bigFromLog10(MULTIVERSE_CAP_E))}）`)) return;
-      const res = performMultiverseEntry(u, idx);
+        `并栖息于「${u.name}」。\n` +
+        `⚠️ 选定后其余 ${Math.max(0, (p.pending ? p.pending.length : 1) - 1)} 个候选宇宙会立刻消散——` +
+        `想换宇宙得重新攒够 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃、再开启新的一批。\n` +
+        `（尘埃上限放宽到 ${formatNumber(bigFromLog10(MULTIVERSE_CAP_E))}）`)) return;
+      const res = performMultiverseEntry(u);
       saveGame(true);
       logEvent("🌌", `进入宇宙「<b>${u.name}</b>」——第 ${res.entries} 次触碰可能性`, "purple");
       showToast(`已进入「<b>${u.name}</b>」：<b>+1</b> 基因点数 · <b>+${res.modGain}</b> 基因修饰点数`);
@@ -6117,9 +6142,13 @@
     }
 
     // ===== 诱饵掉落 =====
+    // 诱饵每秒掉落的期望个数。V0.69：挂上「诱饵爆率」基因/宇宙加成，
+    // 并把原来的硬上限 1（每秒最多 1 个）放宽到 BAIT_DROP_CHANCE_CAP——
+    // 否则幸运诱饵一旦把概率顶到 100%，新基因就完全没意义了。
     function getBaitDropChance() {
       const luck = getBaitBonuses().baitLuck;
-      return Math.min(1, BAIT_DROP_PER_SECOND * (1 + luck));
+      const raw = BAIT_DROP_PER_SECOND * (1 + luck) * getUniverseMult("baitDrop");
+      return Math.min(BAIT_DROP_CHANCE_CAP, raw);
     }
     function getBaitDropWeights() {
       const luck = getBaitBonuses().baitLuck;
@@ -6252,7 +6281,8 @@
     function getShardOriginMult() { return 1 + getShardBonus("origin"); }
     function getShardExpMult() { return 1 + getShardBonus("exp"); }
     function getShardXpMult() { return 1 + getShardBonus("shardXp"); }
-    function getShardDropMult() { return 1 + getShardBonus("shardDrop"); }
+    // 碎片掉率倍率。V0.69：挂上「碎片爆率」基因/宇宙加成（与「碎片强度」是两条独立的线）
+    function getShardDropMult() { return (1 + getShardBonus("shardDrop")) * getUniverseMult("shardDrop"); }
     function getShardAutoHarvestMult() { return 1 + getShardBonus("autoHarvest"); }
     // 时间洪流峰值放大：作用于「超出 ×1 的部分」，不影响时长
     function getShardRushMult() { return 1 + getShardBonus("rush"); }
@@ -6502,15 +6532,18 @@
       for (const th of save.transcendedHounds) {
         total += th.returnLevel * TRANSCEND_BASE_BONUS_PER_LEVEL * getTranscendQualityMult(th.qualityTier);
       }
+      // V0.69：软上限只作用在「原始总量」上；惯性与挑战的乘数照常叠加在外面
+      total = softCapValue(total, TRANSCEND_SOFT_CAP, TRANSCEND_SOFT_K);
       // getHoundBonusMult()：「千锤百炼」的整页失效开关（非挑战中恒为 1，等于没这一层）
       return total * getHoundBonusMult() * getInertiaMult();
     }
-    // 本源加成上限：每级按百分比相加，且与全局加成同源（同样吃品质倍率）
+    // 本源加成上限：每级按百分比相加，且与全局加成同源（同样吃品质倍率）——V0.69 起同样过软上限
     function getTranscendedOriginCapMult() {
       let pct = 0;
       for (const th of save.transcendedHounds) {
         pct += th.returnLevel * TRANSCEND_ORIGIN_CAP_PCT_PER_LEVEL * getTranscendQualityMult(th.qualityTier);
       }
+      pct = softCapValue(pct, TRANSCEND_SOFT_CAP, TRANSCEND_SOFT_K);
       // 上限被折掉后只剩基础 ORIGIN_SOFT_CAP——本源仍在，只是加成的天花板被拉回起点
       return 1 + pct * getHoundBonusMult() * getInertiaMult();
     }
@@ -6637,9 +6670,10 @@
     function getRushDurationCap() {
       return RUSH_DURATION_S * getShardRushDurationMult() * getRushDecayFactor();
     }
-    // 峰值 = 1 + (RUSH_MAX_MULT−1) ×「逆涌核」倍率 × 衰减系数（衰减到 0 时峰值回落到 ×1）
+    // 峰值 = 1 + (RUSH_MAX_MULT−1) ×「逆涌核」倍率 × 衰减系数 ×「洪流峰值」基因/宇宙加成
+    // （衰减到 0 时峰值回落到 ×1；V0.69 起多挂一层基因加成）
     function getRushPeakMult() {
-      return 1 + (RUSH_MAX_MULT - 1) * getShardRushMult() * getRushDecayFactor();
+      return 1 + (RUSH_MAX_MULT - 1) * getShardRushMult() * getRushDecayFactor() * getUniverseMult("rushPeak");
     }
     function getRushMult() {
       const cap = getRushDurationCap();
@@ -8973,14 +9007,14 @@
           <p class="possibility-note">宇宙在你面前展开——<b style="color: var(--purple);">选择一个进入</b>。${wipeText}<br>
           作为交换：<b>+1 基因点数</b>，当前进度折算为 <b style="color: var(--cyan);">${modGain}</b> 点基因修饰点数。<br>
           <span style="color: var(--muted);">折算明细：${breakdownText}</span><br>
-          <span style="color: var(--muted);">候选只有 ${p.pending.length} 个了：进去一个就少一个，用完才能刷新下一批。</span></p>
+          <span style="color: var(--muted);">⚠️ 四个宇宙里<b>只能选择一个</b>：选定之后，其余三个会立刻消散——想换宇宙就得重新攒够 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃、再开启新的一批。</span></p>
           ${curLine}
           <div class="universe-grid">
             ${p.pending.map((u, i) => `
               <div class="universe-card">
                 <div class="universe-name">🌌 ${u.name}</div>
                 <div class="universe-mods">${u.mods.map(m => `<div>${formatMod(m)}</div>`).join("")}</div>
-                <button class="primary-button" data-mv-choose="${i}">进入此宇宙</button>
+                <button class="primary-button" data-mv-choose="${i}" title="选定后其余 ${p.pending.length - 1} 个候选会立刻消散">进入此宇宙</button>
               </div>`).join("")}
           </div>`);
         return;
@@ -9012,15 +9046,16 @@
       const afford = canAffordMultiverse();
       setHTML("mvBody", `
         <p class="possibility-note">
-          尘埃上限已放宽到 <b>${capText}</b>。候选宇宙已经<b>用完</b>——再付 <b style="color: var(--gold);">${formatNumber(bigFromLog10(MULTIVERSE_COST_E))}</b> 尘埃，
-          多元宇宙会刷出<b>新的一批 4 个</b>候选。${wipeText}<br>
+          尘埃上限已放宽到 <b>${capText}</b>。上一批候选宇宙已经<b>消散</b>——想再窥探一次，得先重新攒够
+          <b style="color: var(--gold);">${formatNumber(bigFromLog10(MULTIVERSE_COST_E))}</b> 尘埃，
+          多元宇宙才会为你展开<b>新的一批 4 个</b>（同样<b>只能选一个</b>）。${wipeText}<br>
           每次进入 <b>+1 点基因点数</b>，当前进度此刻可折算 <b style="color: var(--cyan);">${modGain}</b> 点基因修饰点数；
           宇宙的随机数值也会随进入次数继续放大。<br>
           <span style="color: var(--muted);">折算明细：${breakdownText}</span>
         </p>
         ${cur}
         <div class="mv-actions">
-          <button class="primary-button" data-mv-begin="1" ${afford ? "" : "disabled"}>刷新新的一批宇宙</button>
+          <button class="primary-button" data-mv-begin="1" ${afford ? "" : "disabled"}>支付并开启新的一批宇宙</button>
           <span class="mv-cost">需要持有 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃（当前 ${formatNumber(save.dust)}）</span>
         </div>`);
     }
@@ -9108,7 +9143,16 @@
           `它们就会永久住进这里，把等级换成全局加成与本源加成上限。</div>`);
         return;
       }
-      setHTML("transcendedList", list.map(th => {
+      // V0.69：合计一旦被软上限压住，在列表顶部明说一句（每只卡片上显示的仍是它的纸面贡献）
+      const rawTotal = list.reduce((s, th) =>
+        s + (th.returnLevel || 0) * TRANSCEND_BASE_BONUS_PER_LEVEL * getTranscendQualityMult(th.qualityTier), 0);
+      const effTotal = softCapValue(rawTotal, TRANSCEND_SOFT_CAP, TRANSCEND_SOFT_K);
+      const capNote = effTotal < rawTotal - 1e-9
+        ? `<div class="mv-cost" style="margin: 10px 2px;">⚠️ 回归加成已触发软上限：纸面合计 ` +
+          `+${(rawTotal * 100).toFixed(2)}% → 实际 <b>+${(effTotal * 100).toFixed(2)}%</b>。` +
+          `此后每多一只猎犬的收益都会递减，但永远不会变成 0。</div>`
+        : "";
+      setHTML("transcendedList", capNote + list.map(th => {
         const qMult = getTranscendQualityMult(th.qualityTier);
         const bonus = (th.returnLevel * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult * 100).toFixed(2);
         return `
@@ -9206,13 +9250,19 @@
         rawBonus += (th.returnLevel || 0) * TRANSCEND_BASE_BONUS_PER_LEVEL * q;
         rawCapPct += (th.returnLevel || 0) * TRANSCEND_ORIGIN_CAP_PCT_PER_LEVEL * q;
       }
+      // V0.69：面板显示的是【软上限之后】的真实生效值；被压过时额外标出原始值
+      const rawBonus0 = rawBonus, rawCapPct0 = rawCapPct;
+      const effBonus = softCapValue(rawBonus, TRANSCEND_SOFT_CAP, TRANSCEND_SOFT_K);
+      const effCapPct = softCapValue(rawCapPct, TRANSCEND_SOFT_CAP, TRANSCEND_SOFT_K);
       setHTML("inertiaBoostText",
         save.transcendedHounds.length === 0
           ? `展示柜里还没有猎犬，惯性经验为 0。先让猎犬回归，惯性才会开始成长。`
-          : `回归猎犬的全局加成：<b style="color: var(--gold);">+${(rawBonus * 100).toFixed(2)}%</b>` +
-            ` → 经时间惯性放大后 <b style="color: var(--cyan);">+${(rawBonus * mult * 100).toFixed(2)}%</b>；` +
-            `本源加成上限：<b style="color: var(--gold);">+${(rawCapPct * 100).toFixed(2)}%</b>` +
-            ` → <b style="color: var(--cyan);">+${(rawCapPct * mult * 100).toFixed(2)}%</b>。`);
+          : `回归猎犬的全局加成：<b style="color: var(--gold);">+${(effBonus * 100).toFixed(2)}%</b>` +
+            `${effBonus < rawBonus0 - 1e-9 ? ` <span class="mv-cost">（原始 +${(rawBonus0 * 100).toFixed(2)}%，已受软上限压制）</span>` : ""}` +
+            ` → 经时间惯性放大后 <b style="color: var(--cyan);">+${(effBonus * mult * 100).toFixed(2)}%</b>；` +
+            `本源加成上限：<b style="color: var(--gold);">+${(effCapPct * 100).toFixed(2)}%</b>` +
+            `${effCapPct < rawCapPct0 - 1e-9 ? ` <span class="mv-cost">（原始 +${(rawCapPct0 * 100).toFixed(2)}%，已受软上限压制）</span>` : ""}` +
+            ` → <b style="color: var(--cyan);">+${(effCapPct * mult * 100).toFixed(2)}%</b>。`);
 
       setText("inertiaContribTotal", `合计 ${formatNumber(exp)} 点`);
       if (save.transcendedHounds.length === 0) {
