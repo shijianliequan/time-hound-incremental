@@ -93,6 +93,32 @@
       user-select: none;
     }
 
+    /* 更新日志（V0.90）：紧挨版本号的小按钮 + 弹窗 */
+    .version-row { display: flex; align-items: center; gap: 7px; margin-top: 5px; }
+    .version-row .version-badge { margin-top: 0; }
+    .log-button {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(17, 23, 34, 0.82);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      line-height: 1.2;
+      cursor: pointer;
+      user-select: none;
+    }
+    .log-button:hover { color: var(--cyan); border-color: var(--cyan); }
+    .log-box { text-align: left; }                 /* 宽度/边框/底色复用 .modal-box.wide */
+    .log-box > h2 { text-align: center; }
+    .log-box .big-icon { text-align: center; color: var(--cyan); }
+    .log-body { max-height: 58vh; overflow-y: auto; padding-right: 4px; }
+    .log-item { display: flex; gap: 9px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+    .log-item:last-child { border-bottom: none; }
+    .log-ver { flex: 0 0 52px; color: var(--cyan); font-size: 11px; font-weight: 800; letter-spacing: 0.06em; padding-top: 2px; }
+    .log-note { flex: 1; font-size: 12.5px; line-height: 1.6; color: var(--text); }
+
     .eyebrow {
       margin: 0 0 3px;
       color: var(--cyan);
@@ -2542,7 +2568,10 @@
         <p class="eyebrow">CHRONOLOGY / SURVIVAL</p>
         <h1>时间猎犬增量</h1>
         <p class="subtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
-        <span class="version-badge" id="versionBadge" title="游戏版本">V0.89</span>
+        <div class="version-row">
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.90</span>
+          <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
+        </div>
       </div>
 
       <div class="header-stats">
@@ -2563,6 +2592,11 @@
         <div class="stat-chip" id="transcendedChip" style="display: none;">
           <span>超越猎犬</span>
           <strong id="transcendedCount">0</strong>
+        </div>
+        <div class="stat-chip" id="genePointChip" style="display: none;"
+          title="基因点数：每进入一次多元宇宙获得 1 点（苦痛之路 / 里程碑还会乘算）。用来在「🧬 基因改造」植入基因、在「🧪 基因实验室」买升级。">
+          <span>基因点数</span>
+          <strong id="genePointTotal">0</strong>
         </div>
       </div>
     </header>
@@ -3211,7 +3245,9 @@
           <small id="baitSpinCount">已抽取 0 次</small>
         </div>
         <p class="inventory-note">
-          时间之流会自然漂来诱饵：<b>每秒有 1/500 的概率</b>生成一枚随机品质的诱饵，品质越高越稀有。
+          时间之流会自然漂来诱饵：<b>每秒有 1/500 的概率</b>生成一枚随机品质的诱饵，品质越高越稀有。<br>
+          <b style="color: var(--gold);">诱饵是永久加成</b>：被捕获、发动悖论、进入下一个宇宙，它都<b>原样保留</b>；
+          作为代价，它的掉落概率<b>恒定 1/500</b>，不受任何升级或加成影响。
           消耗诱饵转动转盘，指针停在哪一格，就得到哪一枚永久诱饵。
           <br>
           <b style="color: var(--green);">投入的诱饵品质越高，获得的永久诱饵等级越高；投入数量越多，抽奖次数越多。</b>
@@ -3504,6 +3540,18 @@
     </div>
   </div>
 
+  <div class="modal" id="changelogModal">
+    <div class="modal-box wide log-box">
+      <div class="big-icon">✎</div>
+      <h2>更新日志</h2>
+      <p class="stats-sub">从新到旧，只写大致改了什么。</p>
+      <div class="log-body" id="changelogBody"></div>
+      <div class="modal-actions">
+        <button class="primary-button" id="changelogClose">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal" id="paradoxModal">
     <div class="modal-box paradox">
       <div class="big-icon">◈</div>
@@ -3654,7 +3702,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.89";
+    const GAME_VERSION = "V0.90";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -3749,10 +3797,13 @@
     const SILENT_SURVIVE_SECONDS = 600;
     // 诱饵自然生成：每秒 1/500 概率落下一枚
     // V0.82：1/500 → 1/200（玩家反馈基础爆率太低；约 3.3 分钟一个，配合「诱饵爆率」加成会更快）
-    const BAIT_DROP_PER_SECOND = 1 / 200;
+    // V0.90（作者要求）：诱饵改为「永久保留、且完全独立」——
+    //   它不再被悖论 / 多元宇宙重置清空（见 wipeRunForNewCycle），代价是：
+    //   ① 掉率固定在 1/500（不吃任何加成）② 「诱饵爆率」这条加成线整条删除。
+    const BAIT_DROP_PER_SECOND = 1 / 500;
     // 每秒掉落个数的硬上限（V0.69：由 1 放宽到 5，给「诱饵爆率」基因留出空间；
     // 同时挡住基因强化到极高等级时把概率顶成天文数字——虽然 tickBaitDrop 还有 20/帧的保险丝）
-    const BAIT_DROP_CHANCE_CAP = 5;
+    // V0.90：掉率固定后不再需要每秒上限（原来的 BAIT_DROP_CHANCE_CAP(5) 已删除）
     // 掉落品质权重（普通 → 传说），品质越高越稀有
     const BAIT_DROP_WEIGHTS = [60, 25, 10, 4, 1];
     // 成就「诱饵收藏家」的门槛：累计自然掉落 100 枚（1/500 每秒 → 约 14 小时起步）
@@ -4370,7 +4421,7 @@
         name: "多元宇宙旅人",
         icon: "🌌",
         description: "进行 5 次多元宇宙（每进入一个新宇宙算一次）。",
-        unlock: "解锁「自动悖论」（每 30 秒自动发动一次）· 悖论重置不再清空永恒部件",
+        unlock: "解锁自动化「自动悖论」（到 ⚙ 自动化 里开启，每 30 秒自动发动一次）· 悖论重置不再清空永恒部件",
         check: () => (getPossibility().entries || 0) >= 5,
         progress: () => `${Math.min(getPossibility().entries || 0, 5)} / 5 次`,
         reward: {}
@@ -5102,6 +5153,10 @@
         desc: "每秒自动巡检四条时间线，挑出「时间本源产出最高、且推荐战力低于出战猎犬」的那一条派犬入侵——只打有把握的仗，绝不送死。四条时间线一条都打不过时不会干等，只要这只猎犬已达到回归门槛（10 级），它会直接自动回归、进入超越展示柜，把等级换成永久全局加成。出战猎犬战死后会自动换上仓库里最强的一只，从头到尾不用你动手。开启条件：达成成就「猎犬二十级」。"
       },
       {
+        key: "paradox", name: "自动悖论",
+        desc: "每 30 秒自动发动一次悖论：转盘照常转动、照常召唤一只猎犬，不用你动手。它不会打断你——触发时不弹窗、也不抢当前页签；尘埃不够 / 转盘中 / 被捕获时会顺延 5 秒再试。注意：悖论会清空尘埃与升级（达到「多元宇宙旅人」后，永恒部件与装备会保留）。开启条件：达成成就「多元宇宙旅人」。"
+      },
+      {
         key: "bait", name: "自动化诱饵转盘",
         desc: "每秒检查一次诱饵库存：只要有存货就自动投入转盘，把诱饵之力全部换成诱饵等级，不用再一枚枚手动点。消耗顺序是【从最高品质开始】——品质越高单枚之力越强，先把好的转掉。为了不打断你，自动转盘会省略转盘动画，只在事件提示里报一句结果；想看着指针转，把它关掉手动抽即可。开启条件：达成成就「诱饵收藏家」。"
       }
@@ -5109,7 +5164,9 @@
 
     const AUTO_UNLOCK = {
       harvest: "auto_harvest", upgrade: "auto_upgrade", equip: "part_collector", hunt: "hound_lv20",
-      bait: "bait_collector"
+      bait: "bait_collector",
+      // V0.90：自动悖论也搬进「⚙ 自动化」，由成就「多元宇宙旅人」解锁（MULTIVERSE_ACHV_ID 声明在本文件更上方）
+      paradox: MULTIVERSE_ACHV_ID
     };
 
     // 自动狩猎的安全门槛：只挑战「推荐战力 × ratio < 自己战力」的线路。
@@ -5183,7 +5240,12 @@
       let mul = 1;
       try { mul = getUniverseMult("partCap"); } catch (e) { mul = 1; }
       if (!isFinite(mul) || mul < 1) mul = 1;
-      return base * Math.min(mul, PART_CAP_MULT_MAX);
+      // V0.89：基因实验室的「部件改造」是**加法**（作者要求，乘算会让数值爆炸）——
+      //   在乘算结果之上直接加级数。getLabBonus 走的是运行时读取，不认识牌组时会安全地返回 0。
+      let addLv = 0;
+      try { addLv = Math.max(0, getLabBonus("partCap")); } catch (e) { addLv = 0; }
+      if (!isFinite(addLv) || addLv < 0) addLv = 0;
+      return base * Math.min(mul, PART_CAP_MULT_MAX) + addLv;
     }
     // 有效等级（超限部分递减折算）：
     //   等级 ≤ 软上限 → 原样计入（100% 效率，手感与旧版一致）
@@ -5252,9 +5314,11 @@
       },
       {
         id: "luck", name: "磁石之饵", icon: "⌬", color: "var(--purple)",
-        effect: "诱饵掉落", value: 0.10,
-        desc: "吸附诱饵的磁饵：提高诱饵的自然掉落速度，并让高品质诱饵更容易出现。",
-        format: v => `+${(v * 100).toFixed(1)}% 掉落速度 · 品质上移`
+        effect: "诱饵品质", value: 0.10,
+        // V0.90：掉落速度那一半已随「诱饵独立化」取消（掉率恒定）；这里只剩「品质上移」，
+        //   且改成「Lv.100 满级」：到 100 级时传说诱饵爆率正好拉满，之后不再掉落。
+        desc: "吸附诱饵的磁饵：把掉落品质整体上移（诱饵掉率本身恒定，不受它影响）。最高 Lv.100 —— 满级时传说诱饵爆率 100%，此后不再掉落。",
+        format: v => `品质上移（+${(v * 100).toFixed(0)}%）`
       }
       // V0.79：已删除「悖论之饵」（命运扭曲消耗）
     ];
@@ -5298,7 +5362,7 @@
       lines: [],
       linesDirty: false,
       achievements: {},
-      auto: { harvest: false, upgrade: false, hunt: false, equip: false, bait: false },
+      auto: { harvest: false, upgrade: false, hunt: false, equip: false, bait: false, paradox: false },
       bulkLevel: 1,
       luckBoost: 0,
       transcendedHounds: [],
@@ -5885,6 +5949,7 @@
           if (out.length >= 8) break;
           if (!m || typeof m !== "object") continue;
           if (typeof m.k !== "string" || typeof m.label !== "string") continue;
+          if (m.k === "baitDrop") continue;   // V0.90：「诱饵爆率」词条已删除，老存档里的直接丢弃
           const mult = num(m.mult);
           if (!mult) continue;
           out.push({ k: m.k.slice(0, 24), label: m.label.slice(0, 32), mult });
@@ -5899,6 +5964,11 @@
           if (out.length >= GENE_COUNT_CAP) break;
           if (!g || typeof g !== "object") continue;
           if (typeof g.k !== "string" || typeof g.label !== "string") continue;
+          // V0.90：老存档里的「诱饵爆率」基因已随该线删除 —— 就地转成「诱饵效果」基因
+          //   （档位 / 等级 / 已投入的点数全部保留，玩家不会凭空少东西）
+          let gk = g.k;
+          let glabel = g.label;
+          if (gk === "baitDrop") { gk = "bait"; glabel = "诱饵效果"; }
           let tier = typeof g.tier === "number" && isFinite(g.tier) ? Math.floor(g.tier) : -1;
           if (tier < 0) {
             // 老存档（V0.61–V0.63）的基因只有 mult、没有稀有度：按最接近的基础倍率归档
@@ -5912,7 +5982,7 @@
           }
           tier = Math.max(0, Math.min(GENE_TIER_CAP - 1, tier));
           const level = Math.max(1, Math.floor(typeof g.level === "number" && isFinite(g.level) ? g.level : 1));
-          out.push({ k: g.k.slice(0, 24), label: g.label.slice(0, 32), tier, level });
+          out.push({ k: gk.slice(0, 24), label: glabel.slice(0, 32), tier, level });
         }
         return out;
       };
@@ -5983,7 +6053,8 @@
             return null;
           }).filter(Boolean).slice(0, 40) : [];
           return {
-            offers: norm(src.offers).slice(0, 5),
+            // V0.89：「货物扩容」会让每轮上架条数超过 5，这里的上限要跟着放宽
+            offers: norm(src.offers).slice(0, 24),
             owned: norm(src.owned),
             rerollCount: Math.max(0, Math.floor(typeof src.rerollCount === "number" && isFinite(src.rerollCount) ? src.rerollCount : 0))
           };
@@ -6210,7 +6281,7 @@
     // ===================== 可能性（V0.61）：多元宇宙 + 基因改造 =====================
     // 五个挑战全通后解锁的新页面。核心是「换一个宇宙重新来过」：
     // 花 1E1000 尘埃打开多元宇宙 → 随机刷 4 个带正面加成的新宇宙 → 选一个进入，
-    // 进入会清空除【时间碎片 / 诱饵 / 可能性】之外的全部进度（比悖论重置更彻底），
+    // 进入会清空除【诱饵 / 可能性】之外的全部进度（比悖论重置更彻底；诱饵自 V0.90 起永久保留），
     // 换来 +1 基因点数；宇宙加成与基因加成从此常驻。
     // 尘埃上限（新设定）：未解锁多元宇宙前，尘埃被锁死在 1E1000；解锁后放宽到 1E30080。
     const DUST_CAP_E = 1000;        // 第一层尘埃上限（未解锁多元宇宙）
@@ -6244,7 +6315,7 @@
       // V0.71：三条「概率 / 峰值」类（与 V0.69 的三条基因同名同义）。
       // 区间比「强度」类保守一点——掉率与峰值直接影响资源产出，乘得太大不好收。
       { k: "shardDrop", label: "碎片爆率",    min: 1.25, max: 2.00 },
-      { k: "baitDrop",  label: "诱饵爆率",    min: 1.25, max: 2.00 },
+      // V0.90：按作者要求删除「诱饵爆率」——诱饵已改成独立体系，掉率固定 1/500，不再接受任何加成
       { k: "rushPeak",  label: "洪流峰值",    min: 1.25, max: 1.80 }
     ];
     const GENE_POOL = [
@@ -6260,7 +6331,7 @@
       // ⚠️ 注意与上面两条的区别：「时间碎片强度」「诱饵效果」管的是数值大小，
       //    而这三条管的是【掉不掉得下来】与「洪流能冲多高」，是新的维度。
       { k: "shardDrop", label: "碎片爆率",   min: 1.06, max: 1.16 },
-      { k: "baitDrop",  label: "诱饵爆率",   min: 1.06, max: 1.16 },
+      // V0.90：按作者要求删除「诱饵爆率」基因（同上）
       { k: "rushPeak",  label: "洪流峰值",   min: 1.05, max: 1.14 }
     ];
     // 基因稀有度（V0.64，参考转盘/猎犬品质的六档）：越稀有基础倍率越高。
@@ -6580,6 +6651,13 @@
       //   会被重新点亮一次，既"毫无意义"，也让玩家点了很久的高亮凭空复活。
       //   它记的是「这个功能玩家看过没有」，跟轮回无关，所以原样带走（可能是 undefined，交给首帧迁移）。
       const keepSeenTabs = save.seenTabs;
+      // V0.90：**诱饵是永久的** —— 跨悖论、跨宇宙都不再清空（作者要求）。
+      //   等级、库存、累计掉落与抽取次数一并带走（代价见 BAIT_DROP_PER_SECOND 的注释）。
+      const keepBaits = save.baits;
+      const keepBaitStock = save.baitStock;
+      const keepBaitDrops = save.baitDrops || 0;
+      const keepBaitSpins = save.baitSpins || 0;
+      const keepBaitLastDrop = save.baitLastDrop || "";
 
       save = normalizeBigFields(structuredCloneSafe(DEFAULT_SAVE));
       save.possibility = p;
@@ -6589,6 +6667,12 @@
       save.playMs = keepPlayMs;
       save.offlineMs = keepOfflineMs;
       if (keepSeenTabs !== undefined) save.seenTabs = keepSeenTabs;
+      // V0.90：把诱饵原样接回来（它是永久加成，不随轮回清空）
+      if (keepBaits && typeof keepBaits === "object") save.baits = keepBaits;
+      if (Array.isArray(keepBaitStock)) save.baitStock = keepBaitStock;
+      save.baitDrops = keepBaitDrops;
+      save.baitSpins = keepBaitSpins;
+      save.baitLastDrop = keepBaitLastDrop;
 
       // 运行时状态复位（仿 resetSave）
       numberMode = save.numberMode === "sci" ? "sci" : "kmbt";
@@ -6703,15 +6787,20 @@
       setHTML("mvModalMods", u.mods.map(m => `<span class="mv-modal-mod">${formatMod(m)}</span>`).join(""));
       setHTML("mvModalText",
         `<b style="color: var(--red);">进入后将清空整个轮回：</b><br>` +
-        `· 尘埃 / 升级 / 永恒部件 / 时间碎片 / 诱饵 / 猎犬 / 本源 / 本源商店 → 全部归零<br>` +
+        `· 尘埃 / 升级 / 永恒部件 / 时间碎片 / 猎犬 / 本源 / 本源商店 → 全部归零<br>` +
+        `· <b>诱饵不受影响</b>（V0.90 起诱饵是永久加成，跨宇宙一直保留）<br>` +
         `· <b>挑战进度也一并清空</b>（可能性页签保留，挑战要重打）<br>` +
         `· 只保留：<b>成就、自动化开关与可能性本身</b><br>` +
         `<span style="color: var(--muted);">⚠️ 选定后其余 ${rest} 个候选宇宙会立刻消散——想换宇宙得重新攒够 ` +
         `${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃再开新的一批；尘埃上限放宽到 ` +
         `${formatNumber(bigFromLog10(MULTIVERSE_CAP_E))}。</span>`);
+      // ⚠️ V0.90 修：这里原本引用 `painChMult`（苦痛挑战的全局倍率），
+      //    但那个变量在 V0.89 删除「苦痛挑战全局倍率」时就没了 →
+      //    一进这个弹窗就 ReferenceError，**「进入此宇宙」点了完全没反应**。
+      //    现在与真发放口径一致：苦痛之路倍率 × 里程碑倍率。
       const multNote = [
         painMult > 1 ? `苦痛之路 ×${painMult}` : "",
-        painChMult > 1 ? `苦痛挑战 ×${painMultText(painChMult)}` : ""
+        milestoneMult > 1 ? `里程碑 ×${painMultText(milestoneMult)}` : ""
       ].filter(Boolean).join(" · ");
       setHTML("mvModalGain",
         `<div>获得　<b style="color: var(--gold);">${geneGain}</b> 基因点数` +
@@ -7416,20 +7505,55 @@
     }
 
     // ===== 诱饵掉落 =====
-    // 诱饵每秒掉落的期望个数。V0.69：挂上「诱饵爆率」基因/宇宙加成，
-    // 并把原来的硬上限 1（每秒最多 1 个）放宽到 BAIT_DROP_CHANCE_CAP——
-    // 否则幸运诱饵一旦把概率顶到 100%，新基因就完全没意义了。
+    // V0.90（作者要求）：诱饵是一个**独立**的加成体系 —— 掉率恒为 BAIT_DROP_PER_SECOND（1/500），
+    //   不再吃「磁石之饵」的掉落速度、宇宙/基因的「诱饵爆率」，也不再需要每秒上限。
+    //   （「磁石之饵」保留下来，效果改成纯粹「品质上移」。）
     function getBaitDropChance() {
-      const luck = getBaitBonuses().baitLuck;
-      const raw = BAIT_DROP_PER_SECOND * (1 + luck) * getUniverseMult("baitDrop");
-      return Math.min(BAIT_DROP_CHANCE_CAP, raw);
+      return BAIT_DROP_PER_SECOND;
+    }
+    // V0.90（作者要求）：磁石之饵改成「**Lv.100 刚好满级**」的曲线。
+    //   旧公式是 base × k^i（k = 1 + 幸运）—— 它是**渐近线**：Lv.100 只到 68%，
+    //   要 8 万级才显示 100.0%，而一旦超过 100 级就纯属浪费。
+    //   现在：传说爆率 = 1% + 99% × (等级/100)^1.1 → Lv.100 正好 100%（满级），
+    //   指数 1.25（>1）让 Lv.1~60 全程**略弱于**旧曲线（Lv.10 8.1%→6.6%、Lv.25 25.4%→18.5%、Lv.50 47.5%→42.6%），
+    //   Lv.61 之后才开始反超 —— 那段是「冲到满级」的尾巴，不陡就永远到不了 100%。
+    //   其余四档按原来的权重形状分摊剩下的概率。
+    //   ⚠️ 满级只看等级，不受「诱饵效果」倍率影响 —— 这样「100 级 = 正好满级」永远是准的。
+    const BAIT_LUCK_MAX_LEVEL = 100;   // 磁石之饵的等级上限（其它诱饵不设上限）
+    const BAIT_LUCK_EXP = 1.25;        // 曲线指数（1.25 → Lv.1~60 全程略弱于旧曲线；越大越弱、尾巴越陡）
+    function getBaitLuckLevel() {
+      return Math.min(BAIT_LUCK_MAX_LEVEL, Math.max(0, getEffectiveBaitLevel("luck")));
+    }
+    function getBaitLegendaryProb(level) {
+      const lv = level === undefined ? getBaitLuckLevel() : Math.max(0, level);
+      const base = BAIT_DROP_WEIGHTS[BAIT_RARITIES.length - 1] /
+        (BAIT_DROP_WEIGHTS.reduce((a, b) => a + b, 0) || 1);
+      if (lv <= 0) return base;
+      const s = Math.pow(Math.min(1, lv / BAIT_LUCK_MAX_LEVEL), BAIT_LUCK_EXP);
+      return Math.min(1, base + (1 - base) * s);
     }
     function getBaitDropWeights() {
-      const luck = getBaitBonuses().baitLuck;
-      const k = 1 + luck;
-      const weights = BAIT_DROP_WEIGHTS.map((base, i) => base * Math.pow(k, i));
-      const sum = weights.reduce((a, b) => a + b, 0) || 1;
-      return { weights, probs: weights.map(w => w / sum) };
+      const p = getBaitLegendaryProb();
+      const rest = 1 - p;
+      const others = BAIT_DROP_WEIGHTS.slice(0, BAIT_RARITIES.length - 1);
+      const otherSum = others.reduce((a, b) => a + b, 0) || 1;
+      const weights = others.map(w => rest * (w / otherSum));
+      weights.push(p);
+      return { weights, probs: weights.map(w => w / ((rest + p) || 1)) };
+    }
+    // 只有磁石之饵有上限；满级后不再掉落（转盘把它摘掉）
+    function isBaitMaxed(id) {
+      return id === "luck" && getBaitLevel(id) >= BAIT_LUCK_MAX_LEVEL;
+    }
+    // 卡片上的「当前效果」文案（磁石之饵要显示传说爆率，而不是 +1000%）
+    function baitEffectText(def, lv) {
+      if (def.id === "luck") {
+        const p = getBaitLegendaryProb(lv);
+        return p >= 1
+          ? "品质上移（传说爆率 100% · 已满级）"
+          : `品质上移（传说爆率 ${(p * 100).toFixed(1)}%）`;
+      }
+      return def.format(def.value * lv);
     }
     function rollBaitDropRarity() {
       const { weights } = getBaitDropWeights();
@@ -7454,15 +7578,13 @@
     }
     function dropBait(silent) {
       const idx = rollBaitDropRarity();
-      // 「聚饵」碎片让每次飘落多结成几枚（同一品质一起落），数量直接叠加
-      const count = 1 + getShardBaitDropCount();
+      // V0.90：「聚饵」早已删除，这里每次固定飘落 1 枚（不再有多枚叠加）
       const stock = getBaitStock();
-      stock[idx] = (stock[idx] || 0) + count;
-      save.baitDrops = (save.baitDrops || 0) + count;
+      stock[idx] = (stock[idx] || 0) + 1;
+      save.baitDrops = (save.baitDrops || 0) + 1;
       save.baitLastDrop = BAIT_RARITIES[idx].name;
       if (!silent) {
-        showToast(`诱饵飘落：<b style="color:${BAIT_RARITIES[idx].color}">${BAIT_RARITIES[idx].name}诱饵</b>` +
-          (count > 1 ? ` <b>×${count}</b>` : ""));
+        showToast(`诱饵飘落：<b style="color:${BAIT_RARITIES[idx].color}">${BAIT_RARITIES[idx].name}诱饵</b>`);
       }
       return idx;
     }
@@ -7596,10 +7718,7 @@
     function getShardRampStacks() {
       return Math.floor(getShardBonus("ramp"));
     }
-    // 「聚饵」每级 +0.1，累计后向下取整 = 每次飘落额外多给几枚诱饵（每 10 级 +1 枚）
-    function getShardBaitDropCount() {
-      return Math.max(0, Math.floor(getShardBonus("baitDrop")));
-    }
+    // V0.90：「聚饵」碎片与 getShardBaitDropCount() 已彻底删除（诱饵掉落固定为每 500 秒 1 枚）
     // 「双生隙」：一场战斗的碎片掉落倍率（基础 1 次 + 额外次数，可超过 2）
     function getShardDropCountMult() {
       return 1 + getShardExtraDropTimes();
@@ -9320,6 +9439,12 @@
     function isTranscendedStatUnlocked() {
       return save.transcendedHounds.length > 0;
     }
+    // 基因点数：进过多元宇宙（或手上已经有基因/点数）之后才显示，和另两个读数一个规矩
+    function isGenePointStatUnlocked() {
+      const p = save.possibility || {};
+      return (p.entries || 0) > 0 || (p.genePoints || 0) > 0 ||
+        (Array.isArray(p.genes) && p.genes.length > 0);
+    }
 
     const headerChipShown = { originChip: false, transcendedChip: false };
     function toggleHeaderChip(id, unlocked) {
@@ -9342,8 +9467,11 @@
       setText("spentEnergyHint", `成长能量 +${formatNumber(getGrowthEnergyBreakdown().spentBonus)}`);
       setText("originTotal", formatNumber(save.origin));
       setText("transcendedCount", String(save.transcendedHounds.length));
+      // V0.89：基因点数也进顶部读数（在「超越猎犬」右边），同样是"碰到过才显示"
+      setText("genePointTotal", String(Math.max(0, Math.floor(getPossibility().genePoints || 0))));
       toggleHeaderChip("originChip", isOriginStatUnlocked());
       toggleHeaderChip("transcendedChip", isTranscendedStatUnlocked());
+      toggleHeaderChip("genePointChip", isGenePointStatUnlocked());
     }
 
     function renderMain() {
@@ -10384,6 +10512,35 @@
       if (b.e >= 6) return `×${formatDecimal(b)}`;
       return `+${((bigNum(b) - 1) * 100).toFixed(1)}%`;
     }
+    // ===== 更新日志（V0.90）=====
+    // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
+    const CHANGELOG = [
+      ["V0.90", "诱饵改为永久保留（跨悖论 / 跨宇宙都不清空），掉率固定 1/500、不再吃任何爆率加成；「自动悖论」搬进「⚙ 自动化」成为开关；磁石之饵改为 Lv.100 满级（传说爆率拉满后不再掉落）。"],
+      ["V0.89", "新增「多元宇宙里程碑」（每进一次宇宙 +20% 基因点倍率）；基因档位扩到「超越·99」；植入基因的花费每次翻倍（进宇宙归 1 点）；基因实验室的升级带品质，并有概率出售「基因幸运」。"],
+      ["V0.88", "修复「一刷新存档就丢了」的严重 bug，并加了存档备份 + 自动回滚保护。"],
+      ["V0.87", "苦痛之路改为免费预约；可能性页的四个子页签统一「解锁才出现 + 新功能高亮」。"],
+      ["V0.86", "基因实验室改为完成 2 次多元宇宙后解锁；面板改显示「当前总加成」；新增付费刷新（进宇宙免费重置）；苦痛之路改为下一次宇宙重置时才生效。"],
+      ["V0.85", "苦痛挑战「猎影如潮」改为被捕获概率 ÷50；打穿苦痛挑战解锁「自动悖论」；新增「基因实验室」。"],
+      ["V0.84", "科学计数法 EE 起点回到 1E100000（1E30080 能原样显示）；百分比读数跟随显示模式；挑战五的被捕获概率改为 ÷2。"],
+      ["V0.83", "删除悖论「超额献祭」；时间惯性升级门槛提高；百分比超过 10 万% 自动转 KMBT / 科学计数。"],
+      ["V0.82", "诱饵基础爆率 1/500 → 1/200；删除「聚饵」碎片。"],
+      ["V0.81", "猎犬品质倍率改成次指数曲线（不再爆炸，以后能继续加更高级品质）。"],
+      ["V0.80", "缩短超越段品质的成长；回归加成新增「等级效率」（低等级完全不受影响）。"],
+      ["V0.79", "展示柜新增「总加成」与「按加成排序」；第 5 次悖论之后点击直接发动；删除「金砂细饵」「悖论之饵」。"],
+      ["V0.78", "没拿到本源前隐藏「本源加成」那一行；新增猎犬保底经验；时间流速不再吃全局加成。"],
+      ["V0.77", "挑战一改为「被捕概率 ÷10 + 达成一次悖论」；苦痛挑战解锁可能性后才出现；时间线把保底线排到最左。"],
+      ["V0.76", "新解锁的功能页签会高亮并带一个红「新」角标，点过就熄灭。"],
+      ["V0.75", "苦痛挑战奖励改成乘法 ×1.05；右上角「?」改成「教程」。"],
+      ["V0.74", "新增新手教程。"]
+    ];
+    function renderChangelog() {
+      if (!el("changelogBody")) return;
+      setHTML("changelogBody", CHANGELOG.map(it =>
+        `<div class="log-item"><span class="log-ver">${it[0]}</span><span class="log-note">${it[1]}</span></div>`).join(""));
+    }
+    function openChangelogModal() { renderChangelog(); el("changelogModal").classList.add("show"); }
+    function closeChangelogModal() { el("changelogModal").classList.remove("show"); }
+
     function openStatsModal() {
       renderStatsDetail();
       el("statsModal").classList.add("show");
@@ -10602,7 +10759,8 @@
         "开启后时间循环会自己运转，你只需要偶尔回来看看——但每一项自动化都有代价，它们不是纯粹的增益。" +
         (unlockedCount < AUTO_ROWS.length
           ? `<br><span style="color: var(--muted);">未解锁的项达成对应成就后会直接出现。` +
-            `自动收获：累计被捕获 10 次 · 自动升级：任一升级达到 Lv.${AUTO_UPGRADE_UNLOCK_LEVEL}。</span>`
+            `自动收获：累计被捕获 10 次 · 自动升级：任一升级达到 Lv.${AUTO_UPGRADE_UNLOCK_LEVEL} · ` +
+            `自动悖论：成就「多元宇宙旅人」。</span>`
           : ""));
 
       // 未解锁的自动化整行不渲染
@@ -10687,8 +10845,8 @@
           `完成记录是<b>多元宇宙级别</b>的：进入下一个宇宙、整个轮回被清空，它也照样保留；` +
           `下次再点开同一个挑战会直接显示<b>已完成</b>。<br>` +
           (isAutoParadoxUnlocked()
-              ? `<b style="color: var(--cyan);">「自动悖论」已解锁</b>（来自成就「多元宇宙旅人」）：每 ${AUTO_PARADOX_INTERVAL_MS / 1000} 秒自动发动一次悖论、召唤一只猎犬。`
-              : `<span style="color: var(--muted);">「自动悖论」由成就「多元宇宙旅人」解锁：每 ${AUTO_PARADOX_INTERVAL_MS / 1000} 秒自动转盘召唤一只猎犬。</span>`) +
+              ? `<b style="color: var(--cyan);">「自动悖论」已解锁</b>（来自成就「多元宇宙旅人」）：到「⚙ 自动化」里把它打开，之后每 ${AUTO_PARADOX_INTERVAL_MS / 1000} 秒自动发动一次悖论、召唤一只猎犬。`
+              : `<span style="color: var(--muted);">「自动悖论」由成就「多元宇宙旅人」解锁，然后在「⚙ 自动化」里开启：每 ${AUTO_PARADOX_INTERVAL_MS / 1000} 秒自动转盘召唤一只猎犬。</span>`) +
           `<br>每完成一个：进入下一个宇宙时基因点数 <b style="color: var(--gold);">×${PAIN_CH_GENE_STEP}</b>（永久累乘，` +
           `全部打穿就是 ×${painMultText(Math.pow(PAIN_CH_GENE_STEP, PAIN_CHALLENGES.length))}）。` +
           (picks.length
@@ -10861,8 +11019,8 @@
         ? breakdown.map(it => `${it.label} ${it.value}`).join(" · ")
         : "当前没有可折算的进度";
       const wipeText =
-        `进入后将<b style="color: var(--red);">清空整个轮回</b>：尘埃 / 升级 / 部件 / 时间碎片 / 诱饵 / 猎犬 / 本源 / 本源商店全部归零，` +
-        `<b>挑战进度也一并清空（挑战要重打）</b>；只保留<b>成就、自动化开关与可能性本身</b>。`;
+        `进入后将<b style="color: var(--red);">清空整个轮回</b>：尘埃 / 升级 / 部件 / 时间碎片 / 猎犬 / 本源 / 本源商店全部归零，` +
+        `<b>挑战进度也一并清空（挑战要重打）</b>；只保留<b>成就、自动化开关、可能性本身，以及诱饵（永久加成）</b>。`;
 
       // 已刷出候选宇宙：让玩家挑一个进入
       if (p.pending && p.pending.length) {
@@ -11010,7 +11168,13 @@
       { id: "lab_dust2",   icon: "◈", name: "尘埃精馏", cost: 2, key: "dust",     value: 0.60, desc: "尘埃收益 +60%" },
       { id: "lab_speed2",  icon: "⟢", name: "岁月奔流", cost: 2, key: "speed",    value: 0.40, desc: "时间流速 +40%" },
       { id: "lab_origin2", icon: "◍", name: "本源涌泉", cost: 3, key: "origin",   value: 0.80, desc: "本源收益 +80%" },
-      { id: "lab_global",  icon: "✧", name: "全局共振", cost: 3, key: "global",   value: 0.20, desc: "全局收益 +20%" }
+      { id: "lab_global",  icon: "✧", name: "全局共振", cost: 3, key: "global",   value: 0.20, desc: "全局收益 +20%" },
+      // V0.89：两件「上限类」货品。它们不给百分比，而是把系统的**上限**抬高，
+      //   所以效果是**加法**（int=true，品质按整数放大）——乘算会让数值直接爆炸。
+      { id: "lab_partcap", icon: "⚙", name: "部件改造", cost: 3, key: "partCap", value: 4, int: true, unit: "级",
+        desc: "所有永恒部件的软上限 +4 级（加法叠加，不参与乘算）。部件被软上限卡住之后，这是继续变强的主路。" },
+      { id: "lab_cargo",   icon: "▤", name: "货物扩容", cost: 2, key: "offerCount", value: 1, int: true, unit: "条",
+        desc: "实验室每轮上架的升级 +1 条（同时刷新出「部件改造」这类货品的概率更高）。" }
     ];
     const LAB_OFFER_COUNT = 5;   // 每次刷新出几条供选择
     // ===== 多元宇宙里程碑（V0.89）=====
@@ -11036,9 +11200,14 @@
       const def = getLabOfferDef(o);
       return def ? def.cost + (o.tier || 0) : 0;
     }
+    // 品质对「效果」的放大：百分比类直接乘；**上限类（int）取整**，否则会冒出「+7.5 级」这种数
+    function labOfferValueOf(def, tier) {
+      if (!def) return 0;
+      const raw = def.value * (1 + LAB_TIER_VALUE_STEP * (tier || 0));
+      return def.int ? Math.max(1, Math.round(raw)) : raw;
+    }
     function getLabOfferValue(o) {
-      const def = getLabOfferDef(o);
-      return def ? def.value * (1 + LAB_TIER_VALUE_STEP * (o.tier || 0)) : 0;
+      return labOfferValueOf(getLabOfferDef(o), o && o.tier);
     }
 
     const LAB_UNLOCK_ENTRIES = 2;      // 完成第 N 次多元宇宙后实验室显形
@@ -11064,6 +11233,12 @@
     function rerollLabOffers() {
       const p = getPossibility();
       const lab = getLab();
+      // V0.89 BUG 修复：池子空了以后，刷新只会「扣点数 + 涨价」而清单一个字都不变 ——
+      //   玩家看到的就是"点了没反应"。这里直接拦下并说清原因（按钮本身也会禁用）。
+      if (getLabPoolSize() <= 0) {
+        showToast("已经没有可刷新的升级了 —— 能买的都买完了。进入下一个宇宙会自动重新抽一批（免费）。");
+        return;
+      }
       const cost = getLabRerollCost();
       if ((p.genePoints || 0) < cost) {
         showToast(`刷新需要 ${cost} 基因点（当前 ${p.genePoints || 0} 点）。`);
@@ -11083,13 +11258,23 @@
         // 兼容老存档：owned 里可能还是纯 id 字符串（没有品质）
         const def = getLabDef(o && o.id ? o.id : o);
         if (def && def.key === key) {
-          total += def.value * (1 + LAB_TIER_VALUE_STEP * ((o && o.tier) || 0));
+          total += labOfferValueOf(def, (o && o.tier) || 0);
         }
       });
       return total;
     }
     function labOwnedCount() { return getLab().owned.length; }
     // 重新抽一批（排除已拥有的；池子不够就全给）
+    // 每轮上架几条 = 基础条数 + 「货物扩容」买的条数
+    function getLabOfferCount() {
+      return LAB_OFFER_COUNT + Math.max(0, Math.floor(getLabBonus("offerCount")));
+    }
+    // 还没买的升级还剩几条（刷新按钮据此判断"刷了有没有意义"）
+    function getLabPoolSize() {
+      const lab = getLab();
+      const ownedIds = lab.owned.map(o => (o && o.id) ? o.id : o);
+      return LAB_UPGRADES.filter(d => ownedIds.indexOf(d.id) < 0).length;
+    }
     function rollLabOffers() {
       const lab = getLab();
       const ownedIds = lab.owned.map(o => (o && o.id) ? o.id : o);
@@ -11099,7 +11284,7 @@
         const t = pool[i]; pool[i] = pool[j]; pool[j] = t;
       }
       // 每条升级随机一个「品质」（权重会被基因幸运倾斜 —— 越幸运越容易出高品）
-      const offers = pool.slice(0, LAB_OFFER_COUNT).map(d => ({ id: d.id, tier: rollBaseGeneTierIndex() }));
+      const offers = pool.slice(0, getLabOfferCount()).map(d => ({ id: d.id, tier: rollBaseGeneTierIndex() }));
       if (Math.random() < LAB_LUCK_CHANCE) offers.push({ id: LAB_LUCK_ID, tier: 0 });
       lab.offers = offers;
       return offers.length;
@@ -11293,7 +11478,7 @@
           text: `${names.split("\n").join("<br>")}<br><br>` +
             `· <b style="color:var(--green)">无需任何尘埃</b><br>` +
             `· <b>不会立刻清空轮回</b>：苦痛会在你<b>下一次进行多元宇宙重置</b>时开始生效<br>` +
-            `· 届时整个轮回会被清空（尘埃 / 升级 / 部件 / 时间碎片 / 诱饵 / 猎犬 / 本源 / 商店，挑战进度一并清空）<br>` +
+            `· 届时整个轮回会被清空（尘埃 / 升级 / 部件 / 时间碎片 / 猎犬 / 本源 / 商店，挑战进度一并清空；<b>诱饵永久保留</b>）<br>` +
             `· 只保留：<b>成就、自动化开关、可能性本身</b><br>` +
             `· 回报：那一轮结束时，基因点数 <b style="color:var(--gold)">×${mult}</b>（并解锁「苦痛挑战」）<br>` +
             `<span style="color:var(--muted)">后悔了也没关系：预约可以在「苦痛之路」页随时中止（回报作废）。</span>`
@@ -11329,13 +11514,30 @@
       // V0.86：不再罗列"买了什么"，直接把当前的总加成列出来
       const LAB_KEYS = [["dust", "尘埃收益"], ["speed", "时间流速"], ["origin", "本源收益"],
         ["global", "全局收益"], ["part", "部件效果"], ["houndExp", "猎犬经验"], ["shardDrop", "碎片掉落率"]];
-      const sumItems = LAB_KEYS.map(([k, label]) => {
+      const sumList = LAB_KEYS.map(([k, label]) => {
         const v = getLabBonus(k);
         return v > 0 ? `<span class="lab-sum-item">${label} <b>+${formatPercent(v, 1)}</b></span>` : "";
-      }).filter(Boolean).join("");
-      const summary = sumItems ||
-        `<span class="mv-cost">还没有从实验室拿到任何加成。</span>`;
+      }).filter(Boolean);
+      // V0.89：两件「上限类」货品单独列（它们不是百分比，混在百分比里会读错）
+      const sumCapLv = getLabBonus("partCap");
+      if (sumCapLv > 0) sumList.push(`<span class="lab-sum-item">部件软上限 <b>+${Math.round(sumCapLv)} 级</b></span>`);
+      const sumCargo = Math.floor(getLabBonus("offerCount"));
+      if (sumCargo > 0) sumList.push(`<span class="lab-sum-item">每轮上架 <b>+${sumCargo} 条</b></span>`);
+      const summary = sumList.length ? sumList.join("")
+        : `<span class="mv-cost">还没有从实验室拿到任何加成。</span>`;
       const rerollCost = getLabRerollCost();
+      // V0.89：刷新按钮要说清"能不能刷 / 为什么不能刷"，别让玩家点了没反应
+      const offerCount = getLabOfferCount();
+      const poolLeft = getLabPoolSize();
+      const canAffordReroll = (p.genePoints || 0) >= rerollCost;
+      const canReroll = poolLeft > 0 && canAffordReroll;
+      const rerollLabel = poolLeft <= 0
+        ? "已无可刷新的升级"
+        : (canAffordReroll ? `刷新清单（${rerollCost} 基因点）` : `基因点数不足（需要 ${rerollCost} 点）`);
+      const rerollNote = poolLeft <= 0
+        ? `本轮能刷出来的升级已经全部买完了 —— 进入下一个宇宙会<b>免费</b>重新抽一批。`
+        : `本轮已刷新 ${lab.rerollCount || 0} 次 · 进入下一个宇宙会重置这个价格` +
+          (poolLeft < offerCount ? ` · <b style="color: var(--gold);">可刷新的升级只剩 ${poolLeft} 条</b>` : "");
       // V0.89：每条升级都带品质（沿用转盘的六档），品质越高效果越强、价格越贵；
       //   另外有 35% 概率上架一件「基因幸运」。
       const offers = lab.offers.map((o, idx) => {
@@ -11361,13 +11563,18 @@
         const cost = getLabOfferCost(o);
         const mult = 1 + LAB_TIER_VALUE_STEP * (o.tier || 0);
         const afford = afford0 >= cost;
+        // V0.89：上限类货品显示「+N 级 / +N 条」，百分比类才显示「×倍率」
+        const valText = d.int
+          ? `效果 <b>+${Math.round(getLabOfferValue(o))} ${d.unit || ""}</b>`
+          : `效果 ×${mult.toFixed(1)}`;
+        const kindText = d.key === "global" ? "全局收益" : (d.int ? "上限提升" : "定向加成");
         return `
           <div class="lab-card">
             <div class="lab-head">
               <span class="lab-icon">${d.icon}</span>
               <div>
                 <h3>${d.name}</h3>
-                <small><b style="color:${t.color}">${t.name}</b> 品质 · 效果 ×${mult.toFixed(1)} · ${d.key === "global" ? "全局收益" : "定向加成"}</small>
+                <small><b style="color:${t.color}">${t.name}</b> 品质 · ${valText} · ${kindText}</small>
               </div>
               <span class="lab-cost">${cost} 基因点</span>
             </div>
@@ -11379,7 +11586,7 @@
       }).join("");
       setHTML("labBody", `
         <p class="possibility-note">
-          这里的升级是<b>随机刷</b>出来的：<b>每次进入多元宇宙</b>都会重新抽一批（本轮 ${LAB_OFFER_COUNT} 条）。
+          这里的升级是<b>随机刷</b>出来的：<b>每次进入多元宇宙</b>都会重新抽一批（本轮 <b>${offerCount}</b> 条）。
           用「🧬 基因改造」那边攒下的<b style="color: var(--cyan);">基因点数</b>购买，买下后
           <b>永久生效</b>——清空整个轮回也不会掉。<br>
           <span style="color: var(--muted);">每条升级都带<b>品质</b>（沿用转盘那一套六档：普通 → 神话），品质越高<b>效果越强、也越贵</b>；
@@ -11389,10 +11596,10 @@
         </p>
         <div class="lab-summary"><h3 class="lab-title" style="margin-top:0;">当前实验室总加成</h3>${summary}</div>
         <div class="lab-tools">
-          <button class="secondary-button" data-lab-reroll="1" ${(p.genePoints || 0) >= rerollCost ? "" : "disabled"}>
-            刷新清单（${rerollCost} 基因点）
+          <button class="secondary-button" data-lab-reroll="1" ${canReroll ? "" : "disabled"}>
+            ${rerollLabel}
           </button>
-          <span class="mv-cost">本轮已刷新 ${lab.rerollCount || 0} 次 · 进入下一个宇宙会重置这个价格</span>
+          <span class="mv-cost">${rerollNote}</span>
         </div>
         <h3 class="lab-title">本轮可购买（${lab.offers.length} 条）</h3>
         <div class="lab-grid">${offers || '<div class="empty">这一轮的清单已经买完了 —— 进入下一个宇宙会重新抽一批，也可以花钱刷新。</div>'}</div>`);
@@ -12322,9 +12529,14 @@
       // 只从「当前可见」的诱饵里抽：猎犬未解锁时抽不到「兽香之饵」
       const visible = getVisibleBaitTypes();
       for (let i = 0; i < count; i++) {
-        const type = visible[randomInt(0, visible.length - 1)];
+        // V0.90：磁石之饵满级后「不再掉落」—— 把它从转盘里摘掉，这些等级让给别的诱饵
+        const pool = visible.filter(t => !isBaitMaxed(t.id));
+        const list = pool.length ? pool : visible;
+        const type = list[randomInt(0, list.length - 1)];
         if (!save.baits[type.id]) save.baits[type.id] = { level: 0 };
-        save.baits[type.id].level += levels;
+        // ⚠️「其它诱饵不设等级上限」，只有磁石之饵封在 Lv.100
+        const cap = type.id === "luck" ? BAIT_LUCK_MAX_LEVEL : Infinity;
+        save.baits[type.id].level = Math.min(cap, save.baits[type.id].level + levels);
         results.push({ type, levels, level: save.baits[type.id].level });
       }
       return results;
@@ -12386,7 +12598,7 @@
         `<div style="color:${type.color}; font-size:17px; margin-bottom:6px;">${type.icon} ${type.name}</div>` +
         `品级：<b style="color:${rarity.color}">${rarity.name}</b>（本枚 +${levels} 级）<br>` +
         `当前等级：<b>Lv.${total}</b><br>` +
-        `当前效果：<b style="color:${type.color}">${type.format(type.value * total)}</b>`;
+        `当前效果：<b style="color:${type.color}">${baitEffectText(type, total)}</b>`;
       el("baitModal").classList.add("show");
     }
 
@@ -12439,9 +12651,9 @@
             <span class="bait-icon" style="color:${t.color}">${t.icon}</span>
             <h3>${t.name}</h3>
             <p>${t.desc}</p>
-            <div class="bait-lv">${owned ? `Lv.${lv}` : "未获得"}</div>
+            <div class="bait-lv">${owned ? (isBaitMaxed(t.id) ? `Lv.${lv} · 满级` : `Lv.${lv}`) : "未获得"}</div>
             <div class="muted-line" style="color:${owned ? t.color : "inherit"}; font-weight:${owned ? 700 : 400};">
-              ${owned ? t.format(t.value * lv) : "—"}
+              ${owned ? baitEffectText(t, lv) : "—"}
             </div>
             ${isStanceBait && owned
               ? `<div class="bait-stance-tag${stanceOn ? " on" : ""}">`
@@ -12688,6 +12900,8 @@
     on("tutorialClose", () => el("tutorialModal").classList.remove("show"));
     on("statsDetailBtn", () => openStatsModal());
     on("statsClose", () => closeStatsModal());
+    on("changelogButton", () => openChangelogModal());
+    on("changelogClose", () => closeChangelogModal());
     on("confirmCancel", () => closeConfirmModal(false));
     on("confirmOk", () => closeConfirmModal(true));
     on("mvModalCancel", closeMultiverseConfirm);
@@ -12928,8 +13142,12 @@
     function isAutoParadoxUnlocked() {
       return !!(save.achievements && save.achievements[MULTIVERSE_ACHV_ID]);
     }
+    // V0.90：解锁之外还要「在自动化里打开」，所以倒计时读数也要跟着开关走
+    function isAutoParadoxOn() {
+      return isAutoParadoxUnlocked() && !!(save.auto && save.auto.paradox);
+    }
     function getAutoParadoxRemaining() {
-      if (!isAutoParadoxUnlocked()) return 0;
+      if (!isAutoParadoxOn()) return 0;
       const now = Date.now();
       if (!autoParadoxNextAt) return AUTO_PARADOX_INTERVAL_MS;
       return Math.max(0, autoParadoxNextAt - now);
@@ -12950,7 +13168,8 @@
 
     function autoStep() {
       checkChallenges();
-      if (isAutoParadoxUnlocked()) autoParadoxStep();
+      // V0.90：自动悖论搬进「自动化」面板 —— 解锁后还要把那个开关打开才会跑
+      if (isAutoUnlocked("paradox") && save.auto.paradox) autoParadoxStep();
       if (isCaptured || wheelSpinning) return;
       if (isAutoUnlocked("upgrade") && save.auto.upgrade) {
         autoUpgradeStep();
