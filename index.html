@@ -2645,7 +2645,7 @@
         <h1>时间猎犬增量</h1>
         <p class="subtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.100</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.101</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -3879,7 +3879,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.100";
+    const GAME_VERSION = "V0.101";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -5259,7 +5259,8 @@
         // V0.89：苦痛挑战的全局倍率奖励已删除（不再给 globalMult）
         ratio: run => Math.max(0, Math.min(1, runOriginLogDelta(run) / 4)),
         check: run => runOriginLogDelta(run) >= 4,
-        progress: run => `累计 +1E${runOriginLogDelta(run).toFixed(2)} / 1E4 本源`
+        // V0.101（玩家反馈）：旧写法把 log10 直接拼成「1E0.06」，读起来像坏掉；改为正常数值（跟随计数法偏好）
+        progress: run => `累计 ${formatNumber(bigFromLog10(runOriginLogDelta(run)))} / 1E4 本源`
       },
       {
         id: "pch_exp", painId: "pain_exp", name: "血饲", icon: "🩸", stars: 4,
@@ -11008,7 +11009,7 @@
         const autoTarget = busy ? null : pickAutoHuntTarget(selected);
         lineHint += " · " + (busy ? "自动狩猎：交战中"
           : autoTarget ? "自动狩猎：已锁定目标"
-            : (selected ? "自动狩猎待命中（没有战力低于自己的线路）" : "自动狩猎：等待出战猎犬"));
+            : (selected ? "自动狩猎待命：暂时没有打得过的线路（会自动重织时间线，或够门槛就回归）" : "自动狩猎：等待出战猎犬"));
       }
       setText("lineHint", lineHint);
 
@@ -11334,6 +11335,7 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.101", "四条修正。① 修「自动战斗卡死」：自动狩猎遇到「四条时间线一条都打不过」时会静默空转（以前只会悄悄等着）。现在三层兜底 —— 先换仓库里打得过的更强猎犬、够门槛就回归、谁都不够就打不过时自动重织时间线（20 秒节流），保证永远转得下去。② 修超越展示柜排版错乱：软上限警告与「只列 20 只」说明以前被拼进了卡片网格里、占了第一行两个格子，把第一张卡挤到旁边；现在统一收进顶部汇总框。③ 修「先挑衅猎犬、8 秒内开挑战或发动超越悖论会继承保险箱」：重置现在会连同保险箱一起清零、并打断进行中的猎影。④ 修苦痛挑战「累计本源」进度把 log10 直接拼成「1E0.06」的怪文案，改为正常数值；排行榜全链路收紧（只收最新版成绩、每 4 小时一次、在线时长有物理上限）。"],
       ["V0.100", "三条修正。① 排行榜版本门补全：老版本现在连「发送」这一步都不会走 —— 客户端从榜单响应里读到「当前收件版本」，发现自己过期就直接拒发、并提示刷新更新（以前只是打到服务端被拒收，白占一次调用）；服务端那道拦截仍然保留作双保险。② 修「先挑衅猎犬、8 秒内再开挑战 / 发动超越悖论会继承保险箱」：重置现在会连同保险箱一起清零、并打断进行中的猎影 —— 以前旧循环保险箱里存下的尘埃，会在新循环的下一次捕获时结算进来，等于绕过「全清」。③ 修「主线挑战中门槛已锁定」那行文案把尖括号标签原样印出来（改为正常渲染）。"],
       ["V0.99", "四条改动。① 「自动回归」有了专属成就：累计让 5 只猎犬回归展示柜解锁「荣退仪式」——自动回归从此挂在这个成就上（不再和自动狩猎共用「猎犬二十级」）。② 基因里的「诱饵效果」整条删除：诱饵系统保持独立，不再被基因放大；老存档里的「诱饵爆率 / 诱饵效果」基因载入时会直接移除（基因数量会相应少一条）。③ 排行榜防作弊大修：只接受最新版本的上传（旧版数据自动从榜上消失 —— 等于每次版本更新都开一个干净赛季）；同一玩家每 4 小时只能上传一次（客户端按钮带冷却倒计时、服务端双重拦截，也省后端调用费）；在线时长增加物理上限 —— 上报值不可能比游戏本身活得还久，作弊者第一次上传就会被拒收。④ 修「自动升级悖论商店不会升级命运扭曲」：三件套各买 1 级后，剩余本源会持续投进命运扭曲（一次买满买得起的级数）。"],
       ["V0.98", "反转世界上线（首发框架版）。① 解锁：历史最高尘埃达到 1E30080、并且苦痛挑战全部通关之后，导航栏「可能性」的右边会出现「◑ 反转世界」。② 它是一趟完全独立的旅程：走进去，主宇宙的一切都会静止（时间暂停），而反转世界每次进入都从 Lv.1 从头开始 —— 随时可以退出，出去后主宇宙原样继续。③ 它是主宇宙的倒影：在这里「被捕获」不再是恩赐，而是等级 −1 —— 反转猎犬每 10 秒逼近一次，被抓到就掉一级；用「反转铸级」花反转尘埃把等级换回来，等级越高凝析越快。④ 反转尘埃的上限是 1EE10（10^(1E10)），远超主宇宙的 1E30080。⑤ 首发先开放三个子界面：反转主界面 / 自动化（自动凝析、自动铸级）/ 永恒背包（反转部件等战利品会在后续版本陆续觉醒）。⑥ 走进反转世界时，整个界面会翻成淡白的倒影配色，连左上角的「时间猎犬增量」标题都会由白变黑。⑦ 崩溃防护网上线：主循环、自动巡检、启动渲染整体加了异常兜底 —— 以前任何一帧里出现一次报错，整个游戏就会永久卡死（点哪都没反应、也没有任何提示）；现在只会「跳过这一帧继续跑」，并把出错原因写进事件日志、弹一条提示（8 秒节流），截图就能排查。浏览器控制台里的其他报错也会被一并接住上报。⑧ 数值保险丝与防刷屏：碎片等级加了一道 1e12 的硬顶（软上限之外本就是对数量级收益，正常玩法连 1e6 都摸不到），等级求和不会再溢出成天文数字；反转世界切后台回来的补帧，一口气的多次捕获会合并成一条汇总提示，不再一次刷出几百条；清档 / 导入存档时会自动退出反转世界，不会卡在倒影配色里。⑨ 基因高等级概率对标转盘：基因幸运每级幸运值 ×1.1（复利），每上一个「超越档位」所需幸运 ×1.21 —— 正好是 1.1²，所以<b>每买 2 级基因幸运、抽到的基因档位整体上移一档</b>；旧规则在幸运 29 就顶死，现在永不到顶。⑩ 猎犬寿命重定标：每提高一个品质 +2（普通 20 → 神话 30）、超越段每级 +1（超越·n = 30+n）；作为补偿，战斗掉落的本源按出战猎犬品质放大 —— 前期（普通~史诗）一分不变，传说 ×3、神话 ×5、超越·n ×(5+2n)，越往后越夸张；高品质猎犬的四维「弧度」也再上调一点（系数 0.10 → 0.12）。⑪ 自动化从弹窗改成独立子页面（页签直接打开），「收割时机」从三个挡位改成 <b>100%~200% 自由滑动条</b>，拖到哪就从哪收；另新增「自动回归」：出战猎犬寿命只剩 1 点就自动送进展示柜换成永久加成，绝不白死，随后自动换最强的一只接着打。⑫ 反转世界对外挂上「开发中」牌：所有人都能看到页签与门页（写明未来的解锁条件），但目前只有内部版本能真正进入 —— 功能完成、去掉开发锁之后，会把解锁条件接回页签正式开放。⑬ 修「苦痛之路退不出来」：踏入苦痛之后如果把基因移掉（或基因数掉回 10 条以下），旧版会把「苦痛之路」子页签连同里面的「中止苦痛」按钮一起藏掉，人被困在苦痛里。现在只要【曾经踏入过 / 苦痛进行中 / 有预约】三者占其一，入口就永久保留。⑭ 碎片掉落数量加软上限：单场掉落总块数过了 <b>12 块</b>之后按对数递减 —— 掉率再怎么堆，多出来的部分也是「慢慢失效」：不会锁死在 12，也不会再像以前那样恒满 64 块；「碎片单场掉落块数」这条加成同样加了拐点（8 块）。面板会同时显示「单场实际结算约几块」（以前写着「必掉 45 亿块」）。前期（少加成）完全不受影响。⑮ 自动升级悖论商店现在也会升级<b>「命运扭曲」</b>：三件套先各买 1 级保底，剩下的本源持续投进命运扭曲（一次买满买得起的级数）——以前开了自动商店，命运扭曲永远停在原地。"],
@@ -12937,15 +12939,7 @@
         s + (th.returnLevel || 0) * getReturnLevelEfficiency(th.returnLevel) *
         TRANSCEND_ORIGIN_CAP_PCT_PER_LEVEL * getTranscendQualityMult(th.qualityTier), 0);
       const effCapPct = softCapValue(sumCap, TRANSCEND_SOFT_CAP, TRANSCEND_SOFT_K);
-      setHTML("transcendedSummary",
-        `<div class="transcended-total">` +
-        `<div>展示柜总加成：全局 <b style="color: var(--gold);">+${formatPercent(softCapValue(list.reduce((s, th) =>
-          s + (th.returnLevel || 0) * getReturnLevelEfficiency(th.returnLevel) *
-          TRANSCEND_BASE_BONUS_PER_LEVEL * getTranscendQualityMult(th.qualityTier), 0),
-          TRANSCEND_SOFT_CAP, TRANSCEND_SOFT_K), 1)}</b>` +
-        ` · 本源加成上限 <b style="color: var(--cyan);">+${formatPercent(effCapPct, 1)}</b></div>` +
-        `<div class="mv-cost">这里是<b>未乘时间惯性</b>的原始值（惯性页里还有一层 ×惯性 倍率的放大量）。</div>` +
-        `</div>`);
+      // V0.101（玩家反馈：展示柜排版错乱）：汇总框的渲染挪到下面 —— 要连「软上限警告 / 隐藏说明」一起放进同一个框。
       // V0.69：合计一旦被软上限压住，在列表顶部明说一句（每只卡片上显示的仍是它的纸面贡献）
       const rawTotal = list.reduce((s, th) =>
         s + (th.returnLevel || 0) * getReturnLevelEfficiency(th.returnLevel) *
@@ -12972,7 +12966,16 @@
           `这里只列出<b>加成最高的 ${SHOWCASE_MAX_CARDS} 只</b>，其余 <b>${formatNumber(hiddenCount)}</b> 只已隐藏` +
           `（它们照常计入上面的总加成）。</div>`
         : "";
-      setHTML("transcendedList", capNote + hiddenNote + shown.map(th => {
+      // V0.101（玩家反馈：展示柜排版错乱）：capNote / hiddenNote 以前被拼进了卡片网格，
+      //   占了第一行的两个格子、把第一张卡挤到旁边。现在统一收进顶部汇总框，网格里只留卡片。
+      setHTML("transcendedSummary",
+        `<div class="transcended-total">` +
+        `<div>展示柜总加成：全局 <b style="color: var(--gold);">+${formatPercent(softCapValue(rawTotal, TRANSCEND_SOFT_CAP, TRANSCEND_SOFT_K), 1)}</b>` +
+        ` · 本源加成上限 <b style="color: var(--cyan);">+${formatPercent(effCapPct, 1)}</b></div>` +
+        `<div class="mv-cost">这里是<b>未乘时间惯性</b>的原始值（惯性页里还有一层 ×惯性 倍率的放大量）。</div>` +
+        capNote + hiddenNote +
+        `</div>`);
+      setHTML("transcendedList", shown.map(th => {
         const qMult = getTranscendQualityMult(th.qualityTier);
         const eff = getReturnLevelEfficiency(th.returnLevel);
         // V0.96：读数统一走 formatPercent（>10 万% 自动计数法）
@@ -14434,8 +14437,18 @@
 
       const target = pickAutoHuntTarget(hound);
       if (!target) {
-        // 四条时间线一条都打不过：原地空等没意义（线路不会自己重织），
-        // 只要这只猎犬已经够回归门槛，就直接让它回归——把等级换成永久全局加成。
+        // V0.101（玩家反馈：自动战斗卡死不走了）—— 这里绝不允许「静默空转」，三层兜底：
+        //   ① 换成仓库里打得过的更强猎犬（当前这只可能是刚抽到的高品 Lv.1：战力虚高但打不动）；
+        //   ② 谁上都打不过 & 够回归门槛 → 回归换全局加成（原有逻辑）；
+        //   ③ 谁上都打不过 & 不够门槛 → 自动重织时间线（重织会按当前猎犬重算「保底线」，下拍就能出发）。
+        const alt = pickAutoAltHound(hound);
+        if (alt) {
+          save.activeHoundId = alt.hound.id;
+          startBattle(alt.hound.id, alt.target.id);
+          if (activeBattle) activeBattle.autoHunt = true;
+          saveGame(true);
+          return;
+        }
         if (hound.level >= AUTO_HUNT_TRANSCEND_MIN_LEVEL) {
           const transcended = transcendHound(hound);
           const qMult = getTranscendQualityMult(transcended.qualityTier);
@@ -14447,12 +14460,35 @@
           );
           saveGame(true);
           render();
+          return;
+        }
+        const nowMs = Date.now();
+        if (nowMs - lastAutoReweaveAt > AUTO_REWEAVE_COOLDOWN_MS) {
+          lastAutoReweaveAt = nowMs;
+          save.lines = generateLines();
+          saveGame(true);
+          logEvent("🎲", "自动狩猎：四条时间线都打不过，已自动重织时间线。", "purple");
+          showToast("自动狩猎：四条时间线都打不过，已自动<b>重织时间线</b>——重织出的保底线一定打得过，下一拍就出发。");
+          render();
         }
         return;
       }
       startBattle(hound.id, target.id);
       // 标记本场由自动狩猎发起，战败时才会触发「自动回归」
       if (activeBattle) activeBattle.autoHunt = true;
+    }
+
+    // V0.101：为「自动狩猎卡死」兜底 —— 找一只「打得过至少一条线」的替代猎犬。
+    //   按战力从高到低找，当前这只本身不算候选；找不到返回 null。
+    function pickAutoAltHound(cur) {
+      const pool = (save.hounds || [])
+        .filter(h => h && h.lifespan > 0 && (!cur || h.id !== cur.id))
+        .sort((a, b) => (houndPowerKey(b) - houndPowerKey(a)) || ((b.level || 0) - (a.level || 0)));
+      for (const h of pool) {
+        const tg = pickAutoHuntTarget(h);
+        if (tg) return { hound: h, target: tg };
+      }
+      return null;
     }
 
     // 自动装备：把等级 > 0 的部件按等级从高到低补满装备位，顺手卸下等级归零的。
@@ -14518,11 +14554,13 @@
     let autoHuntNextAt = 0;
     // V0.98（作者要求）：自动回归 —— 出战猎犬寿命只剩 1 点时，替它办回归，绝不让它寿终消散。
     //   与自动狩猎的「打不过就回归」「战败但够门槛就回归」是三条互补的保险。
+    // V0.101：改为返回「是否真的办了回归」（布尔）—— 自动狩猎据此决定要不要结束这一拍，
+    //   免得回归因故没办成时，自动狩猎每拍都来试一次、把出战流程整个憋死。
     function autoRetireStep() {
-      if (activeBattle) return;                       // 战斗中不动（这一场已经打响了）
+      if (activeBattle) return false;                 // 战斗中不动（这一场已经打响了）
       const hound = getSelectedHound();
-      if (!hound || hound.lifespan > 1) return;
-      if (hound.level < TRANSCEND_MIN_LEVEL) return;  // 不够回归门槛：让它自己打完最后一场
+      if (!hound || hound.lifespan > 1) return false;
+      if (hound.level < TRANSCEND_MIN_LEVEL) return false;  // 不够回归门槛：让它自己打完最后一场
       const transcended = transcendHound(hound);
       const qMult = getTranscendQualityMult(transcended.qualityTier);
       const bonus = transcended.returnLevel * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult;
@@ -14540,6 +14578,7 @@
       if (next) save.activeHoundId = next.id;
       saveGame(true);
       render();
+      return true;
     }
 
     function autoHuntPump() {
@@ -14548,8 +14587,8 @@
       if (isAutoUnlocked("retire") && save.auto.retire) {
         const doomed = getSelectedHound();
         if (doomed && doomed.lifespan <= 1 && doomed.level >= TRANSCEND_MIN_LEVEL && !activeBattle) {
-          autoRetireStep();
-          return;
+          // V0.101：只有「真的办了回归」才结束这一拍；没办成（异常状态等）就继续走正常派犬流程，绝不憋死
+          if (autoRetireStep()) return;
         }
       }
       if (isCaptured || wheelSpinning) return;
@@ -14596,6 +14635,10 @@
     // 每秒巡检一次：三件套按固定顺序各尝试买 1 级（买得起才买、满级跳过）。
     // 刻意走 silent 通道：不弹 toast、不主动 render —— 主循环每 100ms 自己会重画商店，
     // 否则每秒最多三条提示足以把界面刷爆。
+    // V0.101（玩家反馈：自动战斗卡死不走了）：谁上都打不过时的兜底 ——
+    //   自动重织时间线的节流（20 秒最多一次，避免狂刷黄金线）。
+    const AUTO_REWEAVE_COOLDOWN_MS = 20000;
+    let lastAutoReweaveAt = 0;
     // V0.98（玩家反馈）：自动商店还要升级「命运扭曲」——
     //   顺序：三件套各买 1 级（便宜、优先保底）→ 剩下的本源持续投进命运扭曲（一次最多 1000 级）。
     //   命运扭曲是唯一「越买越贵」的坑（每级 ×1.62），批量静默购买、买不动自然就停。
