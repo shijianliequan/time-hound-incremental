@@ -1698,6 +1698,14 @@
     /* 关键：.primary-button 全局带 width:100%，这里必须显式 width:auto，
        否则按钮会吃掉整行宽度，把左侧「下一级消耗 N 本源」挤成竖排单字 */
     .shop-buy button { flex: 0 0 auto; width: auto; min-width: 92px; min-height: 36px; font-size: 12px; padding: 6px 14px; }
+    /* V0.96：本源商店支持批量购买（×1 / ×10 / ×100）—— 三个小按钮靠右排一行。
+       min-width 必须显式收窄，否则沿用上面 92px 会把左侧「下一级消耗」挤到换行。 */
+    .shop-buy .shop-bulk { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+    .shop-buy .shop-bulk button { min-width: 54px; min-height: 34px; padding: 6px 10px; font-size: 12px; }
+    @media (max-width: 760px) {
+      .shop-buy { flex-wrap: wrap; }
+      .shop-buy .shop-bulk { width: 100%; justify-content: flex-end; }
+    }
 
     .odds-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 16px; }
     .odds-table th, .odds-table td { border-bottom: 1px solid var(--line); padding: 8px 6px; text-align: left; }
@@ -2554,7 +2562,7 @@
         <h1>时间猎犬增量</h1>
         <p class="subtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.95</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.96</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -2859,9 +2867,9 @@
             </div>
             <p class="inventory-note">
               四条随机时间线，难度与收益各不相同。
-              <b style="color: var(--green);">出战猎犬 10 级前</b>，固定保底一条按它当前战力解算、战力占优的时间线
-              （难度随猎犬等级提升，<b>不再固定为 1 级</b>）；
-              <b style="color: var(--red);">10 级之后不再保底</b>，全看运气与猎犬战力。
+              <b style="color: var(--green);">任何时候都固定保底一条</b>按出战猎犬当前战力解算、战力占优的时间线
+              （难度随猎犬等级提升，<b>不再固定为 1 级</b>）——
+              它是「保命线」，收益只有同档随机线的 <b>40%</b>：打不过是运气问题，但<b>至少有一条能打</b>是确定的。
               <b style="color: var(--cyan);">每场狩猎结束后</b>，四条时间线都会被重新撕裂，
               整体替换为四条全新的线路（无论胜败）。
               <br><b style="color: var(--gold);">偶尔会刷出一条「黄金的」时间线</b>——本源收益 ×3、并额外掉落碎片，遇到就别放过。
@@ -3019,7 +3027,7 @@
           将全部永恒部件归零，并把手上全部时间尘埃献给悖论，换取一次抽取可控猎犬的机会。
           至少需要持有 1,000,000 时间尘埃才能发动，发动后尘埃会全部清空。
           猎犬将是你唯一能主动操控的力量。<br>
-          <b style="color: var(--purple);">命运扭曲每次提升都会让运气（阶位中心）×1.3，随着运气抬升，低品质的抽取概率被逐步淘汰消失。</b>
+          <b style="color: var(--purple);">命运扭曲每次提升都会抬高<b>运气</b>（阶位中心），「回旋针」碎片也按倍率计入运气。超越段以下每点运气抬高 0.78 个档位；从「超越」起，每上一档品质所需要的运气还要再贵 1.3 倍——越往后越难，但永远戳不穿。随着中心抬升，低品质的抽取概率被逐步淘汰消失。</b>
         </p>
 
         <button class="secondary-button shop-entry" id="paradoxGoShop">
@@ -3087,7 +3095,7 @@
                 <span class="shop-icon">✨</span>
                 <div class="shop-title">
                   <h4>命运扭曲</h4>
-                  <span class="shop-sub">每次提升让阶位中心 ×1.3（线性上移）</span>
+                  <span class="shop-sub">每级抬高运气 → 阶位中心；超越段以下 0.78 档/点，超越段起每档运气间隔 ×1.3</span>
                 </div>
                 <span class="shop-level">Lv.<b id="boostLevel">0</b><em id="boostMaxLevel"></em></span>
               </div>
@@ -3115,7 +3123,7 @@
               <div class="shop-meter"><i id="boostMeter"></i></div>
               <div class="boost-actions">
                 <button class="secondary-button" id="boostOnce">提升 x1</button>
-                <button class="primary-button purple-button" id="boostMax">一键最大</button>
+                <button class="primary-button purple-button" id="boostMax" title="按当前本源一口气买到买不动为止">一键最大</button>
               </div>
             </div>
 
@@ -3135,7 +3143,12 @@
               <div class="shop-meter"><i id="shopHuntCdMeter"></i></div>
               <div class="shop-buy">
                 <span>下一级消耗 <b id="shopHuntCdCost">500</b> 本源</span>
-                <button class="primary-button" id="shopHuntCdBuy">升级</button>
+                <span class="shop-bulk">
+                  <button class="secondary-button" id="shopHuntCdBuyMax" title="按当前本源一直买到等级上限或买不动为止">一键最大</button>
+                  <button class="primary-button" id="shopHuntCdBuy1">×1</button>
+                  <button class="secondary-button" id="shopHuntCdBuy10">×10</button>
+                  <button class="secondary-button" id="shopHuntCdBuy100">×100</button>
+                </span>
               </div>
             </div>
 
@@ -3156,7 +3169,12 @@
               <div class="shop-meter"><i id="shopHarvestMeter"></i></div>
               <div class="shop-buy">
                 <span>下一级消耗 <b id="shopHarvestCost">1,000</b> 本源</span>
-                <button class="primary-button" id="shopHarvestBuy">升级</button>
+                <span class="shop-bulk">
+                  <button class="secondary-button" id="shopHarvestBuyMax" title="按当前本源一直买到等级上限或买不动为止">一键最大</button>
+                  <button class="primary-button" id="shopHarvestBuy1">×1</button>
+                  <button class="secondary-button" id="shopHarvestBuy10">×10</button>
+                  <button class="secondary-button" id="shopHarvestBuy100">×100</button>
+                </span>
               </div>
             </div>
 
@@ -3165,7 +3183,7 @@
                 <span class="shop-icon">🏹</span>
                 <div class="shop-title">
                   <h4>猎影加速</h4>
-                  <span class="shop-sub">每级 +25%，最高 20 级（×6）· 仅自动狩猎</span>
+                  <span class="shop-sub">每级 +25%，最高 40 级（×11）· 仅自动狩猎</span>
                 </div>
                 <span class="shop-level">Lv.<b id="shopHuntSpeedLevel">0</b><em id="shopHuntSpeedMax"></em></span>
               </div>
@@ -3178,7 +3196,12 @@
               <div class="shop-meter"><i id="shopHuntSpeedMeter"></i></div>
               <div class="shop-buy">
                 <span>下一级消耗 <b id="shopHuntSpeedCost">600</b> 本源</span>
-                <button class="primary-button" id="shopHuntSpeedBuy">升级</button>
+                <span class="shop-bulk">
+                  <button class="secondary-button" id="shopHuntSpeedBuyMax" title="按当前本源一直买到等级上限或买不动为止">一键最大</button>
+                  <button class="primary-button" id="shopHuntSpeedBuy1">×1</button>
+                  <button class="secondary-button" id="shopHuntSpeedBuy10">×10</button>
+                  <button class="secondary-button" id="shopHuntSpeedBuy100">×100</button>
+                </span>
               </div>
             </div>
           </div>
@@ -3622,10 +3645,18 @@
         </div>
       </div>
 
+      <div class="settings-option" id="settingsRestoreRow" style="display: none;">
+        <div>
+          <div class="so-title" style="color: var(--green);">恢复上次清空的存档</div>
+          <div class="so-hint">清空存档时会自动留下一份备份。刚才若是手滑清掉的，可以在这里一键救回来。</div>
+        </div>
+        <button class="primary-button" id="settingsRestore">恢复</button>
+      </div>
+
       <div class="settings-option">
         <div>
           <div class="so-title" style="color: var(--red);">清空存档</div>
-          <div class="so-hint">删除本地所有进度、猎犬与本源。不可恢复。</div>
+          <div class="so-hint">删除本地所有进度、猎犬与本源。删前会自动留一份备份（可在上面恢复一次）。</div>
         </div>
         <button class="danger-button" id="settingsReset">清空</button>
       </div>
@@ -3656,7 +3687,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.95";
+    const GAME_VERSION = "V0.96";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -3830,9 +3861,23 @@
     //   过了交叉点之后造价就冻结在「上限的一半」，玩家攒够半个上限就能发动 —— 悖论永远不会被锁死。
     //   （实测：普通存档上限 1E1000 → 造价封顶 5E999；进过宇宙后 1E30080 → 封顶 1.5E30080。）
     const PARADOX_COST_CAP_RATIO = 0.5;
+    // ===== V0.96（作者要求）：主线挑战里，悖论重置门槛锁死 100 万尘埃 =====
+    // 为什么必须锁：V0.93 把造价改成「跟着命运扭曲等级走」之后，后期能涨到 1E7 甚至更高；
+    //   而主线挑战「一进就强制重置一次」，目标里又有「发动一次悖论重置」这一条。
+    //   于是关卡文案上写的是「攒出 100 万尘埃」，实际却要攒到造价那个量级——
+    //   难度被系统侧的成长率抬高了，而不是加在玩家的操作上。
+    //   所以：**挑战会话进行中，门槛钉回常量 1e6**，与挑战文案完全一致。
+    const CHALLENGE_PARADOX_COST = 1e6;
+    // 只认主线挑战（会话 id 一律以 "ch_" 开头）；苦痛挑战是 "pch_"，不受影响。
+    // 这里直接看 id 前缀、不去查 CHALLENGES 数组 —— 本函数可能被任何时机调用，
+    //   查数组会踩到 CHALLENGES / PAIN_CHALLENGES 的 TDZ。
+    function isMainChallengeRun() {
+      const run = save && save.challengeRun;
+      return !!(run && typeof run.id === "string" && run.id.indexOf("ch_") === 0);
+    }
     // ⚠️ 本函数在渲染路径里会被调用多次，而 getStats() 不便宜 → 做 1 秒记忆化。
     //    代价是刚买完升级时造价读数最多晚 1 秒刷新，对「攒够了吗」的观感没有影响。
-    let paradoxCostCache = null, paradoxCostCacheAt = 0;
+    let paradoxCostCache = null, paradoxCostCacheAt = 0, paradoxCostCacheInCh = false;
     // 造价的收敛规则（抽成纯函数，既让 computeParadoxCost 和 isParadoxCostCapped 共用一份，
     //   也让「上界真的会生效」这件事能被单独测到 —— 因为靠游戏状态几乎构造不出 5E999 级的收益）。
     //   顺序有讲究：
@@ -3851,19 +3896,27 @@
       return bigMax(bigOf(PARADOX_COST_FLOOR), bigMul(bigOf(PARADOX_COST_FLOOR), bigFromLog10(exp10)));
     }
     function computeParadoxCost() {
+      // V0.96：主线挑战里门槛锁死在 100 万（理由见 CHALLENGE_PARADOX_COST 处注释）
+      if (isMainChallengeRun()) return bigOf(CHALLENGE_PARADOX_COST);
       return clampParadoxCost(rawParadoxCost(), getDustCap());
     }
     // 造价是不是被「尘埃上限」那道上界卡住了（被卡住时界面要如实说明，否则玩家看不懂
     //   为什么这个数字不再跟着收益涨了）
     function isParadoxCostCapped() {
+      if (isMainChallengeRun()) return false;   // 挑战里是常量门槛，不存在「被上限卡住」
       const wanted = rawParadoxCost();
       return bigCmp(bigMul(getDustCap(), bigOf(PARADOX_COST_CAP_RATIO)), wanted) < 0;
     }
     function getParadoxCost() {
       const now = Date.now();
-      if (!paradoxCostCache || now - paradoxCostCacheAt >= 1000) {
+      // V0.96：进出主线挑战会**瞬间**改变门槛（常量 1e6 ↔ 命运扭曲档位），
+      //   所以缓存里带上「当前是否在主线挑战中」这个标记，一旦切换立刻失效 ——
+      //   不然进挑战的最初 1 秒内按钮还会按旧门槛判定。
+      const inCh = isMainChallengeRun();
+      if (!paradoxCostCache || paradoxCostCacheInCh !== inCh || now - paradoxCostCacheAt >= 1000) {
         paradoxCostCache = computeParadoxCost();
         paradoxCostCacheAt = now;
+        paradoxCostCacheInCh = inCh;
       }
       return paradoxCostCache;
     }
@@ -3934,9 +3987,11 @@
     // 猎影加速（自动狩猎速度）：只加快「自动狩猎发起的战斗」的节奏——
     // 战斗内的出手速度、战后结果在面板上的停留时间、以及两次狩猎之间的巡检间隔，
     // 全部按同一个倍率缩短。手动发起的战斗完全不受影响，节奏仍是原样。
-    // 加成是加法叠加：倍率 = 1 + 0.25 × 等级，20 级封顶 ×6。
+    // 加成是加法叠加：倍率 = 1 + 0.25 × 等级。
+    // V0.96（作者要求）：等级上限从 20 抬到 40（×6 → ×11）—— 后期几千点寿命挂机时，
+    //   ×6 的节奏还是太慢。成本成长率（1.7/级）保持不变，所以后半段仍然很贵、不是白送。
     const HUNT_SPEED_PER_LEVEL = 0.25;
-    const HUNT_SPEED_MAX_LEVEL = 20;
+    const HUNT_SPEED_MAX_LEVEL = 40;
     const HUNT_SPEED_COST_BASE = 600;    // 第 1 级消耗
     const HUNT_SPEED_COST_GROWTH = 1.7;  // 每级成本倍数
     // 战后结果在战斗面板上停留多久（毫秒）。手动战斗固定这么久，方便你看战报；
@@ -3945,7 +4000,10 @@
     const AUTO_HUNT_HOLD_MIN_MS = 150;
     // 自动狩猎的巡检基准间隔（毫秒）：Lv.0 时等于原来的 1 秒，随猎影加速倍率缩短。
     const AUTO_HUNT_STEP_MS = 1000;
-    const AUTO_HUNT_STEP_MIN_MS = 100;
+    // V0.96：上限抬到 40 级后倍率能到 ×11，原来的 100ms 下限会在 Lv.36 左右就把巡检间隔顶住，
+    //   等于「买了等级却不再变快」。这里把下限同步放到 50ms（最快 20 次/秒的巡检），
+    //   让新加的等级真的兑现成狩猎频率。
+    const AUTO_HUNT_STEP_MIN_MS = 50;
     // 单圈耗时低于这个秒数时，「满格→归零→立刻又满格」会让进度条每帧闪一下。
     // 此时自动收获切换为【持续收割】：进度条停在满格不再归零，尘埃按当前速度连续入账，
     // 平均收益与归零循环完全一致（都是「满档收益 ÷ 单圈耗时」），只是画面不再抖。
@@ -4034,7 +4092,7 @@
     }
     // 提示条（toast）版本：浮层只活 2.4 秒，塞不下明细，只报块数
     function shardToastLine(count, anyNew) {
-      return `✦ 掉落 ${count} 块时间碎片` + (anyNew ? "（含首次解锁）" : "") + "。";
+      return `✦ 掉落 ${formatNumber(count)} 块时间碎片` + (anyNew ? "（含首次解锁）" : "") + "。";
     }
 
     // ===== 黄金时间线 =====
@@ -4056,9 +4114,12 @@
     //            atk / hp / def / aspd / autoHarvest / ramp / soul / baitDrop
     // 其中 ramp 的 perLevel 恒为 1（等级直接等于叠加上限层数），soul 同时作用于攻/血/速，
     // baitDrop 是「每次掉落多给几枚诱饵」——累计后向下取整，每 10 级 = 每次多落 1 枚。
-    // 「回旋针」（wheel_luck）的每级倍率：它是乘法叠加（10 级 ×2.59、20 级 ×6.73）。
+    // 「回旋针」（wheel_luck）的每级倍率：它是乘法叠加（10 级 ×1.63、20 级 ×2.65）。
     // 单独抽成常量，图鉴文案与 getShardWheelLuckMult() 共用一份，免得两处写偏。
-    const SHARD_WHEEL_LUCK_STEP = 0.1;
+    // V0.96：1.1 → 1.05。因为它重新参与「运气」的计算（见 getFocusTier），
+    //   而运气到阶位的映射在「超越」段起是几何曲线——倍率越大越容易把曲线戳穿，
+    //   1.05 让碎片的增益「看得见、但不越轨」。
+    const SHARD_WHEEL_LUCK_STEP = 0.05;
 
     // ===== V0.93 修「后期数值爆炸 / 转盘运气无限 / 转盘失效」 =====
     // 故障链：虚空饵（掉落概率）与双生隙（掉落块数）互相喂 → 碎片等级持续膨胀
@@ -4150,7 +4211,7 @@
       { id: "twin_shard", name: "双生隙", icon: "⧉", tier: 3, stat: "shardDouble", perLevel: 0.10,
         desc: "两道裂缝里映出同一块碎片，所以它总是成对地掉出来。等级够高时，一场战斗里会连续撕下好几块——概率超过 100% 的那部分，就变成了「必定多掉一次」。" },
       { id: "wheel_luck", name: "回旋针", icon: "⟳", tier: 3, stat: "wheelLuck", perLevel: SHARD_WHEEL_LUCK_STEP,
-        desc: "一根不肯停下的针。它<b>不改变转盘能给出的最高品质</b>——天花板永远由「命运扭曲」等级决定——而是把盘面的散布一寸寸收紧，让你每一次抽取都更贴近中心阶位，于是高档位明显更好抽。" },
+        desc: "一根不肯停下的针。每一级把转盘<b>运气</b> ×1.05（复利）——运气直接决定阶位中心，所以它能把你抽到的品质一路往上推；同时它依旧把盘面散布一寸寸收紧，让每次抽取都更贴近中心阶位。<b>从「超越」开始，每上一档品质所需要的运气还要再贵 1.3 倍</b>，所以这份增益再大也是稳稳推进，绝不会一戳到底。" },
       { id: "golden_hourglass", name: "黄金沙漏", icon: "❂", tier: 3, stat: "golden", perLevel: 0.05,
         desc: "沙漏里的沙是金色的，翻过来的时候，整条时间线都会镀上一层金。每一级让黄金时间线的出现概率 +5%；概率满 100% 之后必定出现，而多出来的部分会继续加大黄金线本身的收益。" },
 
@@ -4164,7 +4225,7 @@
       dust: "时间尘埃收益", progress: "时间进度速度", origin: "时间本源收益",
       exp: "猎犬经验获取", shardDrop: "碎片掉落概率", shardXp: "碎片经验获取",
       shardDouble: "碎片额外掉落",
-      wheelLuck: "盘面聚焦",
+      wheelLuck: "转盘运气 / 盘面聚焦",
       golden: "黄金时间线出现概率",
       capture: "被捕获概率", captureRelax: "被捕获概率上限 / 下限",
       atk: "猎犬攻击", hp: "猎犬生命", def: "猎犬防御",
@@ -4200,14 +4261,26 @@
     //   旧：last × 1.28^n —— 每档固定 ×1.28，必然爆炸（超越·100 已到 1.9e12、超越·999 直接溢出），
     //       而且「每次命运扭曲升级都 +21%」在 999 档上也一样剧烈。
     //   新：last × A^(n^B)，B=0.5 即 √n —— **永不溢出、但永远在涨**（超越·999 = 4.2e9，超越·100 万 ≈ 1e255）。
-    //   手感：每次升级（tier +0.78）的增益随档位自然衰减 —— 超越·10 → +7.6%、超越·100 → +2.3%、超越·1000 → +0.7%；
+    //   手感：单档增益随档位自然衰减 —— 超越·10 → +7.6%、超越·100 → +2.3%、超越·1000 → +0.7%；
+    //   （V0.96 起每级命运扭曲能涨几档本身也随运气对数收缩，所以这份衰减比纸上算的还要柔和。）
     //   数学性质：档位每涨 4 倍，单档增益减半（天然收敛、永不封顶）。
     //   ⚠️ 无分段、无硬上限 —— 以后新增更高级品质（星海·N 之类）只要接着算，不需要改任何结构。
-    const TRANSCEND_TIER_MULT_A = 1.8;   // 次指数底数（越大前期越陡）
+    const TRANSCEND_TIER_MULT_A = 1.85;  // 次指数底数（越大前期越陡）
     const TRANSCEND_TIER_MULT_B = 0.5;   // 档位的指数（0.5 = √n；越小后期越平）
     // 旧常量 TRANSCEND_TIER_MULT_STEP(1.28) 已被上面两个取代，保留此行仅为便于回溯。
 
     const FOCUS_COEFF = 0.6;
+    // ===== V0.96（作者要求）：运气 → 阶位中心，超越段起改为「几何间隔」 =====
+    // 旧规则（V0.93~V0.95）：阶位中心 = 0.78 × 等级，再夹一道「每级最多 +1 档」的硬上限。
+    //   两个毛病：① 那条直线永远望不到头，后期每级的手感越来越糊；
+    //   ② 为了防爆炸，回旋针被整个踢出这条链（V0.93 的过度修正），碎片对转盘
+    //      只剩「收紧散布」一件事可做 —— 作者明确要求碎片重新生效。
+    // 新规则：运气 = 命运扭曲等级 × 回旋针倍率（碎片重新参与）；映射分两段 ——
+    //   ① 超越段以下（tier ≤ HOUND_QUALITIES.length）：线性，0.78 档 / 点运气；
+    //   ② 从「超越」起：每上一档，所需运气间隔 ×FOCUS_GEOM_RATIO（几何递增）。
+    // 撤掉硬夹子之后曲线天然收敛：运气翻 10 倍只多 log₁.₃(10) ≈ 8.7 档，
+    //   回旋针倍率再高也戳不穿转盘 —— 这正是「碎片能重新生效」的前提。
+    const FOCUS_GEOM_RATIO = 1.3;
     const SIGMA_MIN = 1.5;
     const SIGMA_COEFF = 0.2;
     const ODDS_MIN_ACTIVE = 1e-6;
@@ -4217,8 +4290,9 @@
     // 概率表显示下限 = 0.01%。低于这个值的品质实际基本抽不出来，
     // 列表里留着只会把表格越拖越长、逼人一直往下翻，所以直接隐藏。
     const ODDS_MIN_SHOW = 1e-4;
-    // 1.3 = FOCUS_STEP（每级抬高的运气倍率），改 FOCUS_STEP 时这里要同步
-    const BOOST_MAX_LEVEL = Math.ceil(MAX_TIER / (FOCUS_COEFF * 1.3)) + 4;
+    // 命运扭曲的可购买等级上限。V0.96 起阶位映射改走几何曲线（见 FOCUS_GEOM_RATIO），
+    //   与等级不再线性相关，所以这里直接沿用旧公式算出的 1291 作为价格体系的天花板。
+    const BOOST_MAX_LEVEL = 1291;
 
     const HOUND_BASE = { atk: 12, aspd: 100, hp: 220, def: 5 };
     // 猎犬仓库上限（V0.70）。猎犬只有「死亡 / 回归」才会离场，而捕获速度远快于它：
@@ -4227,6 +4301,20 @@
     const HOUND_STORAGE_MAX = 300;
     // 玩家自己猎犬的属性浮动（抽奖方差，保持原有的「同品质也有强弱」手感）
     const HOUND_ATTR_VARIANCE = 0.18;
+    // ===== V0.96（作者要求）：品质 → 四维的「弧度」 =====
+    // 为什么加：V0.96 转盘重做之后，高阶品质比过去难抽得多 —— 阶位中心从几百档压回 20~80，
+    //   同一只「超越·30」现在要幸运得多才见得到。作为补偿，四维不再对品质倍率做**线性**映射，
+    //   而是叠一点曲率：四维倍率 = mult^(1 + HOUND_STAT_CURVE)。
+    //   低阶几乎无感（普通 ×1 不变），越高阶多拿的那一层越多（相对旧值：神话 ×1.43、
+    //   超越·10 ×1.74、超越·30 ×2.01）——「抽到高阶」这件事本身的回报更高了。
+    //   ⚠️ 只作用于「猎犬四维」；敌人四维（getEnemyBaseStats）刻意不动 —— 那是对局基准，
+    //      保底线/推荐战力本来就按猎犬实际战力解算，会自动跟着新四维走。
+    const HOUND_STAT_CURVE = 0.1;
+    function houndStatMult(qualityEntry) {
+      const m = qualityEntry && Number.isFinite(qualityEntry.mult) && qualityEntry.mult > 0
+        ? qualityEntry.mult : 1;
+      return m <= 1 ? m : Math.pow(m, 1 + HOUND_STAT_CURVE);
+    }
     // 敌人（时间线守序者）的属性浮动。V0.59 起与玩家猎犬解耦：
     // 每项仍然小幅浮动（战斗不至于完全机械），但生成后会把总战力精确校正回基准值，
     // 也就是「卡片上写的推荐战力 = 真打起来的敌人战力」，把随机方差压到最小。
@@ -4281,10 +4369,24 @@
     const HOUND_MANUAL_COST_EXP = 1.6;
     const LINE_COUNT = 4;
     const LINE_INVASION_SCALE = 0.06;
-    // 出战猎犬低于该等级时，每次刷新时间线都保底一条「战力占优」的线路
-    const LINE_GUARANTEE_MAX_LEVEL = 10;
+    // V0.95（方案 B5）：**保底线常驻**。
+    //   原来只在参考猎犬低于 LINE_GUARANTEE_MAX_LEVEL(10) 时才保底一条 ——
+    //   于是 10 级之后运气差可能刷出四条全都打不过的线，玩家只剩「回归」或干等。
+    //   现在**任何等级都保底一条**，但它的收益按 LINE_GUARANTEE_REWARD_RATIO 打折：
+    //   它是「保命线」，不是「最优解」——想赚得多还得去打随机那几条。
+    const LINE_GUARANTEE_MAX_LEVEL = 10;      // 保留：仅用于文案上区分「新手保护期」
+    const LINE_GUARANTEE_REWARD_RATIO = 0.4;  // 保底线收益 = 同条件下随机线的 40%
     // 保底线敌人战力 / 参考猎犬战力。小于 1 才叫保底
     const LINE_GUARANTEE_POWER_RATIO = 0.65;
+    // ===== V0.95（方案 B6）：三个难度棘轮各自封顶 =====
+    // 时间线难度由三条棘轮一起抬高（都只增不减），不封顶的话后期会一路涨到「怎么打都打不过」：
+    //   ① 入侵次数 → spread 随每次入侵 +LINE_INVASION_SCALE
+    //   ② 参考猎犬等级 → difficultyGrowth = (等级−10) × 0.15
+    //   ③ 危险度档位（1~10）本身也随 difficultyGrowth 一起往上顶
+    // 现在三条各有上限，spread 再兜一道总上限。想整体放松/收紧改这三行即可。
+    const LINE_INVASION_SCALE_CAP = 3;        // ① 入侵带来的膨胀最多 +300%
+    const LINE_DIFFICULTY_GROWTH_CAP = 12;    // ② 等级带来的膨胀最多 +1200%
+    const LINE_SPREAD_CAP = 16;               // 兜底：spread 总上限
 
     // V0.93（作者要求）：**「猎犬合成」整个功能已删除**（合成成功率 / 品质跃迁概率那六个常量一并移除；
     //   相关 CSS、HTML 面板、JS 逻辑与子页签也全部清掉，猎犬子页从五个变成四个）。
@@ -4829,7 +4931,7 @@
       }
       if (typeof e.baitLevelCap === "number") {
         const rate = typeof e.baitOverflowRate === "number" ? e.baitOverflowRate : 0.1;
-        parts.push(`诱饵效果只生效前 ${e.baitLevelCap} 级，超出部分仅 ${(rate * 100).toFixed(0)}%`);
+        parts.push(`诱饵效果只生效前 ${formatNumber(e.baitLevelCap)} 级，超出部分仅 ${(rate * 100).toFixed(0)}%`);
       }
       if (e.upgradeCostMult && e.upgradeCostMult !== 1) parts.push(`尘埃升级造价 ×${e.upgradeCostMult}`);
       if (e.houndExpMult && e.houndExpMult !== 1) parts.push(`猎犬经验 ×${e.houndExpMult}`);
@@ -5180,7 +5282,7 @@
         `${c.id === CHALLENGES[CHALLENGES.length - 1].id ? " · 并解锁「🌌 可能性」" : ""}</span>`;
       el("challengeStartCost").innerHTML =
         `进入挑战会<b style="color: var(--red);">强制发动一次悖论重置</b>：<br>` +
-        `· 全部 ${partCount} 个永恒部件（共 ${partLevels} 级）归零<br>` +
+        `· 全部 ${formatNumber(partCount)} 个永恒部件（共 ${formatNumber(partLevels)} 级）归零<br>` +
         `· 手上全部 ${formatNumber(save.dust)} 时间尘埃清空<br>` +
         `· 当前升级（时间流速 / 尘埃共鸣）回到 Lv.0<br>` +
         `· 本循环已消耗的 ${formatNumber(save.currentSpent)} 尘埃作废<br><br>` +
@@ -5331,6 +5433,10 @@
       {
         key: "bait", name: "自动化诱饵转盘",
         desc: "每秒检查一次诱饵库存：只要有存货就自动投入转盘，把诱饵之力全部换成诱饵等级，不用再一枚枚手动点。消耗顺序是【从最高品质开始】——品质越高单枚之力越强，先把好的转掉。为了不打断你，自动转盘会省略转盘动画，只在事件提示里报一句结果；想看着指针转，把它关掉手动抽即可。开启条件：达成成就「诱饵收藏家」。"
+      },
+      {
+        key: "shop", name: "自动升级悖论商店",
+        desc: "第 5 次进入多元宇宙后，由「多元宇宙里程碑」解锁。每秒自动巡检一次本源商店：挑衅冷却、自动收获效率、猎影加速三件套，只要本源够就各买 1 级——买不起或已满级就跳过，不弹提示、不打扰。开启后攒下的本源会被持续投进商店，不再留着做别的事（比如手动冲「猎影加速」的某一个挡位）。开启条件：多元宇宙里程碑第 5 次。"
       }
     ];
 
@@ -5339,6 +5445,8 @@
       bait: "bait_collector",
       // V0.90：自动悖论也搬进「⚙ 自动化」，由成就「多元宇宙旅人」解锁（MULTIVERSE_ACHV_ID 声明在本文件更上方）
       paradox: MULTIVERSE_ACHV_ID
+      // ⚠️ V0.96：自动升级悖论商店（shop）不走这张表 —— 它挂在多元宇宙里程碑上
+      //    （第 5 次），解锁判定见 isAutoUnlocked 里的特判。
     };
 
     // 自动狩猎的安全门槛：只挑战「推荐战力 × ratio < 自己战力」的线路。
@@ -5452,37 +5560,37 @@
         id: "speed", name: "顺流浮饵", icon: "⟡", color: "var(--cyan)",
         effect: "进度速度", value: 0.01,
         desc: "漂浮在时间之流上的饵食，加快时间进度。",
-        format: v => `+${(v * 100).toFixed(1)}% 进度速度`
+        format: v => `+${formatPercent(v, 1)} 进度速度`
       },
       {
         id: "origin", name: "源息之饵", icon: "◉", color: "var(--purple)",
         effect: "本源收益", value: 0.025,
         desc: "以时间本源的气息制成，狩猎掠夺更多本源。",
-        format: v => `+${(v * 100).toFixed(1)}% 本源收益`
+        format: v => `+${formatPercent(v, 1)} 本源收益`
       },
       {
         id: "houndexp", name: "兽香之饵", icon: "✦", color: "var(--green)",
         effect: "猎犬经验", value: 0.04,
         desc: "猎犬无法抗拒的香气，狩猎经验大幅增加。",
-        format: v => `+${(v * 100).toFixed(1)}% 猎犬经验`
+        format: v => `+${formatPercent(v, 1)} 猎犬经验`
       },
       {
         id: "part", name: "蜕变之饵", icon: "✧", color: "var(--q-epic)",
         effect: "部件成长", value: 0.08,
         desc: "让猎犬撕咬得更彻底，被捕获时部件成长更多。",
-        format: v => `+${(v * 100).toFixed(1)}% 部件成长`
+        format: v => `+${formatPercent(v, 1)} 部件成长`
       },
       {
         id: "calm", name: "静默苔饵", icon: "☾", color: "var(--blue)",
         effect: "静默姿态", value: -0.012,
         desc: "带有安抚气息的苔藓。获得后解锁「静默姿态」：主动抹去时间踪迹，把捕获概率压到当前配置的最低值。",
-        format: v => `${(Math.min(0.9, Math.abs(v)) * 100).toFixed(1)}% 减伤（静默姿态）`
+        format: v => `${formatPercent(Math.min(0.9, Math.abs(v)), 1)} 减伤（静默姿态）`
       },
       {
         id: "bold", name: "逆鳞腥饵", icon: "⚔", color: "var(--red)",
         effect: "暴露姿态", value: 0.02, sub: 0.03,
         desc: "挑衅猎犬的腥饵。获得后解锁「暴露姿态」：无视全部减伤，把捕获概率推到最高；并永久提供部件成长加成。",
-        format: v => `+${(v * 100).toFixed(1)}% 捕获概率（暴露姿态） · +${(v * 1.5 * 100).toFixed(1)}% 部件成长`
+        format: v => `+${formatPercent(v, 1)} 捕获概率（暴露姿态） · +${formatPercent(v * 1.5, 1)} 部件成长`
       },
       {
         id: "luck", name: "磁石之饵", icon: "⌬", color: "var(--purple)",
@@ -5490,7 +5598,7 @@
         // V0.90：掉落速度那一半已随「诱饵独立化」取消（掉率恒定）；这里只剩「品质上移」，
         //   且改成「Lv.100 满级」：到 100 级时传说诱饵爆率正好拉满，之后不再掉落。
         desc: "吸附诱饵的磁饵：把掉落品质整体上移（诱饵掉率本身恒定，不受它影响）。最高 Lv.100 —— 满级时传说诱饵爆率 100%，此后不再掉落。",
-        format: v => `品质上移（+${(v * 100).toFixed(0)}%）`
+        format: v => `品质上移（+${formatPercent(v, 0)}）`
       }
       // V0.79：已删除「悖论之饵」（命运扭曲消耗）
     ];
@@ -5535,7 +5643,7 @@
       lines: [],
       linesDirty: false,
       achievements: {},
-      auto: { harvest: false, upgrade: false, hunt: false, equip: false, bait: false, paradox: false },
+      auto: { harvest: false, upgrade: false, hunt: false, equip: false, bait: false, paradox: false, shop: false },
       bulkLevel: 1,
       luckBoost: 0,
       // V0.93：自动收割点挡位（OVERFLOW_AUTO_LEVELS 的下标）—— 0 稳健 / 1 平衡 / 2 贪婪
@@ -5612,10 +5720,10 @@
       //   刚重置完的玩家会报「1」——排行榜需要一个只增不减的读数。
       bestDust: 0,
       // V0.92：排行榜的本地身份。lbPid 是本机标识（服务端用它做「每人一条」覆盖更新，
-      //   否则每次上传都会新增一行、榜被自己刷满）；lbAuto 是玩家的「自动上传」开关（默认关）。
+      //   否则每次上传都会新增一行、榜被自己刷满）。
+      //   ⚠️ V0.96：原「lbAuto 自动上传开关」已删除 —— 上传改为纯手动（见 loadSave 里的剥离）。
       lbName: "",
       lbPid: "",
-      lbAuto: false,
       savedAt: 0
     };
 
@@ -5878,8 +5986,15 @@
       if (b.e < 36) {
         let tier = Math.floor(b.e / 3);
         if (tier > NUM_SUFFIX.length - 1) tier = NUM_SUFFIX.length - 1;
-        const scaled = bigNum(b) / Math.pow(1000, tier);
-        const digits = scaled < 10 ? 2 : scaled < 100 ? 1 : 0;
+        let scaled = bigNum(b) / Math.pow(1000, tier);
+        let digits = scaled < 10 ? 2 : scaled < 100 ? 1 : 0;
+        // V0.96：999 999 这种「取整后刚好凑满 1000」的值，旧写法会印成「1000K」。
+        //   进位到上一档写成「1.00M」更符合直觉（也避免出现四位数的整数部分）。
+        if (Number(scaled.toFixed(digits)) >= 1000 && tier < NUM_SUFFIX.length - 1) {
+          tier += 1;
+          scaled = bigNum(b) / Math.pow(1000, tier);
+          digits = scaled < 10 ? 2 : scaled < 100 ? 1 : 0;
+        }
         return `${scaled.toFixed(digits)}${NUM_SUFFIX[tier]}`;
       }
       return formatScientific(b);
@@ -6416,7 +6531,9 @@
         //   类型不对就在这里一次性纠正（Object.assign 的合并会把显式 undefined 也带进来）。
         if (typeof good.lbName !== "string") good.lbName = "";
         if (typeof good.lbPid !== "string") good.lbPid = "";
-        good.lbAuto = good.lbAuto === true;
+        // V0.96：自动上传已移除（后端按调用计费）—— 老存档里残留的 lbAuto 字段直接删掉，
+        //   免得它在导出档里继续存在、让玩家以为还在自动上报。
+        delete good.lbAuto;
         // V0.88：每次成功载入都留一份「上一份好存档」的备份 ——
         //   万一以后哪次载入又把存档弄坏，可以自动从这份回滚，不至于全丢。
         try { localStorage.setItem(SAVE_KEY + "-backup", JSON.stringify(good)); } catch (_) {}
@@ -6495,6 +6612,28 @@
     const GENE_UPGRADE_GROWTH = 1.5; // 每级花费 ×1.5
     const GENE_EFFECT_MAX = 1e9;    // 单条基因的倍率上限（12 条同类叠乘 ≈ 1e108，安全）
 
+    // ===== V0.96（作者要求）：部件软上限基因单开一条曲线 =====
+    // 旧规则：每级 ×品质倍率本身（神话 ×1.28、超越段更陡），等级上限由「倍率封顶 1e9」反推。
+    //   两个毛病：① 高档位基因几步就撞上限（超越·99 只能强化 4 级，强化按钮直接变灰）；
+    //   ② 低档位基因反而能把部件软上限一路乘到 1e9 —— 部件等于永久解除限制，超模。
+    // 新规则：**去掉等级上限**（想强化多少级都行，成本照旧每级 ×1.5），
+    //   但成长比例巨幅削弱 —— 每级只吃「品质倍率增量」的 PART_CAP_GENE_STEP_RATIO（一成），
+    //   且单级加成封顶 +PART_CAP_GENE_MAX_STEP（+5%）。
+    //   实感：普通 ×1.002/级、神话 ×1.028/级、超越段一律 ×1.05/级；
+    //   等效总倍率仍受 GENE_EFFECT_MAX 保险丝保护（正常玩法到不了，到得了也不会炸）。
+    //   ⚠️ 只改 partCap 这一条；其余基因的「每级 ×品质倍率 + 等级上限」完全照旧。
+    const PART_CAP_GENE_STEP_RATIO = 0.1;
+    const PART_CAP_GENE_MAX_STEP = 0.05;
+    // 基因的「每级成长比例」：普通基因 = 品质倍率；partCap = 削弱后的单级比例（见上）
+    function geneGrowthRatio(g) {
+      const t = geneTierOf(g);
+      if (g && g.k === "partCap") {
+        return 1 + Math.min(PART_CAP_GENE_MAX_STEP,
+          Math.max(0, t.mult - 1) * PART_CAP_GENE_STEP_RATIO);
+      }
+      return t.mult;
+    }
+
     function getPossibility() { return save.possibility; }
     function isMultiverseOn() { return !!getPossibility().multiverse; }
     function getDustCap() { return bigFromLog10(isMultiverseOn() ? MULTIVERSE_CAP_E : DUST_CAP_E); }
@@ -6562,7 +6701,7 @@
         const n = tier - GENE_BASE_TIERS.length + 1;      // 1 → 超越·1
         out.push({
           id: tier,
-          name: `超越·${n}`,
+          name: `超越·${formatNumber(n)}`,
           color: myth.color,
           weight: GENE_TAIL_WEIGHT,
           mult: myth.mult * Math.pow(GENE_TIER_MULT_A, Math.pow(n, GENE_TIER_MULT_B))
@@ -6696,7 +6835,7 @@
           </div>
           <div class="gm-prob-row">
             <span class="gm-high">高级（稀有及以上）合计 <b>${(high * 100).toFixed(1)}%</b>${luck > 0 ? ` · 幸运 Lv.${luck} 已生效` : " · 还没买过基因幸运"}</span>
-            ${hidden > 0 ? `<span class="mv-cost">（另有 ${hidden} 个更高档位的概率低于 0.5%，未列出）</span>` : ""}
+            ${hidden > 0 ? `<span class="mv-cost">（另有 ${formatNumber(hidden)} 个更高档位的概率低于 0.5%，未列出）</span>` : ""}
           </div>
         </div>`);
     }
@@ -6711,16 +6850,19 @@
       const id = g && typeof g.tier === "number" ? Math.floor(g.tier) : 0;
       return GENE_TIERS[Math.max(0, Math.min(GENE_TIERS.length - 1, id))];
     }
-    // 基因的实际倍率（V0.65 起为乘法）：档位基础倍率 ^ 等级，并封顶在 GENE_EFFECT_MAX。
+    // 基因的实际倍率（V0.65 起为乘法）：档位成长比例 ^ 等级，并封顶在 GENE_EFFECT_MAX。
     // 例：神话(1.28) Lv.10 → ×11.81；普通(1.02) Lv.10 → ×1.22。
+    // V0.96：成长比例走 geneGrowthRatio(g) —— partCap 用它自己那条削弱后的曲线。
     function geneEffect(g) {
-      const t = geneTierOf(g);
+      const r = geneGrowthRatio(g);
       const lv = Math.max(1, Math.floor(g && typeof g.level === "number" ? g.level : 1));
-      const v = Math.pow(t.mult, lv);
+      const v = Math.pow(r, lv);
       return v > GENE_EFFECT_MAX ? GENE_EFFECT_MAX : v;
     }
-    // 该档位的等级上限（到顶后倍率不再涨，UI 会禁用强化）
+    // 该档位的等级上限（到顶后倍率不再涨，UI 会禁用强化）。
+    // V0.96：partCap 没有等级上限（成长比例已被巨幅削弱，靠 GENE_EFFECT_MAX 兜底即可）。
     function geneLevelCap(g) {
+      if (g && g.k === "partCap") return Infinity;
       const t = geneTierOf(g);
       return Math.max(1, Math.floor(Math.log(GENE_EFFECT_MAX) / Math.log(t.mult)));
     }
@@ -6742,7 +6884,7 @@
     }
     // 效果的可读文本（大数走 E 记法，避免 toFixed 在 1e21 以上变成 "1e+21"）
     function geneEffectText(g) {
-      const lg = Math.log10(geneTierOf(g).mult) * Math.max(1, Math.floor(g && g.level || 1));
+      const lg = Math.log10(geneGrowthRatio(g)) * Math.max(1, Math.floor(g && g.level || 1));
       if (lg < 6) return Math.pow(10, lg).toFixed(2);
       const e = Math.floor(lg);
       return `${Math.pow(10, lg - e).toFixed(2)}E${e}`;
@@ -6825,9 +6967,20 @@
       { label: "轮回与狩猎次数", fn: () => ((save.captures || 0) + (save.invasions || 0) + (save.paradoxCount || 0)) * 0.2 }
     ];
     // V0.65：整套「进度分」最后统一除以此数才变成基因修饰点数。
-    // V0.67：分母 40 → 150。校准目标：刚解锁多元宇宙的第一次进入（尘埃刚好 1E1000）**只够买 1 级强化**。
+    // V0.67：分母 40 → 150。当时的校准目标「第一次进入只够买 1 级强化」在 V0.96 被作者判定为过紧
+    //   （见下面 EARLY_GENE_BONUS 的前期倍率）——除数本身没动，前期加成是独立乘上去的。
     // 想整体放松/收紧就改这一个数。
     const WIPE_POINT_DIVISOR = 150;
+    // V0.96（作者反馈）：**前期倍率** —— 第一次踏进多元宇宙的玩家，进度分往往只有一两千，
+    //   除完 150 只换来 8~26 点，连一级基因强化（12 点起）都买不起，这就是「根本升级不了几次」。
+    //   现在按「已经进入过几次宇宙」发一个递减加成：第 1 次 ×3.5，之后每次少 0.5，第 5 次起 ×1.00。
+    //   ⚠️ 只动前期：后期（软上限把部件 / 回归压平之后）读数完全不变，作者要的「后期削弱不变」成立。
+    const EARLY_GENE_BONUS = 2.5;   // 首次进入时的额外倍率（+250%）
+    const EARLY_GENE_DECAY = 5;     // 经过这么多次进入后，加成衰减到 0
+    function getEarlyGeneMult() {
+      const n = Math.max(0, Math.floor(getPossibility().entries || 0));
+      return 1 + EARLY_GENE_BONUS * Math.max(0, 1 - n / EARLY_GENE_DECAY);
+    }
     // 先求和、再除以 WIPE_POINT_DIVISOR 得到总点数，最后按各分项占比分配回明细——
     // 这样「明细相加 = 总点数」恒成立，也不像逐项取整那样把零头全部丢掉（分母大时尤其明显）。
     function getWipeScoreBreakdown() {
@@ -6839,13 +6992,22 @@
       });
       const sum = raw.reduce((a, b) => a + b.raw, 0);
       if (!(sum > 0)) return [];
-      const total = Math.floor(sum / WIPE_POINT_DIVISOR);
+      const base = Math.floor(sum / WIPE_POINT_DIVISOR);
+      if (base <= 0) return [];
+      // V0.96：前期倍率作用在**总点数**上（各项等比例放大，占比不变）
+      const mult = getEarlyGeneMult();
+      const total = Math.floor(base * mult);
       if (total <= 0) return [];
-      const out = raw.map(it => ({ label: it.label, value: Math.floor(total * it.raw / sum) }));
+      // 明细按 base 分配，再把「前期加成」单独列一行 —— 相加仍旧恒等于总点数，
+      //   玩家也看得明白多出来的点数是从哪儿来的（不然会以为折算公式偷偷变了）。
+      const out = raw.map(it => ({ label: it.label, value: Math.floor(base * it.raw / sum) }));
       // 取整产生的余数，从「原始分值最大」的项开始逐个 +1，保证合计不差分毫
-      let left = total - out.reduce((a, b) => a + b.value, 0);
+      let left = base - out.reduce((a, b) => a + b.value, 0);
       const order = out.map((_, i) => i).sort((a, b) => raw[b].raw - raw[a].raw);
       for (let k = 0; left > 0 && order.length > 0; k = (k + 1) % order.length, left--) out[order[k]].value++;
+      if (mult > 1) {
+        out.push({ label: `前期加成 ×${painMultText(mult)}（进入宇宙未满 ${EARLY_GENE_DECAY} 次）`, value: total - base });
+      }
       return out.filter(it => it.value > 0);
     }
     function getWipeModPoints() {
@@ -6864,11 +7026,10 @@
       const keepPlayMs = save.playMs || 0;
       const keepOfflineMs = save.offlineMs || 0;
       // V0.92：排行榜相关的「本存档身份 + 历史最高尘埃」也跨宇宙保留。
-      //   bestDust 是只增不减的终身记录；lbName/lbPid/lbAuto 是玩家身份，重置轮回跟它们没关系。
+      //   bestDust 是只增不减的终身记录；lbName/lbPid 是玩家身份，重置轮回跟它们没关系。
       const keepBestDust = save.bestDust;
       const keepLbName = save.lbName;
       const keepLbPid = save.lbPid;
-      const keepLbAuto = save.lbAuto;
       // V0.89：**「新功能已读」的记录必须跨宇宙保留**。
       //   之前没保留 → 每次进宇宙 seenTabs 被抹掉 → 一个功能（永恒背包/诱饵/可能性子页…）
       //   会被重新点亮一次，既"毫无意义"，也让玩家点了很久的高亮凭空复活。
@@ -6893,7 +7054,6 @@
       save.bestDust = bigMax(bigOf(keepBestDust), save.dust);
       save.lbName = typeof keepLbName === "string" ? keepLbName : "";
       save.lbPid = typeof keepLbPid === "string" ? keepLbPid : "";
-      save.lbAuto = !!keepLbAuto;
       if (keepSeenTabs !== undefined) save.seenTabs = keepSeenTabs;
       // V0.90：把诱饵原样接回来（它是永久加成，不随轮回清空）
       if (keepBaits && typeof keepBaits === "object") save.baits = keepBaits;
@@ -6926,10 +7086,14 @@
       // V0.71：苦痛之路的回报 —— 本次进入宇宙的基因点数按倍率发放；
       // 发了之后苦痛就在这一轮结束（picks 清空，但 everUnlocked 永久保留 → 苦痛挑战仍然可见）。
       const painMult = (p.pain && p.pain.active) ? Math.max(1, Math.floor(p.pain.geneMult || 1)) : 1;
-      // V0.89：苦痛挑战的「全局倍率」奖励已删除；这里只剩「苦痛之路倍率 × 里程碑倍率」
+      // V0.96（作者反馈的 BUG）：苦痛挑战承诺的「每个完成 → 基因点数 ×1.5（累乘）」以前只写了
+      //   painChallengeGeneMult() 这个函数、**从来没有接进发放口**（它是死代码）——
+      //   于是苦痛挑战打完，基因点数一分没多。现在正式接上，和苦痛之路 / 里程碑串联。
+      const painChMult = painChallengeGeneMult();
+      // V0.89：苦痛挑战的「全局倍率」奖励已删除；这里只剩「苦痛之路 × 苦痛挑战 × 里程碑」
       const milestoneMult = getMilestoneGeneMult();
       // V0.89：有小数点就**向上取整**（原来四舍五入会把 ×1.5 的半截抹掉）
-      const geneGain = Math.max(1, Math.ceil(painMult * milestoneMult));
+      const geneGain = Math.max(1, Math.ceil(painMult * painChMult * milestoneMult));
       // 先把本次进入的结果写进可能性（p 对象在重建存档时被原样带过去）
       p.entries = (p.entries || 0) + 1;
       p.genePoints = (p.genePoints || 0) + geneGain;
@@ -6954,7 +7118,7 @@
           p.pain.active = true;
           p.pain.pending = [];
           p.pain.geneMult = carriedMult;
-          logEvent("🩸", `苦痛之路生效：<b>${p.pain.picks.length}</b> 条苦痛加身（本轮结束时回报 ×${carriedMult}）`, "red");
+          logEvent("🩸", `苦痛之路生效：<b>${formatNumber(p.pain.picks.length)}</b> 条苦痛加身（本轮结束时回报 ×${carriedMult}）`, "red");
         } else {
           p.pain.pending = [];
         }
@@ -6977,7 +7141,7 @@
           `（共 ${getMilestoneChallengeCount()} / ${CHALLENGES.length} 关）`, "gold");
       }
       return { entries: p.entries, modGain: modGain, geneGain: geneGain, painMult: painMult,
-        milestoneMult: milestoneMult, milestoneCh: milestoneCh };
+        painChMult: painChMult, milestoneMult: milestoneMult, milestoneCh: milestoneCh };
     }
 
     // ---- 多元宇宙 / 基因 操作 ----
@@ -7030,9 +7194,11 @@
         ? breakdown.map(it => `${it.label} ${it.value}`).join(" · ")
         : "当前没有可折算的进度";
       const painMult = (p.pain && p.pain.active) ? Math.max(1, Math.floor(p.pain.geneMult || 1)) : 1;
-      // V0.89：与真发放同一套口径（苦痛之路倍率 × 里程碑倍率，向上取整）
+      // V0.96：苦痛挑战的 ×1.5 也接进预览（与真发放同一套口径，见 performMultiverseEntry）
+      const painChMult = painChallengeGeneMult();
+      // V0.89：与真发放同一套口径（苦痛之路 × 苦痛挑战 × 里程碑，向上取整）
       const milestoneMult = getMilestoneGeneMult();
-      const geneGain = Math.max(1, Math.ceil(painMult * milestoneMult));
+      const geneGain = Math.max(1, Math.ceil(painMult * painChMult * milestoneMult));
       const rest = Math.max(0, p.pending.length - 1);
       setText("mvModalTitle", `进入「${u.name}」`);
       setHTML("mvModalMods", u.mods.map(m => `<span class="mv-modal-mod">${formatMod(m)}</span>`).join(""));
@@ -7051,10 +7217,11 @@
       //    现在与真发放口径一致：苦痛之路倍率 × 里程碑倍率。
       const multNote = [
         painMult > 1 ? `苦痛之路 ×${painMult}` : "",
+        painChMult > 1 ? `苦痛挑战 ×${painMultText(painChMult)}` : "",
         milestoneMult > 1 ? `里程碑 ×${painMultText(milestoneMult)}` : ""
       ].filter(Boolean).join(" · ");
       setHTML("mvModalGain",
-        `<div>获得　<b style="color: var(--gold);">${geneGain}</b> 基因点数` +
+        `<div>获得　<b style="color: var(--gold);">${formatNumber(geneGain)}</b> 基因点数` +
         (multNote ? ` <span style="color: var(--muted);">（${multNote}）</span>` : "") + `</div>` +
         `<div>折算　<b style="color: var(--cyan);">${formatNumber(modGain)}</b> 基因修饰点数</div>` +
         `<div class="mv-modal-break">明细：${bdText}</div>`);
@@ -7103,13 +7270,14 @@
       const res = performMultiverseEntry(u);
       closeMultiverseConfirm();
       saveGame(true);
-      logEvent("🌌", `进入宇宙「<b>${u.name}</b>」——第 ${res.entries} 次触碰可能性`, "purple");
+      logEvent("🌌", `进入宇宙「<b>${u.name}</b>」——第 ${formatNumber(res.entries)} 次触碰可能性`, "purple");
       const srcNote = [
         res.painMult > 1 ? `苦痛之路 ×${res.painMult}` : "",
+        res.painChMult > 1 ? `苦痛挑战 ×${painMultText(res.painChMult)}` : "",
         res.milestoneMult > 1 ? `里程碑 ×${painMultText(res.milestoneMult)}` : "",
         res.milestoneCh > 0 ? `里程碑永久通关 +${res.milestoneCh} 关主线挑战` : ""
       ].filter(Boolean).join(" · ");
-      showToast(`已进入「<b>${u.name}</b>」：<b>+${res.geneGain}</b> 基因点数` +
+      showToast(`已进入「<b>${u.name}</b>」：<b>+${formatNumber(res.geneGain)}</b> 基因点数` +
         (srcNote ? `<span style="color:var(--gold)">（${srcNote}）</span>` : "") +
         ` · <b>+${formatNumber(res.modGain)}</b> 基因修饰点数`);
       render();
@@ -7203,7 +7371,7 @@
       if (!list.length) return;
       const names = list.map(i => {
         const g = genes[i];
-        return `· ${geneTierOf(g).name}·${g.label} ${geneText(g)}（Lv.${g.level}）`;
+        return `· ${geneTierOf(g).name}·${g.label} ${geneText(g)}（Lv.${formatNumber(g.level)}）`;
       });
       const lostMod = list.reduce((s, i) => s + geneInvested(genes[i]), 0);
       if (!skipConfirm) {
@@ -7211,7 +7379,7 @@
           icon: "🧬", title: `永久移除 ${list.length} 条基因`, ok: "永久移除", danger: true,
           text: `${names.join("<br>")}<br><br>` +
             `<b style="color:var(--red)">⚠️ 不退还任何点数</b>：将失去 ${list.length} 个基因点数` +
-            (lostMod > 0 ? `，以及已投入的 ${lostMod} 点基因修饰点数` : "") + `。`
+            (lostMod > 0 ? `，以及已投入的 ${formatNumber(lostMod)} 点基因修饰点数` : "") + `。`
         }, () => removeGenesByIdx(idxs, true));
         return;
       }
@@ -7221,7 +7389,7 @@
       saveGame(true);
       logEvent("🧬", `永久移除 ${list.length} 条基因（不退还点数）`, "purple");
       showToast(`已永久移除 ${list.length} 条基因：失去 <b>${list.length}</b> 基因点` +
-        (lostMod > 0 ? ` + <b>${lostMod}</b> 修饰点` : "") + `（不退还）`);
+        (lostMod > 0 ? ` + <b>${formatNumber(lostMod)}</b> 修饰点` : "") + `（不退还）`);
       renderPossibility();
     }
     function removeGeneAt(idx) { removeGenesByIdx([idx]); }
@@ -7251,7 +7419,7 @@
         return;
       }
       saveGame(true);
-      showToast(`${geneTierOf(g).name}·${g.label} 强化 ×${done} → <b>Lv.${g.level}</b>（${geneText(g)}，花费 ${spent} 点）`);
+      showToast(`${geneTierOf(g).name}·${g.label} 强化 ×${done} → <b>Lv.${formatNumber(g.level)}</b>（${geneText(g)}，花费 ${spent} 点）`);
       renderPossibility();
     }
 
@@ -7277,6 +7445,10 @@
     // 没有它的话，同一份 .txt 反复载入就能反复拿满 12 小时离线（存档里的导出时刻是固定的）。
     // 有了它，离线只会从「存档里的导出时刻」和「本机上一次结算时刻」里更晚的那个开始算。
     const SAVE_MARK_KEY = SAVE_KEY + "-lastsettle";
+    // V0.96：清空存档前会把当前存档原样另存到这个键，作为「误删备份」——
+    //   确认框防的是「手滑点错」，备份防的是「确认之后立刻后悔」，两道一起才叫防误触。
+    //   恢复入口在设置面板里（只有存在备份时才出现），恢复后备份即被消费掉。
+    const SAVE_WIPED_KEY = SAVE_KEY + "-wiped";
     function getSettledMark() {
       try { return Number(localStorage.getItem(SAVE_MARK_KEY)) || 0; } catch (e) { return 0; }
     }
@@ -7507,6 +7679,11 @@
     }
 
     function resetSave() {
+      // V0.96：删档前先原样留一份「误删备份」（只留最近一份），给手滑一个后悔的机会
+      try {
+        const raw = localStorage.getItem(SAVE_KEY);
+        if (raw) localStorage.setItem(SAVE_WIPED_KEY, raw);
+      } catch (e) { }
       localStorage.removeItem(SAVE_KEY);
       localStorage.removeItem(SAVE_MARK_KEY);
       save = normalizeBigFields(structuredCloneSafe(DEFAULT_SAVE));
@@ -7539,28 +7716,70 @@
       if (!skipConfirm) {
         showConfirm({
           icon: "🗑", title: "清除本地存档", ok: "永久清除", danger: true,
-          text: "所有进度、猎犬、本源、碎片与挑战记录都会被删除，<b style=\"color:var(--red)\">且不可恢复</b>。"
+          text: "所有进度、猎犬、本源、碎片与挑战记录都会被删除。<br>" +
+            "本机会自动留一份<b>「误删备份」</b>（设置面板里可恢复一次），但<b style=\"color:var(--red)\">恢复之后就没有第二次了</b>——请确认你真的要重来。"
         }, () => performReset(true));
         return;
       }
       resetSave();
     }
 
+    // ===== V0.96：误删备份的恢复入口 =====
+    function hasWipedSnapshot() {
+      try { return !!localStorage.getItem(SAVE_WIPED_KEY); } catch (e) { return false; }
+    }
+    function refreshWipedRow() {
+      const row = el("settingsRestoreRow");
+      if (row) row.style.display = hasWipedSnapshot() ? "" : "none";
+    }
+    function restoreWipedSave() {
+      let raw = null;
+      try { raw = localStorage.getItem(SAVE_WIPED_KEY); } catch (e) { }
+      if (!raw) { showToast("没有可恢复的存档备份。"); refreshWipedRow(); return; }
+      showConfirm({
+        icon: "♻", title: "恢复上次清空的存档", ok: "恢复并重载",
+        text: "会用<b>清空之前留下的备份</b>覆盖当前进度，然后自动重载页面（当前这份已清空的状态会被丢掉）。"
+      }, () => {
+        try {
+          localStorage.setItem(SAVE_KEY, raw);
+          // 备份只允许用一次：恢复过就消费掉，避免以后反复回滚到同一份旧档
+          localStorage.removeItem(SAVE_WIPED_KEY);
+          localStorage.removeItem(SAVE_MARK_KEY);
+        } catch (e) { showToast("恢复失败：本机存储不可写。"); return; }
+        try { location.reload(); } catch (e) { }
+      });
+    }
+
     // 每次提升 = 运气（焦点阶位）再乘 FOCUS_STEP 倍，采用线性递增而非老版的平方递增。
     // 老版 FOCUS_COEFF * lv² 在 Lv.10 就冲到「超越·55」，过于膨胀；线性版节奏平缓得多。
     // 1.3 是「首级造价降到 1000」的对价：升级更便宜，但每级抬高的运气少了。
-    // ⚠️ 改这个值要同步 BOOST_MAX_LEVEL 里的字面量。
     const FOCUS_STEP = 1.3;
+    // ===== V0.96（作者要求）：运气 → 阶位中心，两段式映射 =====
+    // 运气 = 等级 × 回旋针倍率 —— 碎片重新参与（V0.93 曾因指数爆炸把它整个踢出去）。
+    // 映射：超越段以下线性（0.78 档/点）；从「超越」起每上一档，运气间隔 ×1.3（几何）。
+    //   连续点验（无碎片）：Lv.10 → 超越·2.6、Lv.20 → 超越·6.2、Lv.50 → 超越·10、
+    //   Lv.100 → 超越·13、Lv.1000 → 超越·22 —— 档位改随运气对数增长，
+    //   于是「永远有得升」，但回旋针倍率再高也戳不穿转盘。
+    // ⚠️ 回旋针倍率自带软上限（见 wheelLuckMultAt），永远有限；log 只吃有限值。
     function getFocusTier(level) {
       const lv = level === undefined ? save.luckBoost : level;
       if (!(lv > 0)) return 0;   // 没点过命运扭曲 → 运气为 0
-      // ===== V0.93（作者反馈修正）：中心阶位**只由命运扭曲等级决定** =====
-      // 老写法是 `… × lv × getShardWheelLuckMult()`，而那个倍率是指数（回旋针 Lv.60 就有 ×304）——
-      // 结果命运扭曲只要 5 级，配合回旋针就直接顶到「超越·999」，整条升级线被架空。
-      // 现在 0.78 × 等级 的线性映射是**刻意校准过的**：满级 (BOOST_MAX_LEVEL) 恰好≈ MAX_TIER，
-      // 所以「想要更好的猎犬」这件事被完整地绑回「一直提升命运扭曲」——这正是作者要的。
-      // 回旋针的价值改由「收紧盘面散布」承担（提高高档位命中率，不碰天花板）。
-      const v = FOCUS_COEFF * FOCUS_STEP * lv;
+      const luck = lv * getShardWheelLuckMult();       // V0.96：碎片重新生效
+      const slope = FOCUS_COEFF * FOCUS_STEP;          // 0.78 档 / 点运气（超越段以下）
+      const tierAtTranscend = HOUND_QUALITIES.length;  // 6 = 超越·1
+      const luckAtTranscend = tierAtTranscend / slope; // ≈7.69：线性段走到「超越」要这么多运气
+      let v;
+      if (luck <= luckAtTranscend) {
+        v = slope * luck;
+      } else {
+        // 超越段：走到第 n 档的累计运气 = luckAtTranscend + base×(1.3^n − 1)/(1.3 − 1)，
+        // base = 1/slope 保证衔接处连续（超越·1 → 超越·2 的第一段间隔 = 线性段的一档）。
+        // 反解 n 即得档位：间隔逐段 ×1.3，档位只随运气对数增长 —— 天然收敛、无需硬夹子。
+        const base = 1 / slope;
+        const r = FOCUS_GEOM_RATIO;
+        const n = Math.log(1 + (luck - luckAtTranscend) * (r - 1) / base) / Math.log(r);
+        v = tierAtTranscend + n;
+      }
       // 非有限保险：老写法 `Math.min(MAX_TIER, NaN)` 会返回 NaN，
       //   于是焦点阶位、σ、可得区间全部变成 NaN —— 玩家看到的就是「转盘失效」。
       //   现在无论哪里出问题，最差也只是顶到 MAX_TIER，转盘永远能用。
@@ -7569,9 +7788,12 @@
     }
     function getSigmaForFocus(focus) {
       const base = Math.max(SIGMA_MIN, SIGMA_COEFF * Math.sqrt(focus + 1));
-      // V0.93（作者反馈）：回旋针改为**收紧盘面散布**（见 getWheelSpreadFactor），
-      //   于是高档位的命中率大幅提升，但**中心阶位一点没动** —— 天花板仍由命运扭曲等级决定。
-      return Math.max(SIGMA_MIN, base * getWheelSpreadFactor());
+      // V0.96：下限改成 SIGMA_MIN × WHEEL_SPREAD_MIN（而不是死的 SIGMA_MIN）。
+      //   V0.96 之前焦点能冲到超越·999，σ 下限 1.5 从来咬不到；新曲线（几何间隔）把焦点
+      //   压进 ~20-80 区间后，0.2×√(焦点+1) 常态不足 1.5 —— 若还按 1.5 兜底，
+      //   回旋针的「收紧散布」会被整段吃掉，图鉴里宣传的效果变成空头支票。
+      //   现在下限跟着散布下限走：无碎片时仍是 1.5，碎片拉满时最低 0.75。
+      return Math.max(SIGMA_MIN * WHEEL_SPREAD_MIN, base * getWheelSpreadFactor());
     }
     function getTierWindow(level) {
       const focus = getFocusTier(level);
@@ -7590,7 +7812,7 @@
       const last = HOUND_QUALITIES[HOUND_QUALITIES.length - 1].mult;
       return {
         id: tier,
-        name: `超越·${n}`,
+        name: `超越·${formatNumber(n)}`,
         color: "var(--q-myth)",
         mult: last * Math.pow(TRANSCEND_TIER_MULT_A, Math.pow(n, TRANSCEND_TIER_MULT_B))
       };
@@ -7997,17 +8219,19 @@
     function getShardDropCountMult() {
       return 1 + getShardExtraDropTimes();
     }
-    // 「回旋针」：每级 ×1.1 **复利**叠加（不是线性相加）—— 这个倍率现在只用来收紧盘面散布，
-    //   **不再乘进中心阶位**（否则指数倍率会让命运扭曲整条升级线被架空，见 getWheelSpreadFactor）。
+    // 「回旋针」：每级 ×1.05 **复利**叠加（不是线性相加）。
+    // V0.96 起它重新乘进中心阶位（见 getFocusTier）—— 因为运气到阶位的映射在「超越」段
+    //   起是几何曲线（每档间隔 ×1.3），指数倍率只会把档位对数级推高，再也戳不穿转盘；
+    //   与此同时它依旧收紧盘面散布（getWheelSpreadFactor），一份碎片两头都办事。
     // 所以它不走 getShardBonus 的 Σ(每级×等级)，直接用等级算幂。
     // 运气 ×0 时（还没点过命运扭曲）乘什么都是 0，等于开局抽不到好处——这是刻意的：
     // 这枚碎片放大的是「已有的运气」，不是凭空给你运气。
-    // 把「复利指数」压成软上限后的有效倍数：拐点内原样（就是 ×1.1^等级），
+    // 把「复利指数」压成软上限后的有效倍数：拐点内原样（就是 ×1.05^等级），
     // 超出部分按**对数**继续涨 —— 永不归零、也没有硬顶，但**永远不会是 Infinity**。
-    // ⚠️ 入参是指数本身（= 回旋针等级 × 猎犬加成倍率），**不是** 1.1^指数。
+    // ⚠️ 入参是指数本身（= 回旋针等级 × 猎犬加成倍率），**不是** 1.05^指数。
     //    因为先算幂的话，等级够高时 Math.pow 会先溢出成 Infinity，
     //    而 softCapValue 对非有限输入会返回 0 → 运气反而掉回 ×1（变成超级削弱）。
-    //    所以在指数上先过一道保险丝（1.1^7000 ≈ 6e289，仍在 double 范围内），
+    //    所以在指数上先过一道保险丝（1.05^7000 ≈ 6e148，仍在 double 范围内），
     //    此时软上限早已钝化到饱和区，肉眼看不出差别。
     // 抽成独立函数是为了让**图鉴文案显示的数**和**实际生效的数**永远是同一个。
     function wheelLuckMultAt(lvEff) {
@@ -8024,14 +8248,14 @@
       return wheelLuckMultAt(lv * getHoundBonusMult());
     }
 
-    // ===== V0.93（作者反馈修正）：回旋针从「抬中心阶位」改为「收紧盘面散布」 =====
-    // 【为什么必须改】实测：`getFocusTier` 原来直接乘这个倍率，而它是 ×1.1^等级 的**指数** ——
-    //   Lv.60 就有 ×304，于是**命运扭曲只要 5 级 + 回旋针 60 级就直接顶到「超越·999」**，
-    //   命运扭曲整条升级线被彻底架空（作者的反馈正是这一条）。
-    // 【为什么这样改才自洽】回旋针自己的说明写的就是「**不改变转盘能给出什么**，
-    //   只让你每一次都更靠近盘面深处那几格」——它本质是**命中率/方差**道具，不是升档道具。
-    //   所以现在它只缩小 σ：盘面散布越窄，你的每次抽取越贴近当前中心阶位，
-    //   于是**高档位命中率显著提高**，而**中心阶位（＝天花板）完全由命运扭曲等级决定**。
+    // ===== V0.96：回旋针「抬中心阶位」与「收紧盘面散布」两头都生效 =====
+    // 【历史】V0.93 曾因为指数爆炸（×1.1^等级，Lv.60 就是 ×304）把「抬中心」整个砍掉，
+    //   只留收紧散布；V0.96 作者要求碎片重新参与运气，同时把倍率降到 ×1.05。
+    // 【为什么现在安全】阶位映射在「超越」段起是几何曲线（每档运气间隔 ×1.3，
+    //   见 getFocusTier）—— 运气涨 10 倍只多约 8.7 档，对数增长天然收敛，
+    //   所以指数倍率不会再架空命运扭曲升级线。
+    // 【两头怎么分工】运气（等级 × 碎片倍率）决定中心阶位；本函数只决定σ（散布宽窄）。
+    //   倍率越大 → 中心越高、盘面越窄，两个方向都让高档位更好中。
     // ⚠️ 用 log 而不是直接乘：倍率本身是指数，再指数叠加会又炸一次。
     const WHEEL_SPREAD_MIN = 0.5;   // σ 最多收到原来的一半（再窄盘面就只剩一两格，不好看也不好抽）
     const WHEEL_SPREAD_K = 0.15;    // 收紧速度
@@ -8144,23 +8368,28 @@
     }
     function formatShardEffect(def, level) {
       const lv = Math.max(1, Math.floor(level || 1));
-      const pct = v => `${(v * 100).toFixed(1)}%`;
+      // V0.96：读数统一走 formatPercent —— 超过 10 万%（六位数）自动转计数法，
+      //   免得高等级碎片把面板撑成「+1084500.0%」这种裸数字。
+      const pct = (v, d) => formatPercent(v, d === undefined ? 1 : d);
       // V0.93：`capture` / `captureRelax` 两个分支随那两块碎片一起删除
       if (def.stat === "soul") return `猎犬攻击 / 生命 / 攻击速度 +${pct(def.perLevel * lv)}`;
       if (def.stat === "wheelLuck") {
-        // V0.93（作者反馈修正）：效果从「抬高中心阶位」改成「收紧盘面散布」，
-        //   所以这里显示的是**散布系数**（越小越容易抽到高档位），不再是运气倍率。
+        // V0.96：回旋针两头都生效 —— 运气倍率（决定阶位中心，见 getFocusTier）
+        //   + 散布系数（决定命中率，见 getWheelSpreadFactor），两行一起摆出来。
+        //   预览等级走 wheelLuckMultAt（与 getShardWheelLuckMult 同一口径，只是换成图鉴里的等级）。
+        const luckMult = wheelLuckMultAt(lv * getHoundBonusMult());
         const spread = getWheelSpreadFactor();
         const pctDown = Math.round((1 - spread) * 100);
-        return `盘面散布 ×${spread.toFixed(2)}` +
+        return `转盘运气 ×${luckMult.toFixed(2)}` +
+          `　盘面散布 ×${spread.toFixed(2)}` +
           (pctDown <= 0
             ? `　<span style="color: var(--muted);">（还看不出效果，继续升级会逐步收紧）</span>`
             : `（已收紧 ${pctDown}%：更容易落在中心阶位附近 = 更容易抽到高档位）`) +
-          `　<b>不影响能抽到的最高品质</b>`;
+          `　<b>超越段起每上一档、所需运气还要再贵 1.3 倍</b>`;
       }
       if (def.stat === "golden") {
         const c = getGoldenChance();
-        return `黄金时间线出现概率 +${pct(def.perLevel * lv)}（当前 ${(c * 100).toFixed(2)}%` +
+        return `黄金时间线出现概率 +${pct(def.perLevel * lv)}（当前 ${formatPercent(c, 2)}` +
           (c > 1 ? ` → 必定出现，黄金强度 ×${getGoldenPower().toFixed(2)}` : "") + `）`;
       }
       if (def.stat === "shardDouble") {
@@ -8200,6 +8429,8 @@
 
     // ===== 自动化 =====
     function isAutoUnlocked(kind) {
+      // V0.96：自动升级悖论商店挂在多元宇宙里程碑上（第 5 次进入宇宙），不是成就
+      if (kind === "shop") return isAutoShopUnlocked();
       const id = AUTO_UNLOCK[kind];
       return !!(id && save.achievements[id]);
     }
@@ -8394,9 +8625,9 @@
         save.hounds.splice(idx, 1);
       }
       if (dropped.length) {
-        logEvent("🐕", `猎犬仓库已达上限（${HOUND_STORAGE_MAX} 只），自动放逐了 ${dropped.length} 只最弱的：` +
+        logEvent("🐕", `猎犬仓库已达上限（${HOUND_STORAGE_MAX} 只），自动放逐了 ${formatNumber(dropped.length)} 只最弱的：` +
           dropped.map(h => `${h.qualityName}·${h.name}`).join("、"), "red");
-        showToast(`猎犬仓库已满（${HOUND_STORAGE_MAX} 只）：自动放逐了 <b>${dropped.length}</b> 只最弱的猎犬。`);
+        showToast(`猎犬仓库已满（${HOUND_STORAGE_MAX} 只）：自动放逐了 <b>${formatNumber(dropped.length)}</b> 只最弱的猎犬。`);
       }
       return dropped;
     }
@@ -8409,13 +8640,13 @@
       if (!skipConfirm) {
         showConfirm({
           icon: "🐕", title: `放逐「${h.name}」`, ok: "永久放逐", danger: true,
-          text: `${h.qualityName} · Lv.${h.level}<br><br>放逐是<b>永久移除</b>，不会返还任何东西（也不会有回归加成）。`
+          text: `${h.qualityName} · Lv.${formatNumber(h.level)}<br><br>放逐是<b>永久移除</b>，不会返还任何东西（也不会有回归加成）。`
         }, () => releaseHound(id, true));
         return;
       }
       removeHound(id);
       saveGame(true);
-      logEvent("🐕", `放逐了 <b>${h.name}</b>（${h.qualityName} · Lv.${h.level}）`, "red");
+      logEvent("🐕", `放逐了 <b>${h.name}</b>（${h.qualityName} · Lv.${formatNumber(h.level)}）`, "red");
       render();
     }
     // 一键清理：放逐所有「未出战 + 等级低于回归门槛 + 品质普通/优秀」的猎犬（典型的纯占位货）
@@ -8425,10 +8656,10 @@
         h.id !== save.activeHoundId && h.id !== busyId &&
         h.level < TRANSCEND_MIN_LEVEL && h.qualityTier <= 1);
       if (!weak.length) { showToast(`没有可清理的猎犬（判据：未出战、Lv.<${TRANSCEND_MIN_LEVEL}、品质普通或优秀）。`); return; }
-      const names = weak.slice(0, 6).map(h => `${h.qualityName}·Lv.${h.level} ${h.name}`).join("\n");
+      const names = weak.slice(0, 6).map(h => `${h.qualityName}·Lv.${formatNumber(h.level)} ${h.name}`).join("\n");
       if (!skipConfirm) {
         showConfirm({
-          icon: "🐕", title: `放逐 ${weak.length} 只弱犬`, ok: "全部放逐", danger: true,
+          icon: "🐕", title: `放逐 ${formatNumber(weak.length)} 只弱犬`, ok: "全部放逐", danger: true,
           text: names.split("\n").join("<br>") +
             (weak.length > 6 ? `<br>…还有 ${weak.length - 6} 只` : "") +
             `<br><br>放逐是<b>永久移除</b>，不会返还任何东西。`
@@ -8439,8 +8670,8 @@
       save.hounds = save.hounds.filter(h => ids.indexOf(h.id) < 0);
       if (save.hounds.length > 0 && !getSelectedHound()) save.houndLocked = false;
       saveGame(true);
-      logEvent("🐕", `一键放逐了 <b>${ids.length}</b> 只弱犬`, "red");
-      showToast(`已放逐 <b>${ids.length}</b> 只弱犬。`);
+      logEvent("🐕", `一键放逐了 <b>${formatNumber(ids.length)}</b> 只弱犬`, "red");
+      showToast(`已放逐 <b>${formatNumber(ids.length)}</b> 只弱犬。`);
       render();
     }
     // 升级因子：每级【相乘】，而不是线性相加。
@@ -8753,39 +8984,89 @@
     function isHuntCdMaxed() {
       return (getOriginShop().huntCd || 0) >= HUNT_CD_MAX_LEVEL;
     }
-    function buyOriginShop(key) {
+    // V0.96（作者要求）：本源商店支持批量购买 —— ×1 / ×10 / ×100。
+    //   · 逐级买：每一级都按「当前等级」的真实造价扣本源，所以批量总价 = 各级造价之和（不打折）。
+    //   · 买不起的部分会**自动少买**并如实报出实际级数，不是错误（所以按钮不必因此禁用）。
+    //   · 到等级上限就停。禁用规则只有一条：连 1 级都买不起、或已满级。
+    const ORIGIN_SHOP_BULK = [1, 10, 100];
+    // 每件商品一排按钮：一键最大 + ×1 / ×10 / ×100（"Max" 传 Infinity，买到上限或买不动为止）
+    const ORIGIN_SHOP_BULK_IDS = ["Max", 1, 10, 100];
+    const ORIGIN_SHOP_MAX = Infinity;
+    // 商店三件套的统一描述：等级字段 / 上限 / 造价函数 / 满级提示 / 成功提示
+    const ORIGIN_SHOP_ITEMS = {
+      huntCd: {
+        field: "huntCd", maxLevel: () => HUNT_CD_MAX_LEVEL, cost: getHuntCdCost,
+        maxToast: "挑衅冷却已达下限。",
+        okToast: () => `挑衅冷却缩减至 Lv.${getOriginShop().huntCd}，冷却时间 <b>${formatCountdown(getHuntCooldownMs() / 1000)}</b>。`
+      },
+      harvestSpeed: {
+        field: "harvestSpeed", maxLevel: () => HARVEST_SPEED_MAX_LEVEL, cost: getHarvestSpeedCost,
+        maxToast: "自动收获效率已达上限。",
+        okToast: () => `自动收获效率提升至 Lv.${getOriginShop().harvestSpeed}，自动收获的尘埃收益 <b>×${getAutoHarvestMult().toFixed(3)}</b>。`
+      },
+      huntSpeed: {
+        field: "huntSpeed", maxLevel: () => HUNT_SPEED_MAX_LEVEL, cost: getHuntSpeedCost,
+        maxToast: "自动狩猎速度已达上限。",
+        okToast: () => `猎影加速提升至 Lv.${getOriginShop().huntSpeed}，自动狩猎节奏 <b>×${getHuntSpeedMult().toFixed(2)}</b>。`
+      }
+    };
+    function getOriginShopItem(key) { return ORIGIN_SHOP_ITEMS[key] || ORIGIN_SHOP_ITEMS.huntSpeed; }
+    function getOriginShopLevel(key) {
+      const def = getOriginShopItem(key);
+      return getOriginShop()[def.field] || 0;
+    }
+    // 批量购买按钮的禁用状态：已满级 / 连 1 级都买不起
+    function renderShopBuys(idPrefix, key) {
+      const def = getOriginShopItem(key);
+      const lv = getOriginShopLevel(key);
+      const maxed = lv >= def.maxLevel();
+      const tooPoor = !maxed && bigCmp(save.origin, def.cost(lv)) < 0;
+      for (let i = 0; i < ORIGIN_SHOP_BULK_IDS.length; i++) {
+        const tag = ORIGIN_SHOP_BULK_IDS[i];
+        const node = el(idPrefix + tag);
+        if (!node) continue;
+        node.disabled = maxed || tooPoor;
+        node.title = maxed ? "已满级"
+          : tag === "Max"
+            ? "按当前本源一直买到等级上限或买不动为止"
+            : `一次买 ${tag} 级（逐级按当前造价扣本源；买不起的部分会自动少买）`;
+      }
+    }
+    // times = 一次最多买几级；silent = 自动化专用（不弹 toast、不主动 render，
+    //   由 100ms 的主循环渲染负责刷新界面）—— 否则每秒三条提示会把界面刷爆。
+    function buyOriginShop(key, times, silent) {
+      const def = getOriginShopItem(key);
       const shop = getOriginShop();
-      let cur, maxLevel, cost, maxToast, okToast;
-      if (key === "huntCd") {
-        cur = shop.huntCd || 0;
-        maxLevel = HUNT_CD_MAX_LEVEL;
-        cost = getHuntCdCost(cur);
-        maxToast = "挑衅冷却已达下限。";
-        okToast = () => `挑衅冷却缩减至 Lv.${shop.huntCd}，冷却时间 <b>${formatCountdown(getHuntCooldownMs() / 1000)}</b>。`;
-      } else if (key === "huntSpeed") {
-        cur = shop.huntSpeed || 0;
-        maxLevel = HUNT_SPEED_MAX_LEVEL;
-        cost = getHuntSpeedCost(cur);
-        maxToast = "自动狩猎速度已达上限。";
-        okToast = () => `猎影加速提升至 Lv.${shop.huntSpeed}，自动狩猎节奏 <b>×${getHuntSpeedMult().toFixed(2)}</b>。`;
-      } else {
-        cur = shop.harvestSpeed || 0;
-        maxLevel = HARVEST_SPEED_MAX_LEVEL;
-        cost = getHarvestSpeedCost(cur);
-        maxToast = "自动收获效率已达上限。";
-        okToast = () => `自动收获效率提升至 Lv.${shop.harvestSpeed}，自动收获的尘埃收益 <b>×${getAutoHarvestMult().toFixed(3)}</b>。`;
-      }
+      const want = Math.max(1, Math.floor(times) || 1);
+      const cur = getOriginShopLevel(key);
+      const maxLevel = def.maxLevel();
 
-      if (cur >= maxLevel) { showToast(maxToast); return; }
-      if (bigCmp(save.origin, cost) < 0) {
-        showToast(`时间本源不足：需要 ${formatNumber(cost)} 点，当前 ${formatNumber(save.origin)} 点。`);
-        return;
+      if (cur >= maxLevel) { if (!silent) showToast(def.maxToast); return false; }
+
+      // 逐级预算：先算出「这次真的能买几级、总共花多少」，再一次性落账
+      let bought = 0, spent = bigOf(0);
+      for (let i = 0; i < want; i++) {
+        const lv = cur + bought;
+        if (lv >= maxLevel) break;
+        const c = bigOf(def.cost(lv));
+        if (bigCmp(save.origin, bigAdd(spent, c)) < 0) break;
+        spent = bigAdd(spent, c);
+        bought++;
       }
-      save.origin = bigSub(save.origin, cost);
-      shop[key] = cur + 1;
+      if (bought <= 0) {
+        if (!silent) showToast(`时间本源不足：需要 ${formatNumber(def.cost(cur))} 点，当前 ${formatNumber(save.origin)} 点。`);
+        return false;
+      }
+      save.origin = bigSub(save.origin, spent);
+      shop[def.field] = cur + bought;
       saveGame(true);
-      showToast(okToast());
+      if (silent) return true;
+      // 批量时把「实际买了几级、花了多少」一并说清楚；买到上限时也提示一声
+      const bulkNote = bought > 1 ? `（一次买了 ${formatNumber(bought)} 级，消耗 ${formatNumber(spent)} 本源）` : "";
+      const capNote = (cur + bought >= maxLevel) ? " 已到等级上限。" : "";
+      showToast(def.okToast() + bulkNote + capNote);
       render();
+      return true;
     }
 
     // ===================== 收益曲线 =====================
@@ -8856,7 +9137,9 @@
       return pick(HOUND_PREFIX) + pick(HOUND_SUFFIX);
     }
     function generateHound(qualityEntry) {
-      const mult = qualityEntry.mult;
+      // V0.96：四维走「带弧度」的倍率（低阶不变、高阶补一点），qualityMult 照旧存品质原值
+      const qMult = qualityEntry.mult;
+      const mult = houndStatMult(qualityEntry);
       const v = () => 1 + randomFloat(-HOUND_ATTR_VARIANCE, HOUND_ATTR_VARIANCE);
       const hound = {
         id: `h${Date.now().toString(36)}${(houndSeq++).toString(36)}`,
@@ -8864,7 +9147,7 @@
         qualityTier: qualityEntry.id,
         qualityName: qualityEntry.name,
         qualityColor: qualityEntry.color,
-        qualityMult: mult,
+        qualityMult: qMult,
         level: 1,
         exp: 0,
         atk: Math.round(HOUND_BASE.atk * mult * v()),
@@ -8972,7 +9255,10 @@
           difficulty,
           reward,
           enemyScale: scale,
-          originYield: Math.max(1, Math.round((2 + reward * 4) * spread)),
+          // V0.95（方案 B5）：保底线常驻之后，它的收益要按比例打折 ——
+          //   否则「必赢 + 高收益」会变成唯一解，随机那几条就没人打了。
+          //   折扣只作用于本源收益，不影响掉落判定（碎片/黄金仍按常规走）。
+          originYield: Math.max(1, Math.round((2 + reward * 4) * spread * LINE_GUARANTEE_REWARD_RATIO)),
           guaranteed: true,
           cleared: false,
           // 记下这条保底是按哪只猎犬解算的：换犬时 renderLineGrid 会据此重织，
@@ -9005,15 +9291,21 @@
       const inv = save.invasions;
       const refHound = getLineReferenceHound();
       const refLevel = refHound ? Math.max(1, refHound.level) : 1;
-      const difficultyGrowth = refLevel <= 10 ? 0 : (refLevel - 10) * 0.15;
-      const spread = 1 + inv * LINE_INVASION_SCALE + difficultyGrowth;
+      // V0.95（方案 B6）：三条棘轮各自封顶 —— 见常量处的注释。
+      const invPart = Math.min(LINE_INVASION_SCALE_CAP, inv * LINE_INVASION_SCALE);
+      const growthPart = Math.min(LINE_DIFFICULTY_GROWTH_CAP, refLevel <= 10 ? 0 : (refLevel - 10) * 0.15);
+      const difficultyGrowth = growthPart;
+      const spread = Math.min(LINE_SPREAD_CAP, 1 + invPart + growthPart);
       const stamp = Date.now().toString(36);
 
-      if (refHound && refLevel < LINE_GUARANTEE_MAX_LEVEL) {
-        // 参考猎犬 10 级前：保底一条按它当前战力解算、战力占优的线路
+      // V0.95（方案 B5）：**保底线常驻**（不再只保护 10 级以下的新手期）。
+      //   收益由 buildGuaranteedLine 按 LINE_GUARANTEE_REWARD_RATIO 打折 ——
+      //   打不过是运气问题，但「至少有一条能打」应该永远是确定的。
+      //   ⚠️ 没有猎犬时不做保底（没有参考战力可解算），此时第一条退回随机，
+      //      否则总条数会少一条（必须是 LINE_COUNT 条）。
+      if (refHound) {
         lines.push(buildGuaranteedLine(refHound, spread, stamp));
       } else {
-        // 10 级后（或还没有猎犬）：不再保底，全部交给随机
         const difficulty = Math.min(10, Math.round(randomInt(1, 2) + difficultyGrowth));
         const reward = randomInt(1, 3);
         lines.push({
@@ -9139,6 +9431,11 @@
     let activeBattle = null;
     let battleTimer = null;
     let battleSpeed = 1;
+    // V0.95（方案 B1）：true 时说明当前在「跑模拟」——endBattle / logBattle / battleSnapshot /
+    //   renderBattle / stopBattleLoop 全都会被它挡掉，保证预测不会产生任何副作用。
+    //   ⚠️ 必须声明在这里（这些函数的**前面**）：它们虽然只在运行期读它，
+    //      但声明若落在后面，装配阶段就可能踩 TDZ（本项目踩过三次的老坑）。
+    let battleSimMode = false;
     let pendingInvadeLineId = null;
 
     function getSelectedHound() {
@@ -9166,7 +9463,7 @@
       save.houndLocked = false;
       saveGame(true);
       render();
-      showToast(`出战猎犬已换成 <b style="color:${hound.qualityColor}">${hound.name}</b> Lv.${hound.level}。`);
+      showToast(`出战猎犬已换成 <b style="color:${hound.qualityColor}">${hound.name}</b> Lv.${formatNumber(hound.level)}。`);
     }
 
     function makeEnemy(line) {
@@ -9185,6 +9482,70 @@
       enemy.maxHp = st.hp;
       enemy.def = st.def;
       return enemy;
+    }
+
+    // ===== V0.95（方案 B1）：时间线卡片「说真话」 =====
+    // 老卡片只用「战力比大小」下判断（足以一战 / 大概率落败），而真实战斗还受攻速、
+    //   防御削减、暴击与 50 回合僵持上限影响 —— 于是经常出现「战力占优却打成僵持」，卡片等于说谎。
+    // 现在直接**跑真战斗**：构造一场临时战斗、跑真 battleTick()、读结局。
+    //   battleSimMode 会把 endBattle / 日志 / 快照 / 重绘 / 循环全部屏蔽，模拟零副作用；
+    //   模拟结束后恢复 activeBattle、出战犬与血量（startBattle 会顺手改写这三样）。
+    // ⚠️ 战斗带暴击与攻速随机，单次跑没代表性 → 每个组合跑 BATTLE_FORECAST_RUNS 次取多数。
+    // ⚠️ 结果按签名缓存：只有「猎犬变了 / 线路变了 / 碎片等级变了」才重算，
+    //    否则每帧 4 条线 × 3 次模拟会把主循环拖死。
+    const BATTLE_FORECAST_ENABLED = true;   // 回滚开关：改 false 立刻退回「战力比大小」
+    const BATTLE_FORECAST_RUNS = 3;
+    let battleForecastCache = { sig: "", map: null };
+    function getBattleForecast(hound, line) {
+      if (!BATTLE_FORECAST_ENABLED || !hound || !line) return null;
+      const sig = [save.activeHoundId, hound.level, hound.maxHp, Math.round(houndPower(hound) || 0),
+        getShardTotalLevel(), line.id, line.enemyScale].join("|");
+      if (battleForecastCache.sig !== sig) battleForecastCache = { sig: sig, map: {} };
+      const key = line.id;
+      if (Object.prototype.hasOwnProperty.call(battleForecastCache.map, key)) {
+        return battleForecastCache.map[key];
+      }
+      const out = runBattleForecast(hound, line);
+      battleForecastCache.map[key] = out;
+      return out;
+    }
+    function runBattleForecast(hound, line) {
+      const realBattle = activeBattle;
+      const realActiveId = save.activeHoundId;
+      const realHp = hound.hp;
+      let wins = 0, losses = 0, stalls = 0, ran = 0;
+      try {
+        battleSimMode = true;
+        for (let i = 0; i < BATTLE_FORECAST_RUNS; i++) {
+          activeBattle = null;
+          hound.hp = hound.maxHp;
+          startBattle(hound.id, line.id);
+          const b = activeBattle;
+          if (!b) break;
+          ran++;
+          let guard = 0;
+          // 上限给足：僵持要打满 BATTLE_MAX_ROUNDS 次我方出手，双方出手总数可能几倍于此
+          while (!b.over && guard++ < BATTLE_MAX_ROUNDS * 6) battleTick();
+          if (!b.over || b.simReason === "timeout") stalls++;
+          else if (b.simWin) wins++;
+          else losses++;
+          activeBattle = null;
+        }
+      } catch (e) {
+        // 模拟出任何意外都只是「不显示结论」，绝不牵连正常游玩
+        ran = 0;
+      } finally {
+        activeBattle = realBattle;
+        save.activeHoundId = realActiveId;
+        hound.hp = realHp;
+        battleSimMode = false;
+      }
+      if (ran === 0) return { text: "无法预测", color: "var(--muted)", wins: 0, losses: 0, stalls: 0 };
+      // 判定顺序：全胜 → 稳赢；有过胜但没全胜 → 险胜；一次没赢且多数僵持 → 会僵持；否则 → 会被打成重伤
+      if (wins === ran) return { text: "稳赢", color: "var(--green)", wins: wins, losses: losses, stalls: stalls };
+      if (wins > 0) return { text: "险胜（" + wins + "/" + ran + "）", color: "var(--gold)", wins: wins, losses: losses, stalls: stalls };
+      if (stalls >= losses) return { text: "只会僵持（拿不到本源）", color: "var(--gold)", wins: wins, losses: losses, stalls: stalls };
+      return { text: "会被打成重伤", color: "var(--red)", wins: wins, losses: losses, stalls: stalls };
     }
 
     function startBattle(houndId, lineId) {
@@ -9232,7 +9593,7 @@
       saveGame(true);
 
       logBattle(`开始入侵【${line.name}】，敌人强度 x${scale.toFixed(2)}`, "sys");
-      logBattle(`${hound.name} 消耗 1 点寿命，本场结束后结算（当前 ${hound.lifespan} / ${hound.maxLifespan}）。`, "");
+      logBattle(`${hound.name} 消耗 1 点寿命，本场结束后结算（当前 ${formatNumber(hound.lifespan)} / ${formatNumber(hound.maxLifespan)}）。`, "");
       renderBattle();
       startBattleLoop();
     }
@@ -9254,11 +9615,11 @@
       el("invadeConfirmText").innerHTML =
         `派 <b style="color:${hound.qualityColor}">${hound.name}</b> 入侵【${line.name}】？`;
       el("invadeConfirmReward").innerHTML =
-        `出战猎犬：<b style="color:${hound.qualityColor}">${hound.name}</b> Lv.${hound.level}<br>` +
-        `剩余寿命：<b style="color:${isLast ? "var(--red)" : "var(--green)"}">${hound.lifespan} / ${hound.maxLifespan}</b>（本场消耗 1 点）<br>` +
+        `出战猎犬：<b style="color:${hound.qualityColor}">${hound.name}</b> Lv.${formatNumber(hound.level)}<br>` +
+        `剩余寿命：<b style="color:${isLast ? "var(--red)" : "var(--green)"}">${formatNumber(hound.lifespan)} / ${formatNumber(hound.maxLifespan)}</b>（本场消耗 1 点）<br>` +
         `预计经验：<b>约 +${formatNumber(nextExp)}</b>（狩猎获得的本源越多，经验越多）<br>` +
         `本源产出：<b>${formatNumber(originGain)}</b> · 敌人强度：x${line.enemyScale.toFixed(2)}<br><br>` +
-        `<span style="color: var(--gold);">⚠ 开始狩猎后，直到这只猎犬死亡或寿命耗尽，都无法更换出战猎犬。</span>` +
+        `<span style="color: var(--gold);">⚠ 战斗进行中无法更换出战猎犬（这一场已经拿着它的四维开打了）；<b>战斗结束后随时可以换</b>。战败只会让它<b>重伤</b>（等级腰斩、经验清零），休整后照样能再战——只有<b>寿命耗尽</b>才会真正消散。</span>` +
         (isLast ? `<br><span style="color: var(--red);">这是它的最后一战，战斗结束后它将寿终消散。</span>` : "");
       el("invadeModal").classList.add("show");
     }
@@ -9277,6 +9638,7 @@
       battleTimer = setInterval(battleTick, BATTLE_TICK_MS / battleSpeed);
     }
     function stopBattleLoop() {
+      if (battleSimMode) return;   // 模拟中没有真实循环可停
       if (battleTimer) { clearInterval(battleTimer); battleTimer = null; }
     }
     function battleTick() {
@@ -9365,6 +9727,7 @@
     }
     // 战况快照：一条日志交代双方血量与累计输出，取代逐次出手的刷屏日志。
     function battleSnapshot() {
+      if (battleSimMode) return;
       const b = activeBattle;
       if (!b) return;
       logBattle(
@@ -9375,6 +9738,8 @@
       );
     }
     function logBattle(text, type) {
+      // V0.95：战斗模拟期间不记日志（否则一次预测能往战报里塞几百行）
+      if (battleSimMode) return;
       const b = activeBattle;
       if (!b) return;
       b.logs.push({ text, type: type || "", t: Date.now() });
@@ -9407,6 +9772,9 @@
     function endBattle(win, reason) {
       const b = activeBattle;
       if (!b || b.over) return;
+      // V0.95（方案 B1）：战斗模拟只关心「谁赢了 / 是不是僵持」，
+      //   绝不能让结算真的跑一遍（那会发奖励、扣寿命、重织时间线、存档）。
+      if (battleSimMode) { b.over = true; b.simWin = !!win; b.simReason = reason || ""; return; }
       b.over = true;
       stopBattleLoop();
 
@@ -9440,14 +9808,14 @@
           parts.push(res.isNew
             ? `【${entry.name}】(${entry.rarity}) 已解锁 Lv.1`
             : `【${entry.name}】(${entry.rarity}) +${res.gained} 经验` +
-              (res.levelUps > 0 ? `，升至 Lv.${res.level}` : ""));
+              (res.levelUps > 0 ? `，升至 Lv.${formatNumber(res.level)}` : ""));
         }
         if (drops.length === 1) {
           const d = drops[0];
           shardMsg = d.isNew
             ? `✦ 掉落碎片【${d.name}】(${d.rarity})，已解锁 Lv.1！`
             : `✦ 掉落重复碎片【${d.name}】(${d.rarity})，转化 +${lastRes.gained} 经验` +
-              (lastRes.levelUps > 0 ? `，升至 Lv.${lastRes.level}` : "") + `。`;
+              (lastRes.levelUps > 0 ? `，升至 Lv.${formatNumber(lastRes.level)}` : "") + `。`;
         } else {
           // V0.92：只详列最前面几块，其余折叠成一行。
           //   之前这里是 parts.join("；") —— 一次掉 43 块时这一条日志能占满整屏。
@@ -9490,7 +9858,7 @@
 
         logBattle(`击杀了 ${b.enemy.name}。掠夺 ${formatNumber(gained)} 点时间本源。`, "sys");
         logBattle(`${hound.name} 获得 ${formatNumber(expGain)} 经验。`, "good");
-        if (levels > 0) logBattle(`${hound.name} 提升至 Lv.${hound.level}。`, "sys");
+        if (levels > 0) logBattle(`${hound.name} 提升至 Lv.${formatNumber(hound.level)}。`, "sys");
 
         if (hound.lifespan <= 0) {
           b.outcome = "expired";
@@ -9501,13 +9869,13 @@
           showToast(`战斗胜利，掠夺 <b>${formatNumber(gained)}</b> 时间本源，但 ${hound.name} 寿命耗尽，永久消散。` + (shardToastMsg ? " " + shardToastMsg : ""));
         } else {
           b.outcome = "win";
-          logBattle(`${hound.name} 消耗 1 点寿命，剩余 ${hound.lifespan} / ${hound.maxLifespan}。`, "");
+          logBattle(`${hound.name} 消耗 1 点寿命，剩余 ${formatNumber(hound.lifespan)} / ${formatNumber(hound.maxLifespan)}。`, "");
           save.linesDirty = false;
           save.lines = generateLines();
           showToast(
             `战斗胜利，掠夺 <b>${formatNumber(gained)}</b> 时间本源` +
-            (levels > 0 ? `，${hound.name} 升至 Lv.${hound.level}` : `，${hound.name} 获得 ${formatNumber(expGain)} 经验`) +
-            `。剩余寿命 ${hound.lifespan}，时间线已重织。` +
+            (levels > 0 ? `，${hound.name} 升至 Lv.${formatNumber(hound.level)}` : `，${hound.name} 获得 ${formatNumber(expGain)} 经验`) +
+            `。剩余寿命 ${formatNumber(hound.lifespan)}，时间线已重织。` +
             (shardToastMsg ? " " + shardToastMsg : "")
           );
         }
@@ -9529,14 +9897,14 @@
         }
         logBattle(`激战 ${BATTLE_MAX_ROUNDS} 回合仍未分出胜负，双方脱离接触。`, "sys");
         logBattle(`${hound.name} 从这场缠斗里获得 ${formatNumber(expGain)} 经验（僵持折算 ${Math.round(TIMEOUT_EXP_RATIO * 100)}%，不消耗寿命）。`, "good");
-        if (levels > 0) logBattle(`${hound.name} 提升至 Lv.${hound.level}。`, "sys");
+        if (levels > 0) logBattle(`${hound.name} 提升至 Lv.${formatNumber(hound.level)}。`, "sys");
         // 时间线的重织规则与胜负一致（每场战斗后都会重织），避免自动狩猎反复咬同一条打不穿的线
         save.linesDirty = false;
         save.lines = generateLines();
         showToast(
           `⚔ 僵持 <b>${BATTLE_MAX_ROUNDS}</b> 回合未分胜负：` +
           `${hound.name} 获得 <b>${formatNumber(expGain)}</b> 经验（<b>不消耗寿命</b>），` +
-          `但没有本源与碎片。剩余寿命 <b>${hound.lifespan}</b>，时间线已重织。`
+          `但没有本源与碎片。剩余寿命 <b>${formatNumber(hound.lifespan)}</b>，时间线已重织。`
         );
       } else {
         // 自动狩猎发起的战斗：只要这只猎犬已经够回归门槛，就不让它白死——
@@ -9545,13 +9913,15 @@
           b.outcome = "transcend";
           const transcended = transcendHound(hound);
           const qMult = getTranscendQualityMult(transcended.qualityTier);
-          const bonus = (transcended.returnLevel * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult * 100).toFixed(2);
+          // V0.96：这里以前是 toFixed(2) 的裸百分比，后期会印出 +1084500.00% 这类长数字，
+          //   现在统一交给 formatPercent（超过 10 万% 自动转计数法）。
+          const bonus = transcended.returnLevel * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult;
           logBattle(`${hound.name} 战败，但已达回归门槛，自动回归时间本源。`, "sys");
-          logBattle(`回归 Lv.${transcended.returnLevel}，全局加成 +${bonus}%。`, "good");
+          logBattle(`回归 Lv.${formatNumber(transcended.returnLevel)}，全局加成 +${formatPercent(bonus)}。`, "good");
           save.invasions += 1;
           showToast(
-            `${hound.name} 战败，已自动回归：全局 <b style="color: var(--gold);">+${bonus}%</b>` +
-            `（回归 Lv.${transcended.returnLevel}）` +
+            `${hound.name} 战败，已自动回归：全局 <b style="color: var(--gold);">+${formatPercent(bonus)}</b>` +
+            `（回归 Lv.${formatNumber(transcended.returnLevel)}）` +
             (shardToastMsg ? " " + shardToastMsg : "")
           );
         } else {
@@ -9569,9 +9939,9 @@
           save.lines = generateLines();
           save.linesDirty = false;
           save.invasions += 1;
-          logBattle(`${hound.name} 战败重伤：Lv.${oldLevel} → Lv.${hound.level}，经验清零。`, "bad");
+          logBattle(`${hound.name} 战败重伤：Lv.${formatNumber(oldLevel)} → Lv.${formatNumber(hound.level)}，经验清零。`, "bad");
           showToast(
-            `${hound.name} 战败重伤：等级从 Lv.${oldLevel} 掉到 <b>Lv.${hound.level}</b>` +
+            `${hound.name} 战败重伤：等级从 Lv.${formatNumber(oldLevel)} 掉到 <b>Lv.${formatNumber(hound.level)}</b>` +
             `（保留 ${Math.round(WOUND_LEVEL_KEEP * 100)}%）、经验清零 —— 但它<b>活下来了</b>。` +
             (shardToastMsg ? " " + shardToastMsg : "")
           );
@@ -10011,7 +10381,7 @@
           <article class="upgrade-card">
             <h3>${t.name}</h3>
             <p>${t.desc}</p>
-            <span class="level">Lv.${level}${atCap ? "" : ` → Lv.${level + 1}`}</span>
+            <span class="level">Lv.${formatNumber(level)}${atCap ? "" : ` → Lv.${level + 1}`}</span>
             <span class="level-cap${atCap ? " reached" : ""}">上限 Lv.${cap}</span>
             <div class="upgrade-delta">
               <div class="ud-row"><span>本级提升</span><b>×${stepRatio.toFixed(3)}（+${((stepRatio - 1) * 100).toFixed(1)}%）</b></div>
@@ -10028,10 +10398,10 @@
                   ? `<b style="color: var(--green);">不消耗升级中</b>（本次升级不扣除尘埃）<br>` +
                     `需持有 ${formatNumber(nextCost)} 尘埃` +
                     (plan.bought > 0
-                      ? `<br>当前档位可买 ${plan.bought} 级（共需 ${formatNumber(plan.total)}）`
+                      ? `<br>当前档位可买 ${formatNumber(plan.bought)} 级（共需 ${formatNumber(plan.total)}）`
                       : `<br><span style="color: var(--red);">持有不足，无法升级</span>`)
                   : `下一级需要 ${formatNumber(nextCost)} 尘埃` +
-                    (plan.bought > 0 ? `<br>当前档位可买 ${plan.bought} 级（共 ${formatNumber(plan.total)}）` : "")}
+                    (plan.bought > 0 ? `<br>当前档位可买 ${formatNumber(plan.bought)} 级（共 ${formatNumber(plan.total)}）` : "")}
             </span>
             <div class="card-actions">
               <button class="secondary-button" data-upgrade="${t.key}" data-mode="bulk"
@@ -10117,7 +10487,7 @@
             <span class="part-icon">${def.icon}</span>
             <h3>${def.name}</h3>
             <p>
-              Lv.${part.level}<br>
+              Lv.${formatNumber(part.level)}<br>
               ${def.description}<br>
               <strong>${def.format(def.value * eff)}</strong><br>
               ${soft
@@ -10187,7 +10557,7 @@
       }
       if (banner.style.display === "none") banner.style.display = "";
       setHTML("lockBanner",
-        `<b>出战猎犬已锁定：</b>${hound.name}（Lv.${hound.level}，剩余寿命 ${hound.lifespan} / ${hound.maxLifespan}）<br>` +
+        `<b>出战猎犬：</b>${hound.name}（Lv.${formatNumber(hound.level)}，剩余寿命 ${formatNumber(hound.lifespan)} / ${formatNumber(hound.maxLifespan)}）<br>` +
         `战败只会让它<b>重伤</b>（等级腰斩），不会永久消失；寿命耗尽的猎犬才会消散。随时可以更换出战猎犬。`);
     }
 
@@ -10226,7 +10596,8 @@
         const cost = getManualLevelCost(h);
         const canTranscend = h.level >= TRANSCEND_MIN_LEVEL && !busy && h.lifespan > 0;
         const qMult = getTranscendQualityMult(h.qualityTier);
-        const bonus = (h.level * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult * 100).toFixed(2);
+        // V0.96：读数统一走 formatPercent（>10 万% 自动计数法），避免裸长百分比
+        const bonus = h.level * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult;
         const tag = isBattling ? "出战中" : isSelected ? "已选中" : "";
         const need = getHoundExpToNext(h.level);
         const expPct = Math.max(0, Math.min(100, ((h.exp || 0) / need) * 100));
@@ -10242,15 +10613,15 @@
             <span class="badge" style="color:${h.qualityColor}">${h.qualityName}</span>
             <h3>${h.name}</h3>
             <ul class="stat-list">
-              <li><span>等级</span><span>Lv.${h.level}</span></li>
+              <li><span>等级</span><span>Lv.${formatNumber(h.level)}</span></li>
               <li><span>攻击</span><span>${formatNumber(h.atk)}</span></li>
               <li><span>攻速</span><span>${formatNumber(h.aspd)}</span></li>
               <li><span>血量</span><span>${formatNumber(h.maxHp)}</span></li>
               <li><span>防御</span><span>${formatNumber(h.def)}</span></li>
-              <li><span>击杀</span><span>${h.kills}</span></li>
+              <li><span>击杀</span><span>${formatNumber(h.kills)}</span></li>
               <li><span>战力</span><span>${formatNumber(houndPower(h))}</span></li>
               ${h.level >= TRANSCEND_MIN_LEVEL
-                ? `<li><span style="color:var(--gold)">回归加成</span><span style="color:var(--gold)">+${bonus}%</span></li>`
+                ? `<li><span style="color:var(--gold)">回归加成</span><span style="color:var(--gold)">+${formatPercent(bonus)}</span></li>`
                 : ""}
             </ul>
             <div class="mini-bar">
@@ -10263,7 +10634,7 @@
             <div class="mini-bar">
               <div class="mini-bar-head">
                 <span>寿命</span>
-                <span><b style="color:${lifeLow ? "var(--red)" : "inherit"}">${h.lifespan}</b> / ${h.maxLifespan}</span>
+                <span><b style="color:${lifeLow ? "var(--red)" : "inherit"}">${formatNumber(h.lifespan)}</b> / ${formatNumber(h.maxLifespan)}</span>
               </div>
               <div class="mini-track"><div class="mini-fill life ${lifeLow ? "low" : ""}" style="width:${lifePct}%"></div></div>
             </div>
@@ -10273,7 +10644,7 @@
               <button class="secondary-button" data-hound-levelup="${h.id}"
                 ${bigCmp(save.origin, cost) < 0 || busy ? "disabled" : ""}>本源升级 (${formatNumber(cost)})</button>
               ${canTranscend
-                ? `<button class="primary-button transcend-button" data-hound-transcend="${h.id}">回归 (Lv.${h.level})</button>`
+                ? `<button class="primary-button transcend-button" data-hound-transcend="${h.id}">回归 (Lv.${formatNumber(h.level)})</button>`
                 : ""}
               <button class="secondary-button hound-release" data-hound-release="${h.id}"
                 title="永久放逐（不返还任何东西）" ${(busy || isSelected) ? "disabled" : ""}>放逐</button>
@@ -10295,21 +10666,19 @@
       if (!save.lines || save.lines.length === 0) {
         save.lines = generateLines();
       } else {
-        // 开局时还没有猎犬，那时生成的时间线不带保底；拿到 10 级以下的猎犬后
-        // 补刷一次，免得新猎犬一上来就被四条必死线路堵死。
+        // V0.95（方案 B5）：保底线**常驻**之后，重织条件不再看等级，只看这两件事：
+        //   ①四条里还没有保底线（例如开局时还没有猎犬、或旧存档的线路）；
+        //   ②保底线是按「另一只猎犬」解算的（换了出战猎犬，强度对不上了）。
+        //   战斗中一律不动，避免正在打的这条线路凭空消失。
         const ref = getLineReferenceHound();
-        // 两种情况要重织：①四条里还没有保底线（新猎犬到手前的旧线路）；
-        // ②保底线是按「另一只猎犬」解算的（换了出战猎犬，强度对不上了）。
-        // 战斗中一律不动，避免正在打的这条线路凭空消失。
-        if (!busy && ref && Math.max(1, ref.level) < LINE_GUARANTEE_MAX_LEVEL &&
-          !save.lines.some(l => l.guaranteed && l.refHoundId === ref.id)) {
+        if (!busy && ref && !save.lines.some(l => l.guaranteed && l.refHoundId === ref.id)) {
           save.lines = generateLines();
         }
       }
 
       // 自动狩猎开着的时候，在标题旁说明它现在在干什么（交战 / 已锁定目标 / 待命）
       let lineHint = selected
-        ? `${selected.name} 已锁定出战 · 剩余寿命 ${selected.lifespan}`
+        ? `${selected.name} 当前出战 · 剩余寿命 ${selected.lifespan}`
         : "选择目标时间线";
       if (isAutoUnlocked("hunt") && save.auto.hunt) {
         const autoTarget = busy ? null : pickAutoHuntTarget(selected);
@@ -10346,14 +10715,18 @@
                   ` · 额外掉落 ${formatDecimal(getGoldenShardDrop(line), 2)} 块碎片</span><br>`
                 : ""}
               ${line.guaranteed
-                ? '<span style="color: var(--green); font-weight: 700;">◆ 保底 · 战力占优</span><br>'
+                ? '<span style="color: var(--green); font-weight: 700;">◆ 保底线 · 战力占优（本源收益 40%）</span><br>'
                 : ""}
               敌人强度：<b>x${line.enemyScale.toFixed(2)}</b><br>
               本源产出：<b>${formatNumber(originGain)}</b> / 次<br>
               推荐战力：<b>${formatNumber(enemyPower)}</b>
               ${selected
-                ? `<br><span style="color:${powerColor}">${selected.name} 战力 ${formatNumber(myPower)}` +
-                  `（${myPower >= enemyPower ? "足以一战" : "大概率落败"}）</span>`
+                ? (() => {
+                  // V0.95（方案 B1）：不再用「战力比大小」下判断 —— 直接跑真战斗给结论
+                  const fc = getBattleForecast(selected, line);
+                  return `<br><span style="color:${powerColor}">${selected.name} 战力 ${formatNumber(myPower)}</span>` +
+                    (fc ? `<br><span style="color:${fc.color}; font-weight: 700;">预测：${fc.text}</span>` : "");
+                })()
                 : ""}
             </div>
             <button class="primary-button" data-invade="${line.id}" ${disabled ? "disabled" : ""}>
@@ -10364,6 +10737,7 @@
     }
 
     function renderBattle() {
+      if (battleSimMode) return;
       const b = activeBattle;
       if (!b) {
         // 左栏常驻：没有战斗时显示占位，避免整列塌陷
@@ -10389,18 +10763,18 @@
       setHTML("battleBox", `
         <div class="battle-head">
           <div class="battle-side ally">
-            <h3>${b.hound.name} <span class="level">Lv.${b.hound.level}</span></h3>
+            <h3>${b.hound.name} <span class="level">Lv.${formatNumber(b.hound.level)}</span></h3>
             <div class="hp-track">
               <div class="hp-fill" style="width:${allyPct}%"></div>
               <div class="hp-text">${formatNumber(b.hound.hp)} / ${formatNumber(b.hound.maxHp)}</div>
             </div>
             <div class="muted-line" style="margin-top: 8px;">
               攻 ${formatNumber(b.hound.atk)} · 速 ${formatNumber(Math.round(b.hound.aspd))} · 防 ${formatNumber(b.hound.def)}<br>
-              经验 ${formatNumber(b.hound.exp || 0)} / ${formatNumber(getHoundExpToNext(b.hound.level))} · 寿命 ${b.hound.lifespan} / ${b.hound.maxLifespan}
+              经验 ${formatNumber(b.hound.exp || 0)} / ${formatNumber(getHoundExpToNext(b.hound.level))} · 寿命 ${formatNumber(b.hound.lifespan)} / ${formatNumber(b.hound.maxLifespan)}
             </div>
           </div>
           <div class="battle-side enemy">
-            <h3>${b.enemy.name} <span class="level">Lv.${b.enemy.level}</span></h3>
+            <h3>${b.enemy.name} <span class="level">Lv.${formatNumber(b.enemy.level)}</span></h3>
             <div class="hp-track">
               <div class="hp-fill enemy" style="width:${enemyPct}%"></div>
               <div class="hp-text">${formatNumber(b.enemy.hp)} / ${formatNumber(b.enemy.maxHp)}</div>
@@ -10427,7 +10801,7 @@
             ? b.shardDrops.map(d =>
               `<div class="shard-drop-line" style="color:${d.color}">` +
               `${d.icon} 掉落时间碎片【${d.name}】${d.rarity}` +
-              `${d.isNew ? " · 新解锁 Lv.1" : ` · Lv.${d.level}`}</div>`).join("")
+              `${d.isNew ? " · 新解锁 Lv.1" : ` · Lv.${formatNumber(d.level)}`}</div>`).join("")
             : ""}
         </div>`);
 
@@ -10465,8 +10839,8 @@
         if (win && r.origin > 0) gains.push(`本源 <b style="color: var(--gold);">+${formatNumber(r.origin)}</b>`);
         // V0.93：僵持也给经验（没本源），所以这里用「胜利 或 僵持」
         if ((win || stalemate) && r.exp > 0) gains.push(`经验 <b style="color: var(--green);">+${formatNumber(r.exp)}</b>`);
-        if ((win || stalemate) && r.levels > 0) gains.push(`<b style="color: var(--cyan);">升至 Lv.${r.level}</b>`);
-        if (transcended) gains.push(`<b style="color: var(--gold);">回归 Lv.${r.level} · 转为永久加成</b>`);
+        if ((win || stalemate) && r.levels > 0) gains.push(`<b style="color: var(--cyan);">升至 Lv.${formatNumber(r.level)}</b>`);
+        if (transcended) gains.push(`<b style="color: var(--gold);">回归 Lv.${formatNumber(r.level)} · 转为永久加成</b>`);
         else if (stalemate) gains.push('<span style="color: var(--muted);">僵持脱离 · 消耗 1 点寿命</span>');
         else if (!win) gains.push('<span style="color: var(--muted);">无收益</span>');
         const drops = Array.isArray(r.drops) ? r.drops : (r.drop ? [r.drop] : []);
@@ -10474,7 +10848,7 @@
           ? drops.map(d =>
             `<div class="reward-drop" style="color:${d.color}">`
             + `${d.name} · ${d.rarity}`
-            + (d.isNew ? " · 新解锁 Lv.1" : ` · Lv.${d.level}`)
+            + (d.isNew ? " · 新解锁 Lv.1" : ` · Lv.${formatNumber(d.level)}`)
             + `</div>`).join("")
           : "";
         return `<div class="reward-item ${cls}">
@@ -10636,9 +11010,10 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.96", "十五条体验与平衡修正。① 所有读数统一走计数法：回归加成、碎片效果、诱饵加成这些「百分比」以前会直接印出 +1084500.00% 之类的裸长数字，现在超过 10 万% 一律自动转计数法（跟随你的字母 / 科学偏好）。② 主线挑战里的「悖论重置」门槛锁死 100 万尘埃——以前它会跟着命运扭曲等级一起涨，等于把关卡难度偷偷加上去了。③ 「猎影加速」放开到 40 级（×11，原来 20 级 ×6），自动狩猎的巡检间隔下限同步放到 50ms，买的等级真的兑现成狩猎频率。④ 转盘幸运逻辑重做：撤掉「每次升级最多 +1 档」的硬规则，改成超越段以下每点运气 +0.78 档、从「超越」起每上一档所需运气再贵 1.3 倍的几何曲线——越往后每级越难，但永远戳不穿；作为补偿，「回旋针」碎片重新参与运气（每级 ×1.05 复利，原来是 ×1.1），它终于再次影响你能抽到的品质，收紧盘面散布的老本行也还在。⑤ 基因修饰点数加强前期：第一次达到多元宇宙时总点数 ×3.5，之后每进一次宇宙衰减一档，第 5 次起恢复原样——前期终于升得动级了，后期一分不变。⑥ 苦痛挑战说好的「每完成一个 → 基因点数 ×1.5」以前只写了规则、从没接进发放口（打完一分不多），现在正式生效，与苦痛之路、里程碑串联结算。⑦ 多元宇宙里程碑第 5 次解锁「自动升级悖论商店」：挂在「自动化」页签，每秒巡检一次，挑衅冷却 / 自动收获效率 / 猎影加速三件套，只要本源够就各买 1 级。⑧ 基因实验室可以重复购买同一条升级了：买下的每一份都单独算加成、购买没有总量上限；实验台一共十个货物栏——基础 5 件、「货物扩容」最多再 +4 条、外加偶尔上架的「基因幸运」；代价是同一种升级每多买一份，价格 ×1.5。⑨ 战斗文案同步 V0.94 起的新规则：战斗进行中无法更换出战猎犬（这一场已经拿着它的四维开打了），战斗结束后随时可以换；战败只会让它重伤（等级腰斩、经验清零），休整后照样能再战——只有寿命耗尽才会真正消散。⑩ 本源商店三件套（挑衅冷却 / 自动收获 / 猎影加速）全部支持「×1 / ×10 / ×100」批量购买，逐级按真实造价扣本源，买不起自动少买；命运扭曲的「一键最大」恢复成一次买到买不动为止。⑪ 修「清空存档没有确认框」：这个按钮以前点一下就立刻删档（回调里误吃了点击事件、把「跳过确认」当成了 true）。现在会正常弹确认，并且删档前自动留一份「误删备份」，设置面板里可以一键恢复一次。同源的另外两处（退出挑战、确认超越）一并修好。⑫ 盘面散布的下限改成跟着碎片走：新曲线下阶位中心比过去低，「收紧散布」不再被 σ 下限整段吃掉——回旋针拉满时盘面真的会收窄。⑬ 排行榜改成纯手动上传：以前成功上传一次后，游戏会每 5 分钟在后台自动上报一遍（后端按调用次数计费，长期挂机的代价不小），现在只在点「上传成绩」时发送一次，后台不再有任何自动请求；旧存档里的「自动上传」开关一并移除。⑭ 高阶猎犬的四维加了一点「弧度」：转盘重做之后高阶品质难抽多了，作为补偿，四维不再对品质倍率做线性映射，而是叠了一层轻微曲率——低阶几乎无感（普通不变），神话约补 43%、超越·30 约补 100%，抽到高阶这件事本身的回报更高了。⑮ 基因「部件软上限」重做：去掉等级上限（不再有「满级」把强化卡死），代价是成长比例巨幅削弱——每级只吃原来品质增量的十分之一、单级最多 +5%（普通 ×1.002/级、神话 ×1.028/级、超越段 ×1.05/级）。以前它要么几步撞上限、要么把部件软上限乘到 1e9 直接超模，现在两头都收住了。"],
       ["V0.95", "修复了海量 BUG。战斗、时间进度条、时间碎片、转盘与多元宇宙重置的显示与结算问题一起清了一遍：战败不再让猎犬永久消失（改成重伤），僵持不再白打，出战猎犬不再被锁死；进度条溢流段的风险与收益重新对齐；转盘最多只显示和抽到 7 个品质，能抽到的最高品质从此完全由「命运扭曲」等级决定；多元宇宙重置的折算改用软上限生效后的数值，不会再换出天文数字的点数；折算相关的大数字也会跟随你的计数法偏好显示。另外删除了「势能核」碎片，并给全部时间碎片统一加上软上限。"],
       ["V0.94", "时间进度条重做：满了之后不再只能收，而是可以继续「溢流」到 200%。溢流段按固定速率推进，越往后收益越高（200% 时是满圈的 2.5 倍），但被捕获概率会大幅上升（200% 时是满圈的 7 倍）——所以「收还是贪」第一次成了真正的判断：一圈内越危险就越该早点收。自动收获的收割时机也交给你选（稳健 100% / 平衡 130% / 贪婪 180%，在「自动化」里设置）。猎犬战斗改动：取消出战猎犬的锁定，随时可以自由更换；战斗失败不再让猎犬永久消失，而是改成「重伤」（等级腰斩、经验清零，休整后照样能再战），只有寿命耗尽才会真正消散；打不穿的僵持局也不再白打，现在会给 30% 经验且不消耗寿命。猎犬合成的功能整个移除（子页从五个变四个）。时间碎片调整：移除了「悖论锁」与「凝滞」两块降低被捕获概率的碎片；「虚空饵」加上软上限，避免后期掉率滚雪球；「回旋针」不再抬高能抽到的最高品质（天花板从此完全由「命运扭曲」等级决定，回旋针改为收紧盘面散布、让高档位更好抽）；转盘最多只显示和抽到 7 个品质。悖论造价不再用写死的数字，而是跟着「命运扭曲」等级走。多元宇宙里程碑新增两件事：第 20 次之后发动悖论不再清空尘埃与升级；「超越悖论」的进度折算改用软上限生效后的部件与回归等级，避免后期换算出的点数失控。"],
-      ["V0.92", "排行榜开放了。导航栏右侧、「成就」左边多了一个「🏅 排行榜」入口：填个昵称就能把「在线时长」和「历史最高尘埃」传上去，和所有猎手比一比（可以按尘埃或时长排序）。第一次手动上传之后会自动开启「每 5 分钟自动上传」，随时能在面板里关掉。榜单上只会显示前 50 名，别人看不到你的存档、你也看不到别人的。顺带三条体验修正：展示柜现在只列出加成最高的 20 只猎犬（其余的仍然计入总加成，只是不画卡片了，免得几百只时整页拖不动）；一次掉落大量碎片时战报只详列前几块、其余折叠成一行；多元宇宙走到第 10 次之后，被时间猎犬捕获不再把尘埃 / 进度 / 升级一起清零（苦痛挑战里仍然照旧）。"],
+      ["V0.92", "排行榜开放了。导航栏右侧、「成就」左边多了一个「🏅 排行榜」入口：填个昵称就能把「在线时长」和「历史最高尘埃」传上去，和所有猎手比一比（可以按尘埃或时长排序）。第一次手动上传之后会自动开启「每 5 分钟自动上传」，随时能在面板里关掉（该自动上传已在 V0.96 整体移除，现在只有手动提交）。榜单上只会显示前 50 名，别人看不到你的存档、你也看不到别人的。顺带三条体验修正：展示柜现在只列出加成最高的 20 只猎犬（其余的仍然计入总加成，只是不画卡片了，免得几百只时整页拖不动）；一次掉落大量碎片时战报只详列前几块、其余折叠成一行；多元宇宙走到第 10 次之后，被时间猎犬捕获不再把尘埃 / 进度 / 升级一起清零（苦痛挑战里仍然照旧）。"],
       ["V0.91", "修「导入存档后必须退回主界面才生效」（确认弹窗被存档弹窗盖住了，点不到）；导入后会直接回到主界面并显示读到的关键数字。多元宇宙里程碑追加奖励：每 2 次多元宇宙永久通关 1 关主线挑战（第 10 次全通）；进多元宇宙改为必须先通关全部主线挑战；每多走一次宇宙，「自动悖论」就快 2.7 秒（30 秒 → 最快 3 秒）；第 10 次之后被捕获不再重置尘埃 / 进度 / 升级（苦痛挑战中不生效）。基因植入花费取消上限、一直翻倍。展示柜只列出加成最高的 20 只猎犬（其余隐藏，但仍计入总加成）；一次掉落大量碎片时，战报只详列前几块、其余折叠。修复可能性页四个子页签「点进去也不熄灭」的高亮 bug。"],
       ["V0.90", "诱饵改为永久保留（跨悖论 / 跨宇宙都不清空），掉率固定 1/500、不再吃任何爆率加成；「自动悖论」搬进「⚙ 自动化」成为开关；磁石之饵改为 Lv.100 满级（传说爆率拉满后不再掉落）。"],
       ["V0.89", "新增「多元宇宙里程碑」（每进一次宇宙 +20% 基因点倍率）；基因档位扩到「超越·99」；植入基因的花费每次翻倍（进宇宙归 1 点）；基因实验室的升级带品质，并有概率出售「基因幸运」。"],
@@ -10675,6 +11050,9 @@
     // ===== 排行榜（V0.92）=====
     // 设计要点：**上报层与后端解耦** —— 换后端、以后上 Steam 走 Steamworks，都只改本段，
     //   游戏逻辑一行不用动。对外只有两个动作：lbSubmit()（上报）与 lbLoad()（拉榜）。
+    // ⚠️ V0.96：上传是**纯手动**的 —— 只在玩家点「上传成绩」时发一次请求。
+    //   原「每 5 分钟自动上报」已整体移除：后端（腾讯云云函数）按调用次数计费，
+    //   自动上报会在后台持续扣费。这里不要再加任何定时/自动的 submit。
     // ⚠️ `LEADERBOARD_API` 留空 = 后端尚未接入：导航栏的入口**照常显示**，但面板会如实写
     //   「排行榜还没开放」、上传/刷新按钮不出现 —— 既不装成能用，也不是点了没反应的死按钮。
     //   把后端根地址（形如 "https://xxxx.service.tcloudbase.com/leaderboard"）填进去即启用。
@@ -10688,7 +11066,6 @@
     //     ⚠️ 尘埃显示一律由客户端用 bigFromLog10() 现算，**不信服务端给的字符串**。
     const LEADERBOARD_API = "https://shijianliequan-d0gg4kdtf6d987183-150674349.ap-shanghai.app.tcloudbase.com/leaderboard";
     const LB_TIMEOUT_MS = 8000;        // 单次请求超时（绝不拖住主循环）
-    const LB_AUTO_MS = 5 * 60 * 1000;  // 自动上报间隔
     const LB_NAME_MAX = 12;
     const LB_ROWS = 50;
 
@@ -10696,8 +11073,6 @@
     let lbRows = [];
     let lbNote = "";
     let lbBusy = false;
-    let lbSentAt = 0;
-    let lbSentSnapshot = "";
     // 只在本地调试时被打开：后端还没接入时，用假数据把面板跑起来看效果。
     // 生产环境下永远是 false（唯一的赋值点包在 DEV 标记里，发布版会被剥掉）。
     let lbPreview = false;
@@ -10766,9 +11141,6 @@
         throw err;
       });
     }
-    function lbSnapshot() {
-      return Math.floor(save.playMs || 0) + "|" + (isFinite(bigLog10(save.bestDust)) ? bigLog10(save.bestDust).toFixed(3) : "0");
-    }
     function lbSubmit(skipConfirm) {
       if (lbBusy) return;
       if (!isLeaderboardOn()) { showToast("排行榜尚未接入。"); return; }
@@ -10778,7 +11150,7 @@
           icon: "🏆", title: "上传成绩",
           text: `将把 <b>昵称「${lbEscape(getLbName())}」</b>、<b>在线时长 ${formatPlayTime(save.playMs || 0)}</b>、` +
                 `<b>历史最高尘埃 ${formatNumber(save.bestDust)}</b> 上传到排行榜，<b>所有人都能看到</b>。<br>` +
-                `<span style="color: var(--muted);">上传后会自动开启「每 5 分钟自动上传」，随时可以在排行榜里关掉。</span>`,
+                `<span style="color: var(--muted);">上传是纯手动操作：只在你点「上传」时发送一次，不会在后台自动上报。</span>`,
           ok: "上传"
         }, () => lbSubmit(true));
         return;
@@ -10787,9 +11159,6 @@
       // ⚠️ 判据必须是 lbPreview —— 不能像早期那样写成「LEADERBOARD_API 为空」，
       //    否则后端一接上，DEV 预览就失效了（V0.92 修）。
       if (lbPreview) {
-        lbSentAt = Date.now();
-        lbSentSnapshot = lbSnapshot();
-        save.lbAuto = true;
         lbNote = "【预览】模拟上传成功 · " + new Date().toLocaleTimeString();
         renderLeaderboard();
         return;
@@ -10799,11 +11168,6 @@
       renderLeaderboard();
       lbRequest("/submit", { method: "POST", body: JSON.stringify(buildLeaderboardPayload()) }).then(res => {
         lbBusy = false;
-        lbSentAt = Date.now();
-        lbSentSnapshot = lbSnapshot();
-        // 手动传过一次 = 玩家同意公开 → 顺手把「自动上传」打开（可以再关掉）
-        save.lbAuto = true;
-        saveGame(true);
         // 名次走 Toast 通知（状态行会被紧接着的「刷新榜单」结果覆盖，塞那儿反而看不见）
         const rank = (res && typeof res.rank === "number") ? res.rank : 0;
         showToast(rank > 0 ? `成绩已上传到排行榜 · 当前第 ${rank} 名` : "成绩已上传到排行榜。");
@@ -10815,13 +11179,8 @@
         renderLeaderboard();
       });
     }
-    // 自动上报：每 5 分钟一次，且只在「时长/尘埃有变化」时才真的发（省流量也省后端）
-    function lbAutoSubmitStep() {
-      if (!LEADERBOARD_API || !save.lbAuto || lbBusy) return;
-      if (Date.now() - lbSentAt < LB_AUTO_MS) return;
-      if (lbSnapshot() === lbSentSnapshot) return;
-      lbSubmit(true);
-    }
+    // V0.96：原「lbAutoSubmitStep 每 5 分钟自动上报」已整体移除（后端按调用计费）。
+    //   现在只有玩家点「上传成绩」才会发 /submit —— 后台零请求，别再往回加定时上报。
     function lbLoad(sort) {
       lbSort = sort === "time" ? "time" : "dust";
       // 预览模式（DEV 假数据）不联网；没接后端时也只是重绘一下
@@ -10838,11 +11197,6 @@
         lbNote = "读取失败：" + ((err && err.message) || "网络错误");
         renderLeaderboard();
       });
-    }
-    function lbSetAuto(on) {
-      save.lbAuto = !!on;
-      saveGame(true);
-      renderLeaderboard();
     }
     function renderLeaderboardButton() {
       // V0.92（作者要求）：入口**常显**，像「成就」一样固定在导航栏右侧。
@@ -10861,15 +11215,14 @@
         : "排行榜还没开放 —— 后端正在接入中，开放后这里就能上传成绩、看全服排名。");
       // 自己的成绩（昵称输入框不重绘 —— 否则会把玩家正在输入的框冲掉）
       setText("lbSelfScore", "你的成绩：" + formatNumber(save.bestDust) + " 尘埃 · ⏱ " + formatPlayTime(save.playMs || 0));
-      // 工具条
+      // 工具条（V0.96：自动上传开关已移除 —— 上传是纯手动，点一次发一次）
       const sorts = [["dust", "按最高尘埃"], ["time", "按在线时长"]];
       setHTML("lbTools",
         (on ? sorts.map(s =>
           `<button class="lb-sort ${lbSort === s[0] ? "active" : ""}" data-lb-sort="${s[0]}">${s[1]}</button>`
         ).join("") : "") +
         (on ? `<button class="primary-button" data-lb-submit="1" ${lbBusy ? "disabled" : ""}>${lbBusy ? "上传中…" : "上传成绩"}</button>` +
-          `<button class="secondary-button" data-lb-refresh="1">刷新榜单</button>` +
-          `<button class="switch ${save.lbAuto ? "on" : ""}" data-lb-auto="1">${save.lbAuto ? "自动上传：开" : "自动上传：关"}</button>`
+          `<button class="secondary-button" data-lb-refresh="1">刷新榜单</button>`
         : ""));
       // 榜单
       if (!on) {
@@ -10988,7 +11341,7 @@
         statsRow("猎犬经验加成", statsMult(getHoundExpBonus()), "战斗结算与经验饵都乘在这里"),
         statsRow("猎犬属性全局加成", statsMult(getHoundGlobalMult()), "同时作用于猎犬战力与战斗中的实际属性"),
         sel ? statsRow("出战猎犬", `${sel.qualityName}·${sel.name}`,
-          `Lv.${sel.level} · 战力 ${formatNumber(houndPower(sel))} · 寿命 ${sel.lifespan} / ${sel.maxLifespan}`)
+          `Lv.${formatNumber(sel.level)} · 战力 ${formatNumber(houndPower(sel))} · 寿命 ${formatNumber(sel.lifespan)} / ${formatNumber(sel.maxLifespan)}`)
           : statsRow("出战猎犬", "—", "当前没有出战猎犬"),
         statsRow("仓库猎犬 / 展示柜", `${(save.hounds || []).length} 只 / ${(save.transcendedHounds || []).length} 只`),
         statsRow("时间惯性", statsMult(getInertiaMult()),
@@ -11001,9 +11354,9 @@
         const lv = (parts[k] && parts[k].level) || 0;
         const eff = getPartEffectiveLevel(k);
         const capLv = PART_BONUS_CAP[k];
-        const cap = capLv === undefined ? "" : `软上限 ${capLv} 级`;
+        const cap = capLv === undefined ? "" : `软上限 ${formatNumber(capLv)} 级`;
         return statsRow(`${def.icon} ${def.name}`, statsBonus(1 + getPartBonus(k)),
-          `Lv.${lv}${eff !== lv ? ` → 有效 ${eff.toFixed(1)}` : ""} · 每级 ${def.format(def.value)}${cap ? " · " + cap : ""}`);
+          `Lv.${formatNumber(lv)}${eff !== lv ? ` → 有效 ${eff.toFixed(1)}` : ""} · 每级 ${def.format(def.value)}${cap ? " · " + cap : ""}`);
       });
 
       // ⑦ 碎片
@@ -11013,7 +11366,7 @@
         const label = SHARD_STAT_LABEL[k] || k;
         // 概率类的碎片是「减法」语义（如被捕获概率），用原值展示更准确
         if (k === "capture" || k === "captureRelax" || k === "shardDouble" || k === "golden" || k === "autoHarvest") {
-          return statsRow(label, `${(v * 100).toFixed(1)}%`);
+          return statsRow(label, formatPercent(v, 1));
         }
         return statsRow(label, statsBonus(1 + v));
       });
@@ -11029,7 +11382,7 @@
         const lv = getBaitLevel(t.id);
         const eff = getEffectiveBaitLevel(t.id);
         return statsRow(`${t.icon} ${t.name}`, t.format((t.value || 0) * lv),
-          `Lv.${lv}${eff !== lv ? ` → 有效 ${eff}` : ""}`);
+          `Lv.${formatNumber(lv)}${eff !== lv ? ` → 有效 ${eff}` : ""}`);
       });
 
       // ⑨ 基因
@@ -11070,6 +11423,10 @@
       uniRows.push(statsRow("悖论免除重置",
         isParadoxGraceOn() ? "已生效" : "未生效",
         `第 ${MILESTONE_PARADOX_GRACE_ENTRIES} 次进入宇宙后生效，免掉尘埃 / 升级的重置；进度与部件照旧重置，苦痛挑战中不生效`));
+      // V0.96：里程碑的第六份奖励 —— 自动升级悖论商店
+      uniRows.push(statsRow("自动升级悖论商店",
+        isAutoShopUnlocked() ? "已解锁" : `未解锁（${p.entries || 0} / ${MILESTONE_SHOP_AUTO_ENTRIES} 次）`,
+        `第 ${MILESTONE_SHOP_AUTO_ENTRIES} 次进入宇宙后解锁；开关在「⚙ 自动化」里，每秒自动给本源商店三件套各买 1 级`));
 
       // ⑪ 实验室
       const labRows = [
@@ -11087,7 +11444,7 @@
         statsRow("苦痛挑战", `${(p.painCleared || []).length} / ${PAIN_CHALLENGES.length} 个`,
           "每个完成：全局倍率 ×1.05（累乘）· 基因点数 ×1.5（累乘）"),
         statsRow("苦痛之路", p.pain && p.pain.active ? `进行中（${(p.pain.picks || []).length} 条）` : "未开启",
-          p.pain && Array.isArray(p.pain.pending) && p.pain.pending.length ? `已预约 ${p.pain.pending.length} 条，下次进宇宙生效` : ""),
+          p.pain && Array.isArray(p.pain.pending) && p.pain.pending.length ? `已预约 ${formatNumber(p.pain.pending.length)} 条，下次进宇宙生效` : ""),
         statsRow("成就加成", `尘埃 ${(achv.dust * 100).toFixed(0)}% · 速度 ${(achv.speed * 100).toFixed(0)}% · 本源 ${(achv.origin * 100).toFixed(0)}%`,
           `已达成 ${ACHIEVEMENTS.filter(a => save.achievements[a.id]).length} / ${ACHIEVEMENTS.length}`),
         statsRow("减伤（被捕获概率）", `-${(stats.riskReduction * 100).toFixed(2)}%`, "永恒沙漏部件 + 碎片提供的捕获减免"),
@@ -11115,19 +11472,19 @@
 
       // 未解锁前整块直接隐藏，不再用「??? 」占位
       setText("autoTitle", "自动化");
-      setText("autoCount", `${unlockedCount} / ${AUTO_ROWS.length}`);
+      setText("autoCount", `${formatNumber(unlockedCount)} / ${AUTO_ROWS.length}`);
       const autoBtn = el("autoBtn");
       autoBtn.classList.toggle("locked", !anyUnlocked);
       autoBtn.classList.toggle("unlocked", anyUnlocked);
       autoBtn.disabled = !anyUnlocked;
       autoBtn.style.display = anyUnlocked ? "" : "none";
-      setHTML("autoBtn", `⚙ 自动化 <b>${unlockedCount} / ${AUTO_ROWS.length}</b>`);
+      setHTML("autoBtn", `⚙ 自动化 <b>${formatNumber(unlockedCount)} / ${AUTO_ROWS.length}</b>`);
       setHTML("autoNote",
         "开启后时间循环会自己运转，你只需要偶尔回来看看——但每一项自动化都有代价，它们不是纯粹的增益。" +
         (unlockedCount < AUTO_ROWS.length
           ? `<br><span style="color: var(--muted);">未解锁的项达成对应成就后会直接出现。` +
             `自动收获：累计被捕获 10 次 · 自动升级：任一升级达到 Lv.${AUTO_UPGRADE_UNLOCK_LEVEL} · ` +
-            `自动悖论：成就「多元宇宙旅人」。</span>`
+            `自动悖论：成就「多元宇宙旅人」 · 自动升级悖论商店：多元宇宙里程碑第 ${MILESTONE_SHOP_AUTO_ENTRIES} 次。</span>`
           : ""));
 
       // 未解锁的自动化整行不渲染
@@ -11209,7 +11566,7 @@
       const unlocked = isPainEverUnlocked();
       const total = PAIN_CHALLENGES.length;
       const doneCount = painClearedCount();
-      setText("painChProgressText", `${doneCount} / ${total} 种完成`);
+      setText("painChProgressText", `${formatNumber(doneCount)} / ${formatNumber(total)} 种完成`);
 
       const note = el("painChNote");
       if (!unlocked) {
@@ -11236,7 +11593,7 @@
           `<br>每完成一个：进入下一个宇宙时基因点数 <b style="color: var(--gold);">×${PAIN_CH_GENE_STEP}</b>（永久累乘，` +
           `全部打穿就是 ×${painMultText(Math.pow(PAIN_CH_GENE_STEP, PAIN_CHALLENGES.length))}）。` +
           (picks.length
-            ? `<br>当前开着的苦痛：<b>${picks.length}</b> 条 —— 下面亮着「可进入」的就是现在能打的。`
+            ? `<br>当前开着的苦痛：<b>${formatNumber(picks.length)}</b> 条 —— 下面亮着「可进入」的就是现在能打的。`
             : `<br><span style="color: var(--muted)">你现在并没有走在苦痛之路上：先去「🩸 苦痛之路」踏入一次（会清空整个轮回），再回来这里。</span>`);
       }
 
@@ -11306,7 +11663,7 @@
       }
 
       const doneCount = CHALLENGES.filter(c => isChallengeDone(c.id)).length;
-      setText("challengeProgressText", `${doneCount} / ${CHALLENGES.length} 完成`);
+      setText("challengeProgressText", `${formatNumber(doneCount)} / ${CHALLENGES.length} 完成`);
 
       const run = getChallengeRun();
       const runIdx = run ? getChallengeIndex(run.id) : -1;
@@ -11429,6 +11786,12 @@
           ? `<b style="color: var(--gold);">已生效</b>`
           : `<b style="color: var(--muted);">未生效（${mileN} / ${MILESTONE_PARADOX_GRACE_ENTRIES} 次）</b>`) +
         `<span class="mv-cost">（第 ${MILESTONE_PARADOX_GRACE_ENTRIES} 次进入宇宙后生效；<b>苦痛挑战中不生效</b>）</span>` +
+        // V0.96：里程碑的第六份奖励 —— 自动升级悖论商店
+        `<br>自动升级悖论商店：` +
+        (isAutoShopUnlocked()
+          ? `<b style="color: var(--gold);">已解锁</b>`
+          : `<b style="color: var(--muted);">未解锁（${mileN} / ${MILESTONE_SHOP_AUTO_ENTRIES} 次）</b>`) +
+        `<span class="mv-cost">（第 ${MILESTONE_SHOP_AUTO_ENTRIES} 次进入宇宙后解锁；到 <b>⚙ 自动化</b> 里开启，每秒自动买 1 级）</span>` +
         `</div></div>`);
       // 折算预览：进入会把当前进度换成多少基因修饰点数（让玩家看得见代价与收益）
       const breakdown = getWipeScoreBreakdown();
@@ -11515,7 +11878,7 @@
       // V0.89：植入价格每次翻倍（进一次宇宙归 1 点）—— 先算出来，状态栏/按钮/提示都要用
       const implantCost = getGeneImplantCost();
       setText("geneStatusText",
-        `基因点数 ${p.genePoints || 0} · 基因 ${genes.length} / ${GENE_MAX} · 修饰点 ${mp} · 下次植入 ${geneImplantCostText()} 点`);
+        `基因点数 ${p.genePoints || 0} · 基因 ${formatNumber(genes.length)} / ${GENE_MAX} · 修饰点 ${mp} · 下次植入 ${geneImplantCostText()} 点`);
       const canAdd = (p.genePoints || 0) >= implantCost && genes.length < GENE_MAX;
       const pickedCount = geneSelection.size;
 
@@ -11523,7 +11886,7 @@
         ? `
         <div class="gene-tools">
           <button class="secondary-button" data-gene-pick-all="1">${pickedCount === genes.length ? "取消全选" : "全选"}</button>
-          <button class="danger-button" data-gene-remove-picked="1" ${pickedCount ? "" : "disabled"}>移除选中（${pickedCount}）</button>
+          <button class="danger-button" data-gene-remove-picked="1" ${pickedCount ? "" : "disabled"}>移除选中（${formatNumber(pickedCount)}）</button>
           <span class="mv-cost">点每条基因左边的方框可以多选；移除会把该基因与已投入的点数一起销毁（<b style="color: var(--red, #e0554f);">不退还</b>），删前还会再确认一次。</span>
         </div>
         <div class="gene-list">${genes.map((g, i) => {
@@ -11531,6 +11894,9 @@
             const picked = geneSelection.has(i);
             const cap = geneLevelCap(g);
             const atCap = Math.floor(g.level || 1) >= cap;
+            // V0.96：成长比例走 geneGrowthRatio —— partCap 是削弱后的三位小数（如 ×1.028）
+            const grow = geneGrowthRatio(g);
+            const growTxt = g.k === "partCap" ? grow.toFixed(3) : grow.toFixed(2);
             const c1 = geneUpgradeCost(g);
             const c10 = geneUpgradeBulkCost(g, 10);
             const c100 = geneUpgradeBulkCost(g, 100);
@@ -11545,7 +11911,7 @@
                 <span class="gene-tier" style="color:${t.color}">${t.name}</span>
                 <span class="gene-name">${g.label}</span>
                 <span class="gene-val">×${geneEffectText(g)}</span>
-                <span class="gene-lv">Lv.${g.level}${atCap ? "（满级）" : ""} · 每级 ×${t.mult.toFixed(2)}${inv > 0 ? ` · 已投入 ${inv} 点` : ""}</span>
+                <span class="gene-lv">Lv.${formatNumber(g.level)}${atCap ? "（满级）" : ""} · 每级 ×${growTxt}${inv > 0 ? ` · 已投入 ${inv} 点` : ""}</span>
               </div>
               <div class="gene-ops">
                 ${upBtn(1, "×1", c1, !atCap && mp >= c1)}
@@ -11598,9 +11964,18 @@
       { id: "lab_partcap", icon: "⚙", name: "部件改造", cost: 3, key: "partCap", value: 4, int: true, unit: "级",
         desc: "所有永恒部件的软上限 +4 级（加法叠加，不参与乘算）。部件被软上限卡住之后，这是继续变强的主路。" },
       { id: "lab_cargo",   icon: "▤", name: "货物扩容", cost: 2, key: "offerCount", value: 1, int: true, unit: "条",
-        desc: "实验室每轮上架的升级 +1 条（同时刷新出「部件改造」这类货品的概率更高）。" }
+        desc: "实验室每轮上架的升级 +1 条（同时刷新出「部件改造」这类货品的概率更高）。最多 +4 条 —— 加上基础 5 件，正好摆满十个货物栏。" }
     ];
-    const LAB_OFFER_COUNT = 5;   // 每次刷新出几条供选择
+    const LAB_OFFER_COUNT = 5;   // 每轮基础摆几件货
+    // V0.96（作者要求）：实验室要能**反复刷出同一条加成**供重复购买。三条配套规则：
+    //   ① 「十个货物栏」指**实验台每轮摆的货位数**：基础 5 件，「货物扩容」最多再 +4 条，
+    //      外加 35% 概率上架的「基因幸运」——从头到尾最多 10 件，这就是十个货物栏。
+    //   ② 购买**没有总量上限** —— 想买多少买多少、同一种能一直叠（刷新就能再刷到它）。
+    //   ③ 代价只有一条：同一种升级每多买一份，价格 ×1.5（份数越多越贵）。
+    //   ⚠️ 别再把「10」实现成「总共只能买 10 份」（V0.96 初版做错过一次，作者明确纠正）。
+    const LAB_CARGO_MAX = 4;       // 「货物扩容」上限：最多 +4 条
+    const LAB_SHELF_MAX = 10;      // 十个货物栏：一轮最多摆 10 件货
+    const LAB_REPEAT_STEP = 1.5;   // 与基因强化的成长率同一条线，玩家读得懂
     // ===== 多元宇宙里程碑（V0.89）=====
     // 每走进一个新宇宙，里程碑 +1 级；每一级都让「进入宇宙时拿到的基因点数」再多一点。
     // 公式取线性（每级 +20%）：第 1 次 ×1.20、第 5 次 ×2.00、第 10 次 ×3.00、第 50 次 ×11.00 ——
@@ -11672,6 +12047,14 @@
       return true;
     }
 
+    // V0.96（作者要求）：里程碑的第六份奖励 —— 第 5 次多元宇宙之后解锁「自动升级悖论商店」。
+    //   本源商店三件套从此可以自动买级（开关在「⚙ 自动化」里，和其它自动化一样默认关）。
+    //   ⚠️ 这里只判断「解没解锁」；跑不跑由 save.auto.shop 决定（见 autoShopStep）。
+    const MILESTONE_SHOP_AUTO_ENTRIES = 5;
+    function isAutoShopUnlocked() {
+      return Math.max(0, Math.floor(getPossibility().entries || 0)) >= MILESTONE_SHOP_AUTO_ENTRIES;
+    }
+
     // V0.89：实验室的每一条升级都带「品质」——直接沿用转盘那一套六档稀有度。
     //   品质越高：效果越强（value × (1 + 0.5 × tier)）、价格越贵（cost + tier）。
     const LAB_TIER_VALUE_STEP = 0.5;
@@ -11683,7 +12066,15 @@
       if (!o) return 0;
       if (o.id === LAB_LUCK_ID) return LAB_LUCK_COST;
       const def = getLabOfferDef(o);
-      return def ? def.cost + (o.tier || 0) : 0;
+      if (!def) return 0;
+      // V0.96：重复购买同一种升级要付涨价后的价钱（×1.5^已持有份数，向上取整）
+      const copies = getLabOwnedCopies(o.id);
+      const base = def.cost + (o.tier || 0);
+      return copies <= 0 ? base : Math.ceil(base * Math.pow(LAB_REPEAT_STEP, copies));
+    }
+    // 已持有几份同一种升级（V0.96：重复购买后用来报价与显示）
+    function getLabOwnedCopies(id) {
+      return getLab().owned.filter(o => (o && o.id ? o.id : o) === id).length;
     }
     // 品质对「效果」的放大：百分比类直接乘；**上限类（int）取整**，否则会冒出「+7.5 级」这种数
     function labOfferValueOf(def, tier) {
@@ -11718,12 +12109,8 @@
     function rerollLabOffers() {
       const p = getPossibility();
       const lab = getLab();
-      // V0.89 BUG 修复：池子空了以后，刷新只会「扣点数 + 涨价」而清单一个字都不变 ——
-      //   玩家看到的就是"点了没反应"。这里直接拦下并说清原因（按钮本身也会禁用）。
-      if (getLabPoolSize() <= 0) {
-        showToast("已经没有可刷新的升级了 —— 能买的都买完了。进入下一个宇宙会自动重新抽一批（免费）。");
-        return;
-      }
+      // V0.96：允许重复购买后，盘面永远刷得出来东西 —— 原来的「池子空了什么都不变」守卫
+      //   （V0.89 的 BUG 修复）随之退出，只剩「基因点够不够」这一道判断。
       const cost = getLabRerollCost();
       if ((p.genePoints || 0) < cost) {
         showToast(`刷新需要 ${cost} 基因点（当前 ${p.genePoints || 0} 点）。`);
@@ -11749,28 +12136,30 @@
       return total;
     }
     function labOwnedCount() { return getLab().owned.length; }
-    // 重新抽一批（排除已拥有的；池子不够就全给）
-    // 每轮上架几条 = 基础条数 + 「货物扩容」买的条数
+    // 重新抽一批。V0.96（作者要求）：**不再排除已购升级** —— 实验室要能反复刷出同一条加成，
+    //   玩家才能「刷新 → 再买一份」。已购只影响一件事：下一份的价格（越买越贵）；
+    //   购买数量本身没有任何上限，「十个货物栏」说的是每轮的货位（见 LAB_SHELF_MAX）。
+    // 每轮上架几条 = 基础条数 + 「货物扩容」买的条数（扩容加成封顶 +LAB_CARGO_MAX）
     function getLabOfferCount() {
-      return LAB_OFFER_COUNT + Math.max(0, Math.floor(getLabBonus("offerCount")));
+      const cargo = Math.min(LAB_CARGO_MAX, Math.max(0, Math.floor(getLabBonus("offerCount"))));
+      return Math.min(LAB_SHELF_MAX, LAB_OFFER_COUNT + cargo);
     }
-    // 还没买的升级还剩几条（刷新按钮据此判断"刷了有没有意义"）
+    // V0.96：允许重复购买后，池子永远不会被买空 —— 每一次刷新都可能刷到想要的那条。
+    //   （保留这个函数是为了不动老调用点；它现在恒等于整池大小。）
     function getLabPoolSize() {
-      const lab = getLab();
-      const ownedIds = lab.owned.map(o => (o && o.id) ? o.id : o);
-      return LAB_UPGRADES.filter(d => ownedIds.indexOf(d.id) < 0).length;
+      return LAB_UPGRADES.length;
     }
     function rollLabOffers() {
       const lab = getLab();
-      const ownedIds = lab.owned.map(o => (o && o.id) ? o.id : o);
-      const pool = LAB_UPGRADES.filter(d => ownedIds.indexOf(d.id) < 0);
+      const pool = LAB_UPGRADES.slice();
       for (let i = pool.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         const t = pool[i]; pool[i] = pool[j]; pool[j] = t;
       }
       // 每条升级随机一个「品质」（权重会被基因幸运倾斜 —— 越幸运越容易出高品）
       const offers = pool.slice(0, getLabOfferCount()).map(d => ({ id: d.id, tier: rollBaseGeneTierIndex() }));
-      if (Math.random() < LAB_LUCK_CHANCE) offers.push({ id: LAB_LUCK_ID, tier: 0 });
+      // 十个货物栏的硬上限：扩容加成已封顶，这里再兜一道（幸运占第 10 格，绝不超框）
+      if (Math.random() < LAB_LUCK_CHANCE && offers.length < LAB_SHELF_MAX) offers.push({ id: LAB_LUCK_ID, tier: 0 });
       lab.offers = offers;
       return offers.length;
     }
@@ -11795,14 +12184,21 @@
       } else {
         const def = getLabDef(o.id);
         if (!def) return;
-        if (lab.owned.some(x => (x && x.id ? x.id : x) === o.id)) { showToast("这条升级已经买过了。"); return; }
+        // V0.96：购买**没有总量上限**（十个货物栏说的是每轮摆几件货，不是终生购买数）；
+        //   只有「货物扩容」本身封顶 +LAB_CARGO_MAX 条 —— 它是货栏本身的容量。
+        if (o.id === "lab_cargo" && getLabOwnedCopies("lab_cargo") >= LAB_CARGO_MAX) {
+          showToast(`「货物扩容」最多 +${LAB_CARGO_MAX} 条（实验台十个货物栏已经摆满）。`);
+          return;
+        }
         p.genePoints -= cost;
         lab.owned.push({ id: o.id, tier: o.tier || 0 });
         lab.offers.splice(idx, 1);
         saveGame(true);
         const t = GENE_TIERS[Math.max(0, Math.min(GENE_TIERS.length - 1, o.tier || 0))];
-        logEvent("🧪", `基因实验室：购入 <b>${t.name}</b> 品质的「${def.name}」`, "cyan");
-        showToast(`已购入 <b style="color:${t.color}">${t.name}</b> 品质的「<b>${def.name}</b>」（永久生效）`);
+        const copies = getLabOwnedCopies(o.id);
+        const nth = copies > 1 ? ` 第 <b>${copies}</b> 份` : "";
+        logEvent("🧪", `基因实验室：购入 <b>${t.name}</b> 品质的「${def.name}」${copies > 1 ? `（第 ${copies} 份）` : ""}`, "cyan");
+        showToast(`已购入 <b style="color:${t.color}">${t.name}</b> 品质的「<b>${def.name}</b>」${nth}（永久生效）`);
       }
       renderPossibility();
     }
@@ -11830,9 +12226,9 @@
       const unlocked = geneCount >= PAIN_REQUIRED_GENES;
       const pendingList = Array.isArray(pain.pending) ? pain.pending : [];
       setText("painStatusText", pain.active
-        ? `苦痛进行中 · ${pain.picks.length} 条 · 下次进入宇宙 ×${pain.geneMult}`
-        : (pendingList.length ? `已预约 ${pendingList.length} 条 · 下次重置生效`
-          : (unlocked ? "可以预约" : `基因 ${geneCount} / ${PAIN_REQUIRED_GENES}`)));
+        ? `苦痛进行中 · ${formatNumber(pain.picks.length)} 条 · 下次进入宇宙 ×${pain.geneMult}`
+        : (pendingList.length ? `已预约 ${formatNumber(pendingList.length)} 条 · 下次重置生效`
+          : (unlocked ? "可以预约" : `基因 ${formatNumber(geneCount)} / ${PAIN_REQUIRED_GENES}`)));
 
       // ⓪ 已预约、还没生效：说明它会在下一次多元宇宙重置时压上来
       if (!pain.active && pendingList.length) {
@@ -11842,7 +12238,7 @@
         }).join("");
         setHTML("painBody", `
           <p class="possibility-note">
-            <b style="color: var(--gold);">苦痛已预约</b>——这 <b>${pendingList.length}</b> 条会在你
+            <b style="color: var(--gold);">苦痛已预约</b>——这 <b>${formatNumber(pendingList.length)}</b> 条会在你
             <b>下一次进行多元宇宙重置</b>时开始生效（届时整个轮回本来就会被清空，苦痛从那一轮压上来）。
             回报 <b style="color: var(--gold);">×${pain.geneMult}</b> 基因点数会在那一轮结束时兑现。<br>
             <span style="color: var(--muted);">不想等（或改主意了）可以在下面中止预约；中止会作废这次回报。</span>
@@ -11862,7 +12258,7 @@
         }).join("");
         setHTML("painBody", `
           <p class="possibility-note">
-            你正走在<b style="color: var(--red);">苦痛之路</b>上——<b>${pain.picks.length}</b> 条苦痛同时压在这一轮里。
+            你正走在<b style="color: var(--red);">苦痛之路</b>上——<b>${formatNumber(pain.picks.length)}</b> 条苦痛同时压在这一轮里。
             进入下一个宇宙时会一次性拿到 <b style="color: var(--gold);">×${pain.geneMult}</b> 基因点数，
             <b>届时苦痛自动结束</b>（那一轮的进度照样会被清空）。现在唯一要做的，就是在这一轮里活下去、并把
             <b>「苦痛挑战」</b>打掉。
@@ -11880,9 +12276,9 @@
         setHTML("painBody", `
           <p class="possibility-note">
             这条路由<b>基因的密度</b>铺成：先在「🧬 基因改造」里植入
-            <b>${PAIN_REQUIRED_GENES}</b> 条基因（当前 <b>${geneCount}</b> 条），路才会显形。
+            <b>${PAIN_REQUIRED_GENES}</b> 条基因（当前 <b>${formatNumber(geneCount)}</b> 条），路才会显形。
           </p>
-          <div class="pain-lock">🔒 苦痛之路尚未显形 · 已植入基因 <b>${geneCount} / ${PAIN_REQUIRED_GENES}</b></div>`);
+          <div class="pain-lock">🔒 苦痛之路尚未显形 · 已植入基因 <b>${formatNumber(geneCount)} / ${PAIN_REQUIRED_GENES}</b></div>`);
         return;
       }
 
@@ -11909,7 +12305,7 @@
         <div class="pain-tools">
           <button class="secondary-button" data-pain-all="1">${n === PAIN_DEFS.length ? "取消全选" : "全选（10 条）"}</button>
           <span class="mv-cost">${n > 0
-            ? `已选 <b>${n}</b> 条 → 下次进入宇宙基因点 <b style="color: var(--gold);">×${mult}</b>${n < 10 ? `（勾满 10 条 = ×${PAIN_MAX_BONUS}）` : ""}`
+            ? `已选 <b>${formatNumber(n)}</b> 条 → 下次进入宇宙基因点 <b style="color: var(--gold);">×${mult}</b>${n < 10 ? `（勾满 10 条 = ×${PAIN_MAX_BONUS}）` : ""}`
             : `勾选任意条数即可踏入——开得越多，下一轮拿到的基因点数越多（最高 ×${PAIN_MAX_BONUS}）`}</span>
         </div>
         <div class="pain-list">${list}</div>
@@ -11931,8 +12327,8 @@
         showConfirm({
           icon: "🕊", title: "中止苦痛之路", ok: "中止苦痛", danger: true,
           text: (p.pain.active
-            ? `当前压着 <b>${p.pain.picks.length}</b> 条苦痛`
-            : `当前预约了 <b>${p.pain.pending.length}</b> 条苦痛（尚未生效）`) +
+            ? `当前压着 <b>${formatNumber(p.pain.picks.length)}</b> 条苦痛`
+            : `当前预约了 <b>${formatNumber(p.pain.pending.length)}</b> 条苦痛（尚未生效）`) +
             `（进入下一个宇宙本可拿到 <b style="color:var(--gold)">×${p.pain.geneMult}</b> 基因点数）。<br><br>` +
             `中止后：<b>所有苦痛立刻解除</b>，但<b style="color:var(--red)">这一轮的基因点倍率一并作废</b>。<br>` +
             `不会清空轮回、不会清除基因、苦痛挑战也照常保留。`
@@ -11959,7 +12355,7 @@
       const names = picks.map(id => { const d = getPainDef(id); return `· ${d.name}：${d.desc}`; }).join("\n");
       if (!skipConfirm) {
         showConfirm({
-          icon: "🩸", title: "预约苦痛之路", ok: `预约 ${picks.length} 条苦痛`, danger: true,
+          icon: "🩸", title: "预约苦痛之路", ok: `预约 ${formatNumber(picks.length)} 条苦痛`, danger: true,
           text: `${names.split("\n").join("<br>")}<br><br>` +
             `· <b style="color:var(--green)">无需任何尘埃</b><br>` +
             `· <b>不会立刻清空轮回</b>：苦痛会在你<b>下一次进行多元宇宙重置</b>时开始生效<br>` +
@@ -11977,8 +12373,8 @@
       p.pain = { picks: [], pending: picks.slice(), geneMult: mult, active: false, everUnlocked: true };
       painSelection.clear();
       saveGame(true);
-      logEvent("🩸", `预约苦痛之路：<b>${picks.length}</b> 条苦痛，将在下一次多元宇宙重置时生效`, "red");
-      showToast(`苦痛已预约（<b>${picks.length}</b> 条）：<b>下一次进入多元宇宙</b>时开始生效，届时回报 <b>×${mult}</b> 基因点数`);
+      logEvent("🩸", `预约苦痛之路：<b>${formatNumber(picks.length)}</b> 条苦痛，将在下一次多元宇宙重置时生效`, "red");
+      showToast(`苦痛已预约（<b>${formatNumber(picks.length)}</b> 条）：<b>下一次进入多元宇宙</b>时开始生效，届时回报 <b>×${mult}</b> 基因点数`);
       render();
       switchTab("possibility");
     }
@@ -11995,7 +12391,7 @@
           `<span style="color: var(--muted);">完成第 ${LAB_UNLOCK_ENTRIES} 次多元宇宙之后，这里会亮起来。</span></div>`);
         return;
       }
-      setText("labStatusText", `基因点数 ${p.genePoints || 0} · 已购 ${lab.owned.length} 条`);
+      setText("labStatusText", `基因点数 ${p.genePoints || 0} · 已购 ${formatNumber(lab.owned.length)} 份 · 本期货栏 ${formatNumber(lab.offers.length)} / ${LAB_SHELF_MAX}`);
       // V0.86：不再罗列"买了什么"，直接把当前的总加成列出来
       const LAB_KEYS = [["dust", "尘埃收益"], ["speed", "时间流速"], ["origin", "本源收益"],
         ["global", "全局收益"], ["part", "部件效果"], ["houndExp", "猎犬经验"], ["shardDrop", "碎片掉落率"]];
@@ -12007,22 +12403,16 @@
       const sumCapLv = getLabBonus("partCap");
       if (sumCapLv > 0) sumList.push(`<span class="lab-sum-item">部件软上限 <b>+${Math.round(sumCapLv)} 级</b></span>`);
       const sumCargo = Math.floor(getLabBonus("offerCount"));
-      if (sumCargo > 0) sumList.push(`<span class="lab-sum-item">每轮上架 <b>+${sumCargo} 条</b></span>`);
+      if (sumCargo > 0) sumList.push(`<span class="lab-sum-item">每轮上架 <b>+${formatNumber(sumCargo)} 条</b></span>`);
       const summary = sumList.length ? sumList.join("")
         : `<span class="mv-cost">还没有从实验室拿到任何加成。</span>`;
       const rerollCost = getLabRerollCost();
       // V0.89：刷新按钮要说清"能不能刷 / 为什么不能刷"，别让玩家点了没反应
       const offerCount = getLabOfferCount();
-      const poolLeft = getLabPoolSize();
       const canAffordReroll = (p.genePoints || 0) >= rerollCost;
-      const canReroll = poolLeft > 0 && canAffordReroll;
-      const rerollLabel = poolLeft <= 0
-        ? "已无可刷新的升级"
-        : (canAffordReroll ? `刷新清单（${rerollCost} 基因点）` : `基因点数不足（需要 ${rerollCost} 点）`);
-      const rerollNote = poolLeft <= 0
-        ? `本轮能刷出来的升级已经全部买完了 —— 进入下一个宇宙会<b>免费</b>重新抽一批。`
-        : `本轮已刷新 ${lab.rerollCount || 0} 次 · 进入下一个宇宙会重置这个价格` +
-          (poolLeft < offerCount ? ` · <b style="color: var(--gold);">可刷新的升级只剩 ${poolLeft} 条</b>` : "");
+      const canReroll = canAffordReroll;
+      const rerollLabel = canAffordReroll ? `刷新清单（${rerollCost} 基因点）` : `基因点数不足（需要 ${rerollCost} 点）`;
+      const rerollNote = `本轮已刷新 ${lab.rerollCount || 0} 次 · 进入下一个宇宙会重置这个价格`;
       // V0.89：每条升级都带品质（沿用转盘的六档），品质越高效果越强、价格越贵；
       //   另外有 35% 概率上架一件「基因幸运」。
       const offers = lab.offers.map((o, idx) => {
@@ -12047,7 +12437,10 @@
         const t = GENE_TIERS[Math.max(0, Math.min(GENE_TIERS.length - 1, o.tier || 0))];
         const cost = getLabOfferCost(o);
         const mult = 1 + LAB_TIER_VALUE_STEP * (o.tier || 0);
-        const afford = afford0 >= cost;
+        // V0.96：同一种升级可以反复买 —— 显示已持有份数；只有「货物扩容」到 +4 才禁用
+        const copies = getLabOwnedCopies(o.id);
+        const cargoFull = o.id === "lab_cargo" && copies >= LAB_CARGO_MAX;
+        const afford = afford0 >= cost && !cargoFull;
         // V0.89：上限类货品显示「+N 级 / +N 条」，百分比类才显示「×倍率」
         const valText = d.int
           ? `效果 <b>+${Math.round(getLabOfferValue(o))} ${d.unit || ""}</b>`
@@ -12059,23 +12452,28 @@
               <span class="lab-icon">${d.icon}</span>
               <div>
                 <h3>${d.name}</h3>
-                <small><b style="color:${t.color}">${t.name}</b> 品质 · ${valText} · ${kindText}</small>
+                <small><b style="color:${t.color}">${t.name}</b> 品质 · ${valText} · ${kindText}` +
+                (copies > 0 ? ` · 已持有 <b style="color: var(--gold);">${copies}</b> 份` : "") + `</small>
               </div>
               <span class="lab-cost">${cost} 基因点</span>
             </div>
             <p class="lab-desc">${d.desc}</p>
             <button class="primary-button" data-lab-buy="${idx}" ${afford ? "" : "disabled"}>
-              ${afford ? "购入（永久生效）" : "基因点数不足"}
+              ${cargoFull ? `已满（最多 +${LAB_CARGO_MAX} 条）`
+                : afford ? (copies > 0 ? `再买 1 份（涨价后 ${cost} 点）` : "购入（永久生效）")
+                  : "基因点数不足"}
             </button>
           </div>`;
       }).join("");
       setHTML("labBody", `
         <p class="possibility-note">
-          这里的升级是<b>随机刷</b>出来的：<b>每次进入多元宇宙</b>都会重新抽一批（本轮 <b>${offerCount}</b> 条）。
+          这里的升级是<b>随机刷</b>出来的：<b>每次进入多元宇宙</b>都会重新抽一批（本轮 <b>${formatNumber(offerCount)}</b> 条）。
           用「🧬 基因改造」那边攒下的<b style="color: var(--cyan);">基因点数</b>购买，买下后
           <b>永久生效</b>——清空整个轮回也不会掉。<br>
           <span style="color: var(--muted);">每条升级都带<b>品质</b>（沿用转盘那一套六档：普通 → 神话），品质越高<b>效果越强、也越贵</b>；
           偶尔还会上架一件「<b style="color: var(--cyan);">基因幸运</b>」（永久提高抽到高级基因的概率）。</span><br>
+          <span style="color: var(--muted);">V0.96：同一条升级可以<b>反复购买</b>——刷新清单有机会再刷到它，买下的<b>每一份都单独算加成</b>，购买<b>没有总量上限</b>；
+          唯一的代价是同一种升级每多买一份，价格 <b>×${LAB_REPEAT_STEP}</b>。实验台一共 <b>${LAB_SHELF_MAX}</b> 个货物栏：基础 ${LAB_OFFER_COUNT} 件、「货物扩容」最多再 +${LAB_CARGO_MAX} 条、外加偶尔上架的「基因幸运」。</span><br>
           <span style="color: var(--muted);">也可以花基因点当场刷新清单：第一次 ${LAB_REROLL_COST_BASE} 点，往后每刷一次翻一倍。
           不过进入下一个宇宙是<b>免费重抽</b>的——所以能省就省。</span>
         </p>
@@ -12086,7 +12484,7 @@
           </button>
           <span class="mv-cost">${rerollNote}</span>
         </div>
-        <h3 class="lab-title">本轮可购买（${lab.offers.length} 条）</h3>
+        <h3 class="lab-title">本轮可购买（${formatNumber(lab.offers.length)} 条）</h3>
         <div class="lab-grid">${offers || '<div class="empty">这一轮的清单已经买完了 —— 进入下一个宇宙会重新抽一批，也可以花钱刷新。</div>'}</div>`);
     }
 
@@ -12167,26 +12565,27 @@
       const hiddenCount = list.length - shown.length;
       const hiddenNote = hiddenCount > 0
         ? `<div class="mv-cost" style="margin: 10px 2px;">展示柜共 <b>${list.length}</b> 只，` +
-          `这里只列出<b>加成最高的 ${SHOWCASE_MAX_CARDS} 只</b>，其余 <b>${hiddenCount}</b> 只已隐藏` +
+          `这里只列出<b>加成最高的 ${SHOWCASE_MAX_CARDS} 只</b>，其余 <b>${formatNumber(hiddenCount)}</b> 只已隐藏` +
           `（它们照常计入上面的总加成）。</div>`
         : "";
       setHTML("transcendedList", capNote + hiddenNote + shown.map(th => {
         const qMult = getTranscendQualityMult(th.qualityTier);
         const eff = getReturnLevelEfficiency(th.returnLevel);
-        const bonus = (th.returnLevel * eff * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult * 100).toFixed(2);
+        // V0.96：读数统一走 formatPercent（>10 万% 自动计数法）
+        const bonus = th.returnLevel * eff * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult;
         return `
           <div class="transcended-card">
             <span class="transcend-icon">★</span>
             <h3 style="color: var(--gold);">超越时间的${th.name}</h3>
             <div style="margin: 8px 0; color: var(--muted); font-size: 12px;">
-              回归等级：<b style="color: var(--gold);">Lv.${th.returnLevel}</b><br>
+              回归等级：<b style="color: var(--gold);">Lv.${formatNumber(th.returnLevel)}</b><br>
               原品质：<span style="color: ${th.qualityColor}">${th.qualityName}</span> (x${qMult.toFixed(1)})<br>
               等级效率：<b style="color: ${eff < 1 ? "var(--muted)" : "var(--green)"};">×${eff.toFixed(2)}</b>` +
               (eff < 1 ? `<span class="mv-cost">（超过 Lv.${TRANSCEND_EFF_FREE_LEVEL} 的部分按等级递减）</span>` : "") +
               `</div>
             <div class="bonus-stat">
-              全局加成：+${bonus}%<br>
-              本源加成上限：+${bonus}%
+              全局加成：+${formatPercent(bonus)}<br>
+              本源加成上限：+${formatPercent(bonus)}
             </div>
           </div>`;
       }).join(""));
@@ -12255,7 +12654,7 @@
       const mult = getInertiaMult();
       const curNeed = getInertiaExpForLevel(lv);
       const nextNeed = getInertiaExpForLevel(lv + 1);
-      setText("inertiaLevel", `Lv.${lv}`);
+      setText("inertiaLevel", `Lv.${formatNumber(lv)}`);
       setText("inertiaMult", `×${formatDecimal(mult)}`);
       setText("inertiaExp", `${formatNumber(exp)} / ${formatNumber(nextNeed)}`);
       setText("inertiaNextHint", `再 ${formatNumber(Math.max(0, nextNeed - exp))} 点升到 Lv.${formatNumber(lv + 1)}`);
@@ -12299,7 +12698,7 @@
         const contrib = (th.returnLevel || 0) * q;
         return `<div class="inertia-contrib">
             <span>超越时间的<span style="color:${th.qualityColor}">${th.name}</span></span>
-            <small>Lv.${th.returnLevel} × ×${q.toFixed(1)} = <b style="color: var(--cyan);">${formatNumber(contrib)}</b></small>
+            <small>Lv.${formatNumber(th.returnLevel)} × ×${q.toFixed(1)} = <b style="color: var(--cyan);">${formatNumber(contrib)}</b></small>
           </div>`;
       }).join(""));
     }
@@ -12327,7 +12726,7 @@
       shardRenderSig = sig;
       const owned = getOwnedShardCount();
       const total = SHARD_DEFS.length;
-      setText("shardCountText", `${owned} / ${total}`);
+      setText("shardCountText", `${owned} / ${formatNumber(total)}`);
 
       // ---- 汇总：当前所有碎片提供的加成 ----
       const rows = [];
@@ -12355,10 +12754,11 @@
       rows.push(["黄金时间线出现概率",
         `${(goldenChance * 100).toFixed(2)}%` +
         (goldenChance > 1 ? ` · 黄金强度 ×${getGoldenPower().toFixed(2)}` : "")]);
-      // V0.93：「回旋针」改成了收紧盘面散布 —— 它不再抬高中心阶位（那会让命运扭曲被架空），
-      //   所以这里摊的是「散布系数」，并把决定天花板的命运扭曲等级一起写出来。
+      // V0.96：「回旋针」重新参与运气（等级 × 碎片倍率），阶位映射在超越段起走几何曲线；
+      //   同时它依旧收紧盘面散布。所以这里摊「运气 / 散布 / 中心阶位」三行。
+      rows.push(["转盘运气", `命运扭曲 Lv.${Math.floor(save.luckBoost || 0)} × 回旋针 ${getShardWheelLuckMult().toFixed(2)}`]);
       rows.push(["盘面散布", `×${getWheelSpreadFactor().toFixed(2)}（越小越容易落在中心阶位附近）`]);
-      rows.push(["中心阶位（品质天花板）", `${getFocusTier().toFixed(1)} / ${MAX_TIER} · 由命运扭曲 Lv.${Math.floor(save.luckBoost || 0)} 决定`]);
+      rows.push(["中心阶位（品质天花板）", `${getFocusTier().toFixed(1)} / ${MAX_TIER} · 由命运扭曲等级与回旋针共同决定`]);
 
       // 当前可打的最难线路，其单场总掉率
       let bestDiff = 0;
@@ -12398,7 +12798,7 @@
 
         const nameHTML = locked ? `<b style="color: var(--muted);">???</b>` : `<b style="color:${rarity.color}">${def.name}</b>`;
         const iconHTML = locked ? "❔" : def.icon;
-        const subHTML = locked ? `${rarity.name} · 未解锁` : `${rarity.name} · Lv.${level}`;
+        const subHTML = locked ? `${rarity.name} · 未解锁` : `${rarity.name} · Lv.${formatNumber(level)}`;
         const bodyHTML = locked
           ? `<div class="shard-lock">???</div>`
           : `<div class="shard-effect">${formatShardEffect(def, level)}</div>
@@ -12417,7 +12817,7 @@
             </div>
             ${bodyHTML}
             ${barHTML}
-            <div class="shard-foot">基础掉率 <b>${(rarity.base * 100).toFixed(2)}%</b> · 重复转化 <b>+${rarity.xpGain}</b> 经验/次</div>
+            <div class="shard-foot">基础掉率 <b>${(rarity.base * 100).toFixed(2)}%</b> · 重复转化 <b>+${formatNumber(rarity.xpGain)}</b> 经验/次</div>
           </div>`;
       }).join(""));
     }
@@ -12468,8 +12868,7 @@
       setText("shopHuntCdMax", ` / ${HUNT_CD_MAX_LEVEL}`);
       setText("shopHuntCdValue", formatCountdown(getHuntCooldownMs() / 1000));
       setText("shopHuntCdCost", cdMaxed ? "已满级" : formatNumber(getHuntCdCost(cdLv)));
-      el("shopHuntCdBuy").disabled = cdMaxed || bigCmp(save.origin, getHuntCdCost(cdLv)) < 0;
-      setText("shopHuntCdBuy", cdMaxed ? "已满级" : "升级");
+      renderShopBuys("shopHuntCdBuy", "huntCd");
       updateShopMeter("shopHuntCdMeter", cdLv, HUNT_CD_MAX_LEVEL);
 
       const hsLv = getOriginShop().harvestSpeed || 0;
@@ -12478,8 +12877,7 @@
       setText("shopHarvestMax", ` / ${HARVEST_SPEED_MAX_LEVEL}`);
       setText("shopHarvestValue", `×${getAutoHarvestMult().toFixed(3)}`);
       setText("shopHarvestCost", hsMaxed ? "已满级" : formatNumber(getHarvestSpeedCost(hsLv)));
-      el("shopHarvestBuy").disabled = hsMaxed || bigCmp(save.origin, getHarvestSpeedCost(hsLv)) < 0;
-      setText("shopHarvestBuy", hsMaxed ? "已满级" : "升级");
+      renderShopBuys("shopHarvestBuy", "harvestSpeed");
       updateShopMeter("shopHarvestMeter", hsLv, HARVEST_SPEED_MAX_LEVEL);
 
       const hspLv = getOriginShop().huntSpeed || 0;
@@ -12488,8 +12886,7 @@
       setText("shopHuntSpeedMax", ` / ${HUNT_SPEED_MAX_LEVEL}`);
       setText("shopHuntSpeedValue", `×${getHuntSpeedMult().toFixed(2)}`);
       setText("shopHuntSpeedCost", hspMaxed ? "已满级" : formatNumber(getHuntSpeedCost(hspLv)));
-      el("shopHuntSpeedBuy").disabled = hspMaxed || bigCmp(save.origin, getHuntSpeedCost(hspLv)) < 0;
-      setText("shopHuntSpeedBuy", hspMaxed ? "已满级" : "升级");
+      renderShopBuys("shopHuntSpeedBuy", "huntSpeed");
       updateShopMeter("shopHuntSpeedMeter", hspLv, HUNT_SPEED_MAX_LEVEL);
 
       renderOddsTable();
@@ -12510,10 +12907,14 @@
       //   「为什么我练了幸运、这个门槛却不动了」。
       const costCapped = isParadoxCostCapped();
       setText("paradoxCostHint",
-        bigCmp(save.dust, paradoxCost) >= 0
-          ? `消耗：全部永恒部件等级归零 + 手上全部 ${formatNumber(save.dust)} 时间尘埃`
-          : `消耗：全部永恒部件等级归零 + 手上全部时间尘埃（门槛 ${formatNumber(paradoxCost)} 尘埃 ≈ 命运扭曲 Lv.${Math.floor(save.luckBoost || 0)} 的档位` +
-            (costCapped ? ` · 已撞上尘埃上限的一半，不会再涨` : "") + `）`);
+        // V0.96：主线挑战里门槛是常量 100 万 —— 文案必须说清楚，不然玩家会按「命运扭曲档位」去理解
+        isMainChallengeRun()
+          ? `消耗：全部永恒部件等级归零 + 手上全部 ${formatNumber(save.dust)} 时间尘埃` +
+            `（<b style="color: var(--cyan);">主线挑战中门槛已锁定为 ${formatNumber(paradoxCost)}</b>，不随命运扭曲等级上涨）`
+          : bigCmp(save.dust, paradoxCost) >= 0
+            ? `消耗：全部永恒部件等级归零 + 手上全部 ${formatNumber(save.dust)} 时间尘埃`
+            : `消耗：全部永恒部件等级归零 + 手上全部时间尘埃（门槛 ${formatNumber(paradoxCost)} 尘埃 ≈ 命运扭曲 Lv.${Math.floor(save.luckBoost || 0)} 的档位` +
+              (costCapped ? ` · 已撞上尘埃上限的一半，不会再涨` : "") + `）`);
     }
 
     function renderOddsTable() {
@@ -12536,7 +12937,7 @@
           </tr>`).join("");
       const hidden = all.length - rows.length;
       const foot = hidden > 0
-        ? `<tr class="odds-hidden-note"><td colspan="4">已隐藏 ${hidden} 项概率低于 0.01% 的品质</td></tr>`
+        ? `<tr class="odds-hidden-note"><td colspan="4">已隐藏 ${formatNumber(hidden)} 项概率低于 0.01% 的品质</td></tr>`
         : "";
       setHTML("oddsBody", body + foot);
     }
@@ -12581,7 +12982,7 @@
       const keepEconomy = isParadoxGraceOn();
       el("paradoxLoss").innerHTML =
         `将失去：<br>` +
-        `· 全部 ${partCount} 个永恒部件（共 ${totalLevels} 级）归零<br>` +
+        `· 全部 ${formatNumber(partCount)} 个永恒部件（共 ${formatNumber(totalLevels)} 级）归零<br>` +
         (keepEconomy
           ? `· 本循环的进度与「已消耗」标记（筹码重新开始）<br>` +
             `<span style="color: var(--gold);">★ 里程碑奖励已生效：这次不会失去尘埃与升级</span><br>`
@@ -12630,7 +13031,7 @@
 
       const count = performParadoxReset();
 
-      logEvent("◈", `发动悖论：时间线重置，开始第 <b>${count}</b> 次抽取`, "purple");
+      logEvent("◈", `发动悖论：时间线重置，开始第 <b>${formatNumber(count)}</b> 次抽取`, "purple");
       // V0.83：超额献祭已删除（本源只来自时间线战斗的掠夺）
 
       const result = rollQuality();
@@ -12661,16 +13062,17 @@
       const hound = save.hounds.find(h => h.id === houndId);
       if (!hound || hound.level < TRANSCEND_MIN_LEVEL || activeBattle) return;
       const qMult = getTranscendQualityMult(hound.qualityTier);
-      const bonus = (hound.level * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult * 100).toFixed(2);
+      // V0.96：读数统一走 formatPercent（>10 万% 自动计数法）
+      const bonus = hound.level * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult;
 
       el("transcendConfirmText").innerHTML =
         `让 <b style="color:${hound.qualityColor}">${hound.name}</b> 回归时间本源？`;
       el("transcendReward").innerHTML = `
         <b style="color: var(--gold);">回归效果</b><br>
-        · 保留 Lv.${hound.level}，进入超越展示柜<br>
-        · <b style="color: var(--gold);">全局加成：+${bonus}%</b><br>
-        · <b style="color: var(--cyan);">本源加成上限：+${bonus}%</b><br>
-        · <b style="color: var(--green);">等级锁关键值：+${hound.level}</b>（同时抬高升级上限与部件成长上限）<br>
+        · 保留 Lv.${formatNumber(hound.level)}，进入超越展示柜<br>
+        · <b style="color: var(--gold);">全局加成：+${formatPercent(bonus)}</b><br>
+        · <b style="color: var(--cyan);">本源加成上限：+${formatPercent(bonus)}</b><br>
+        · <b style="color: var(--green);">等级锁关键值：+${formatNumber(hound.level)}</b>（同时抬高升级上限与部件成长上限）<br>
         · 该猎犬将无法再次使用<br><br>
         <span style="color: var(--muted); font-size: 11px;">
           品质 <span style="color:${hound.qualityColor}">${hound.qualityName}</span> 的加成倍率为 x${qMult.toFixed(1)}
@@ -12697,7 +13099,7 @@
       save.lines = generateLines();
       save.linesDirty = false;
       // 手动回归与自动回归共用这里，两边都会在事件日志里留一条
-      logEvent("◇", `猎犬回归：<b style="color:${transcended.qualityColor}">${transcended.name}</b> Lv.${transcended.returnLevel} 转入超越展示柜`, "gold");
+      logEvent("◇", `猎犬回归：<b style="color:${transcended.qualityColor}">${transcended.name}</b> Lv.${formatNumber(transcended.returnLevel)} 转入超越展示柜`, "gold");
       return transcended;
     }
 
@@ -12711,9 +13113,10 @@
       el("transcendModal").classList.remove("show");
 
       const qMult = getTranscendQualityMult(transcended.qualityTier);
-      const bonus = (transcended.returnLevel * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult * 100).toFixed(2);
+      // V0.96：读数统一走 formatPercent（>10 万% 自动计数法）
+      const bonus = transcended.returnLevel * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult;
       showToast(
-        `<b style="color: var(--gold);">${transcended.name}</b> 已回归，全局 +${bonus}%，本源加成上限 +${bonus}%`
+        `<b style="color: var(--gold);">${transcended.name}</b> 已回归，全局 +${formatPercent(bonus)}，本源加成上限 +${formatPercent(bonus)}`
       );
       render();
     }
@@ -12790,7 +13193,7 @@
         }
         save.upgrades[type] += plan.bought;
         save.currentSpent = bigAdd(save.currentSpent, plan.total);
-        showToast(`${names[type]} +${plan.bought} 级（不扣尘埃，但照常计入本循环消耗 ${formatNumber(plan.total)}），Lv.${save.upgrades[type]}`);
+        showToast(`${names[type]} +${formatNumber(plan.bought)} 级（不扣尘埃，但照常计入本循环消耗 ${formatNumber(plan.total)}），Lv.${save.upgrades[type]}`);
         showUpgradeEffect(type, before);
         render();
         return;
@@ -12805,7 +13208,7 @@
       save.dust = bigSub(save.dust, plan.total);
       save.currentSpent = bigAdd(save.currentSpent, plan.total);
       save.upgrades[type] += plan.bought;
-      showToast(`${names[type]} +${plan.bought} 级，Lv.${save.upgrades[type]}（花费 ${formatNumber(plan.total)} 尘埃）`);
+      showToast(`${names[type]} +${formatNumber(plan.bought)} 级，Lv.${save.upgrades[type]}（花费 ${formatNumber(plan.total)} 尘埃）`);
       showUpgradeEffect(type, before);
       render();
     }
@@ -12891,11 +13294,11 @@
       const graceOn = isCaptureGraceOn();
       const graceNote = graceOn ? "，<b>尘埃 / 进度 / 升级全部保留</b>" : "";
       logEvent(def.icon, (oldLevel === 0
-        ? `被时间猎犬捕获，获得新部件 <b>${def.name}</b> Lv.${newLevel}`
-        : `被时间猎犬捕获，<b>${def.name}</b> +${gainedLevel} 级 → Lv.${newLevel}`) + graceNote, "gold");
+        ? `被时间猎犬捕获，获得新部件 <b>${def.name}</b> Lv.${formatNumber(newLevel)}`
+        : `被时间猎犬捕获，<b>${def.name}</b> +${formatNumber(gainedLevel)} 级 → Lv.${formatNumber(newLevel)}`) + graceNote, "gold");
       showToast((oldLevel === 0
-        ? `被捕获：获得 <b>${def.name}</b> Lv.${newLevel}`
-        : `被捕获：<b>${def.name}</b> +${gainedLevel} 级（Lv.${newLevel}）`) + graceNote);
+        ? `被捕获：获得 <b>${def.name}</b> Lv.${formatNumber(newLevel)}`
+        : `被捕获：<b>${def.name}</b> +${formatNumber(gainedLevel)} 级（Lv.${formatNumber(newLevel)}）`) + graceNote);
 
       // 捕获即时结算完毕，直接继续下一个循环——不需要玩家再点确认。
       isCaptured = false;
@@ -13100,7 +13503,7 @@
           setText("baitHubTitle", one.type.name);
           setText("baitHubSub", rarity.name);
           setHTML("baitPendingNote",
-            `最近一次：<b>${one.type.name}</b> · ${rarity.name}（+${levels} 级）· 消耗 1 枚${rarity.name}诱饵`);
+            `最近一次：<b>${one.type.name}</b> · ${rarity.name}（+${formatNumber(levels)} 级）· 消耗 1 枚${rarity.name}诱饵`);
           render();
           showBaitResult(one.type, rarity, levels);
         }, BAIT_SPIN_MS);
@@ -13122,8 +13525,8 @@
       const total = getBaitLevel(type.id);
       el("baitResult").innerHTML =
         `<div style="color:${type.color}; font-size:17px; margin-bottom:6px;">${type.icon} ${type.name}</div>` +
-        `品级：<b style="color:${rarity.color}">${rarity.name}</b>（本枚 +${levels} 级）<br>` +
-        `当前等级：<b>Lv.${total}</b><br>` +
+        `品级：<b style="color:${rarity.color}">${rarity.name}</b>（本枚 +${formatNumber(levels)} 级）<br>` +
+        `当前等级：<b>Lv.${formatNumber(total)}</b><br>` +
         `当前效果：<b style="color:${type.color}">${baitEffectText(type, total)}</b>`;
       el("baitModal").classList.add("show");
     }
@@ -13132,7 +13535,7 @@
       const icon = el("baitIcon");
       icon.textContent = "✦";
       icon.style.color = rarity.color;
-      el("baitTitle").textContent = `${count} 连抽 · ${rarity.name}`;
+      el("baitTitle").textContent = `${formatNumber(count)} 连抽 · ${rarity.name}`;
 
       const grouped = {};
       results.forEach(r => {
@@ -13146,13 +13549,13 @@
         return `<div class="bait-draw-line">
             <span style="color:${g.type.color}; font-size:16px;">${g.type.icon}</span>
             <span>${g.type.name}</span>
-            <span style="color:var(--muted); font-size:12px;">×${g.times} → Lv.${g.level}</span>
-            <b style="color:${g.type.color}">+${g.levels}</b>
+            <span style="color:var(--muted); font-size:12px;">×${formatNumber(g.times)} → Lv.${formatNumber(g.level)}</span>
+            <b style="color:${g.type.color}">+${formatNumber(g.levels)}</b>
           </div>`;
       }).join("");
 
       el("baitResult").innerHTML =
-        `消耗 <b>${count}</b> 枚<span style="color:${rarity.color}">${rarity.name}诱饵</span>，` +
+        `消耗 <b>${formatNumber(count)}</b> 枚<span style="color:${rarity.color}">${rarity.name}诱饵</span>，` +
         `合计 +${count * rarity.gain} 级：` +
         `<div class="bait-draw-summary">${lines}</div>`;
       el("baitModal").classList.add("show");
@@ -13166,7 +13569,7 @@
     function renderBaitGrid() {
       // 只列「当前可见」的诱饵：猎犬解锁前不显示「兽香之饵」，分母也跟着变成 9
       const visibleBaits = getVisibleBaitTypes();
-      setText("baitOwnedCount", `${getBaitOwnedCount()} / ${visibleBaits.length}`);
+      setText("baitOwnedCount", `${getBaitOwnedCount()} / ${formatNumber(visibleBaits.length)}`);
       setHTML("baitGrid", visibleBaits.map(t => {
         const lv = getBaitLevel(t.id);
         const owned = lv > 0;
@@ -13177,7 +13580,7 @@
             <span class="bait-icon" style="color:${t.color}">${t.icon}</span>
             <h3>${t.name}</h3>
             <p>${t.desc}</p>
-            <div class="bait-lv">${owned ? (isBaitMaxed(t.id) ? `Lv.${lv} · 满级` : `Lv.${lv}`) : "未获得"}</div>
+            <div class="bait-lv">${owned ? (isBaitMaxed(t.id) ? `Lv.${formatNumber(lv)} · 满级` : `Lv.${formatNumber(lv)}`) : "未获得"}</div>
             <div class="muted-line" style="color:${owned ? t.color : "inherit"}; font-weight:${owned ? 700 : 400};">
               ${owned ? baitEffectText(t, lv) : "—"}
             </div>
@@ -13202,7 +13605,7 @@
             <span class="bait-stock-icon" style="color:${r.color}">${r.icon}</span>
             <div>
               <div class="bait-stock-name" style="color:${r.color}">${r.name}诱饵</div>
-              <div class="bait-stock-meta">掉落 ${(probs[i] * 100).toFixed(1)}% · 单枚 +${r.gain} 级</div>
+              <div class="bait-stock-meta">掉落 ${(probs[i] * 100).toFixed(1)}% · 单枚 +${formatNumber(r.gain)} 级</div>
             </div>
             <span class="bait-stock-count">×${owned}</span>
             <div class="bait-stock-actions">
@@ -13268,7 +13671,7 @@
       if (bigCmp(save.origin, cost) < 0) { showToast("时间本源不足。"); return; }
       save.origin = bigSub(save.origin, cost);
       levelUpHound(hound, 1);
-      showToast(`${hound.name} 消耗 ${formatNumber(cost)} 本源，提升至 Lv.${hound.level}。`);
+      showToast(`${hound.name} 消耗 ${formatNumber(cost)} 本源，提升至 Lv.${formatNumber(hound.level)}。`);
       render();
     }
 
@@ -13302,10 +13705,19 @@
     // ===== 设置面板（右上角齿轮）=====
     on("settingsButton", () => {
       renderNumberModeChoice();
+      refreshWipedRow();   // V0.96：只有存在「误删备份」时才显示恢复入口
       el("settingsModal").classList.add("show");
     });
     on("settingsClose", () => el("settingsModal").classList.remove("show"));
-    on("settingsReset", performReset);
+    // ⚠️ V0.96 修的三个坑：`on(id, fn)` 是把监听器直接挂在 click 上，所以 fn 会收到**事件对象**。
+    //    下面这三个函数都带一个「跳过确认 / 静默」的布尔参数 —— 事件对象是真值，等于把参数
+    //    当成 true 传了进去：
+    //      · performReset  → 确认框被整个跳过，点一下「清空」就立刻删档（作者反馈的误触）
+    //      · quitChallenge → 退出挑战的确认框同样被跳过，进度直接作废
+    //      · confirmParadox → 被当成「自动悖论」的静默模式，不切页签、转盘看不见
+    //    统一改成用箭头函数**显式不传参**，把默认行为（弹确认 / 非静默）还回来。
+    on("settingsReset", () => performReset());
+    on("settingsRestore", () => restoreWipedSave());
     delegate("numberModeChoice", "[data-mode]", btn => applyNumberMode(btn.dataset.mode));
     el("settingsModal").addEventListener("click", e => {
       if (e.target === el("settingsModal")) el("settingsModal").classList.remove("show");
@@ -13385,10 +13797,12 @@
 
     on("paradoxButton", openParadoxConfirm);
     on("paradoxCancel", () => el("paradoxModal").classList.remove("show"));
-    on("paradoxConfirm", confirmParadox);
+    on("paradoxConfirm", () => confirmParadox());
     on("transcendCancel", () => el("transcendModal").classList.remove("show"));
     on("transcendConfirm", confirmTranscend);
     on("boostOnce", () => boostLuck(1));
+    // V0.96：一键最大恢复成「按当前本源一口气买到买不动为止」（作者要求：去掉上次那道 10 级上限）。
+    //   注意「每级最多 +1 个品质档位」是 getFocusTier 里的底层硬规则，这里不需要再限。
     on("boostMax", () => boostLuck(1000));
 
     // ===== 悖论页子页面 / 本源商店 =====
@@ -13396,9 +13810,21 @@
     on("subTabShop", () => switchParadoxSub("shop"));
     on("paradoxGoShop", () => switchParadoxSub("shop"));
     on("paradoxBackFromShop", () => switchParadoxSub("main"));
-    on("shopHuntCdBuy", () => buyOriginShop("huntCd"));
-    on("shopHarvestBuy", () => buyOriginShop("harvestSpeed"));
-    on("shopHuntSpeedBuy", () => buyOriginShop("huntSpeed"));
+    // 本源商店：三件套各自 ×1 / ×10 / ×100（V0.96）
+    // ⚠️ 刻意**不写成 forEach 循环**：build.js 会扫描绑定语句里的**字面量 id** 并与静态 HTML 比对，
+    //    用字符串拼接出来的 id（前缀 + 数字）会被判成「引用了不存在的 id」而拒绝发布，所以逐条写死。
+    on("shopHuntCdBuyMax", () => buyOriginShop("huntCd", ORIGIN_SHOP_MAX));
+    on("shopHuntCdBuy1", () => buyOriginShop("huntCd", 1));
+    on("shopHuntCdBuy10", () => buyOriginShop("huntCd", 10));
+    on("shopHuntCdBuy100", () => buyOriginShop("huntCd", 100));
+    on("shopHarvestBuyMax", () => buyOriginShop("harvestSpeed", ORIGIN_SHOP_MAX));
+    on("shopHarvestBuy1", () => buyOriginShop("harvestSpeed", 1));
+    on("shopHarvestBuy10", () => buyOriginShop("harvestSpeed", 10));
+    on("shopHarvestBuy100", () => buyOriginShop("harvestSpeed", 100));
+    on("shopHuntSpeedBuyMax", () => buyOriginShop("huntSpeed", ORIGIN_SHOP_MAX));
+    on("shopHuntSpeedBuy1", () => buyOriginShop("huntSpeed", 1));
+    on("shopHuntSpeedBuy10", () => buyOriginShop("huntSpeed", 10));
+    on("shopHuntSpeedBuy100", () => buyOriginShop("huntSpeed", 100));
 
     // ===== 猎犬页子标签 / 时间惯性 =====
     on("subTabHound", () => switchHoundSub("hound"));
@@ -13442,7 +13868,6 @@
     delegate("lbTools", "[data-lb-sort]", btn => lbLoad(btn.dataset.lbSort));
     delegate("lbTools", "[data-lb-submit]", () => lbSubmit(false));
     delegate("lbTools", "[data-lb-refresh]", () => lbLoad(lbSort));
-    delegate("lbTools", "[data-lb-auto]", () => lbSetAuto(!save.lbAuto));
     on("confirmCancel", () => closeConfirmModal(false));
     on("confirmOk", () => closeConfirmModal(true));
     on("mvModalCancel", closeMultiverseConfirm);
@@ -13459,7 +13884,7 @@
     delegate("labBody", "[data-lab-buy]", btn => buyLabOffer(Number(btn.dataset.labBuy)));
     delegate("labBody", "[data-lab-reroll]", () => rerollLabOffers());
     delegate("painBody", "[data-pain-abandon]", () => abandonPain());
-    on("challengeQuit", quitChallenge);
+    on("challengeQuit", () => quitChallenge());
     on("challengeStartCancel", () => {
       pendingChallengeId = null;
       el("challengeStartModal").classList.remove("show");
@@ -13583,10 +14008,11 @@
         if (hound.level >= AUTO_HUNT_TRANSCEND_MIN_LEVEL) {
           const transcended = transcendHound(hound);
           const qMult = getTranscendQualityMult(transcended.qualityTier);
-          const bonus = (transcended.returnLevel * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult * 100).toFixed(2);
+          // V0.96：读数统一走 formatPercent（>10 万% 自动计数法）
+          const bonus = transcended.returnLevel * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult;
           showToast(
             `四条时间线都打不过，<b style="color: var(--gold);">${transcended.name}</b> 已自动回归：` +
-            `全局 <b style="color: var(--gold);">+${bonus}%</b>（回归 Lv.${transcended.returnLevel}）`
+            `全局 <b style="color: var(--gold);">+${formatPercent(bonus)}</b>（回归 Lv.${formatNumber(transcended.returnLevel)}）`
           );
           saveGame(true);
           render();
@@ -13701,12 +14127,25 @@
       confirmParadox(true);
     }
 
+    // ===== 自动升级悖论商店（V0.96，里程碑第 5 次多元宇宙解锁）=====
+    // 每秒巡检一次：三件套按固定顺序各尝试买 1 级（买得起才买、满级跳过）。
+    // 刻意走 silent 通道：不弹 toast、不主动 render —— 主循环每 100ms 自己会重画商店，
+    // 否则每秒最多三条提示足以把界面刷爆。
+    function autoShopStep() {
+      let bought = 0;
+      if (buyOriginShop("huntCd", 1, true)) bought++;
+      if (buyOriginShop("harvestSpeed", 1, true)) bought++;
+      if (buyOriginShop("huntSpeed", 1, true)) bought++;
+      return bought;
+    }
+
     function autoStep() {
       checkChallenges();
       // V0.90：自动悖论搬进「自动化」面板 —— 解锁后还要把那个开关打开才会跑
       if (isAutoUnlocked("paradox") && save.auto.paradox) autoParadoxStep();
-      // V0.92：排行榜自动上报（节流 5 分钟，且只在时长/尘埃有变化时才发；失败静默重试）
-      lbAutoSubmitStep();
+      // V0.96：自动升级悖论商店（里程碑第 5 次解锁）—— 买本源商店的级，与捕获/转盘无关
+      if (isAutoUnlocked("shop") && save.auto.shop) autoShopStep();
+      // ⚠️ 排行榜没有自动步骤 —— 上传只在玩家点「上传成绩」时发生（后端按调用计费）。
       if (isCaptured || wheelSpinning) return;
       if (isAutoUnlocked("upgrade") && save.auto.upgrade) {
         autoUpgradeStep();
