@@ -6295,17 +6295,61 @@
     const el = id => document.getElementById(id);
     let toastTimer = null;
 
+    // ===== V0.108（作者要求：写进底层）显示层数字规则 =====
+    //   ① 量级 ≥ 100 万（1e6）的数字一律走**计数法**（K/M/B/T 或科学计数法，跟随「设置」里的偏好）——
+    //      不再出现「4398046511104」这种一长串数字（1e3~1e6 之间顺带用 K，本来就更易读）。
+    //   ② 原生科学计数法（JS 的 `3e+307` / `toExponential()` 出来的 `1e+9`）一律改写成游戏的
+    //      `E` 记法 —— 也就是把那个多余的「+」号去掉。
+    //   挂在最底层的两个出口（setHTML / setText）与提示框（showToast）上，只改**标签之外**的文本，
+    //   并且只认「前后不紧贴字母 / 下划线 / 小数点」的纯数字串 —— 免得误伤 id、版本号、存档码、文件名。
+    const RAW_COUNT_RE = /(^|[^\w.])(\d{7,})(?![\w.])/g;
+    const RAW_SCI_RE = /(\d+(?:\.\d+)?)e\+(\d+)/gi;
+    const RAW_QUICK_RE = /\d{7}|e\+/i;   // 快速预判：没有可疑片段就整段跳过（省性能）
+    function fmtDisplayNumbers(text) {
+      if (text === undefined || text === null) return text;
+      if (typeof text !== "string") text = String(text);
+      if (!RAW_QUICK_RE.test(text)) return text;
+      // 先处理原生科学计数（去掉 + 号、改写成 E 记法），再处理长数字串
+      let out = text.replace(RAW_SCI_RE, (m, mantissa, exp) => formatNumber(Number(mantissa + "e" + exp)));
+      return out.replace(RAW_COUNT_RE, (m, pre, digits) => {
+        const v = Number(digits);
+        if (isFinite(v)) return pre + formatNumber(v);
+        // 位数多到超出 double（>308 位）：交给大数，log10 ≈ 位数 − 1 + log10(前 16 位)
+        const lead = Number("0." + digits.slice(0, 16)) * 10;
+        const log10 = (digits.length - 1) + (isFinite(lead) && lead > 0 ? Math.log10(lead) : 0);
+        return pre + formatNumber(bigFromLog10(log10));
+      });
+    }
+    // HTML 版：逐段跳过 <...> 标签，只对标签之外的文本做替换
+    function fmtDisplayNumbersInHtml(html) {
+      if (html === undefined || html === null) return html;
+      if (typeof html !== "string") return html;
+      if (!RAW_QUICK_RE.test(html)) return html;
+      let out = "", i = 0;
+      while (i < html.length) {
+        const lt = html.indexOf("<", i);
+        if (lt < 0) { out += fmtDisplayNumbers(html.slice(i)); break; }
+        out += fmtDisplayNumbers(html.slice(i, lt));
+        const gt = html.indexOf(">", lt);
+        if (gt < 0) { out += html.slice(lt); break; }
+        out += html.slice(lt, gt + 1);
+        i = gt + 1;
+      }
+      return out;
+    }
+
     function setHTML(id, html) {
       const node = el(id);
       if (!node || node._lastHTML === html) return;
       node._lastHTML = html;
-      node.innerHTML = html;
+      // 只在内容真的变了时才做数字格式化（省性能：事件日志 / 猎犬网格是常刷的大块）
+      node.innerHTML = fmtDisplayNumbersInHtml(html);
     }
     function setText(id, text) {
       const node = el(id);
       if (!node || node._lastText === text) return;
       node._lastText = text;
-      node.textContent = text;
+      node.textContent = fmtDisplayNumbers(text);
     }
     const styleCache = new Map();
     function setStyle(id, prop, value) {
@@ -6566,6 +6610,11 @@
       return formatNumber(bigOf(pct)) + "%";
     }
     // 读数入口：Number 和 Big 都能吃，任何路径都不会再吐出 ∞
+    // ⚠️ V0.108（作者要求，写进底层）：**所有**要显示的数字都必须过这里（或 formatDecimal）。
+    //   规则：量级 ≥ 1e6（一百万）一律走计数法 —— K/M/B/T 或科学计数法（跟随「设置」里的偏好），
+    //   绝不直印「4398046511104」这种长串；1e3 起步就用 K 后缀，读起来更顺。
+    //   另外：显示层还兜了一道底（setHTML/setText/showToast 里的 fmtDisplayNumbers）——
+    //   就算某处漏了走这里，长数字串与 JS 原生的 `3e+307` 也会被自动改写（+ 号去掉、转 E 记法）。
     function formatNumber(value) {
       const b = bigOf(value);
       if (b.m === 0) return "0";
@@ -6587,6 +6636,32 @@
         return `${scaled.toFixed(digits)}${NUM_SUFFIX[tier]}`;
       }
       return formatScientific(b);
+    }
+    // ===== V0.108（作者口径）：货币 / 价格 / 点数这类读数的格式化 =====
+    //   低于 100 万（1e6）→ **原样显示精确值**（价格就得看得准）；
+    //   到达 100 万 → 转计数法（K/M/B/T 或科学计数法，跟随设置偏好）。
+    //   （尘埃那类「大数」仍走 formatNumber —— 它们从 1e3 起就带 K，一直是这个观感。）
+    function formatCount(value) {
+      const b = bigOf(value);
+      if (b.m === 0) return "0";
+      if (b.e < 6) {
+        const n = bigNum(b);
+        if (Number.isFinite(n)) {
+          const r = Math.round(n);
+          // 抹掉大数尾数的浮点毛刺（985 可能存成 984.9999999999999）
+          return String(Math.abs(n - r) <= Math.max(1e-6, Math.abs(n) * 1e-12) ? r : Math.floor(n));
+        }
+      }
+      return formatNumber(b);
+    }
+    // V0.108：货币类大数（基因点数 / 修饰点数）都是整数，但大数的尾数是 double ——
+    //   加减会留下「985 → 9.85e2 → 985.0000000000001」这样的毛刺（比较与显示都差一丝）。
+    //   小量级时把尾数抹回整数；大到 double 存不下整数时就别再折腾了。
+    function bigIntFix(b) {
+      b = bigOf(b);
+      if (b.m === 0 || b.e > 14) return b;
+      const n = Math.round(bigNum(b));
+      return isFinite(n) ? bigOf(n) : b;
     }
     // 两位小数显示（含大数）。
     // 坑：Number.prototype.toFixed 只对 |x| < 1e21 生效，再大就直接退化成
@@ -6672,7 +6747,7 @@
     }
     function showToast(message) {
       const toast = el("toast");
-      toast.innerHTML = message;
+      toast.innerHTML = fmtDisplayNumbersInHtml(message);   // V0.108：提示里的数字同样走显示层规则
       toast.classList.add("show");
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => toast.classList.remove("show"), 2400);
@@ -6914,10 +6989,13 @@
         entries: intOf(raw.entries),
         pending: pending && pending.length ? pending : null,
         universe: cleanUniverse(raw.universe),
-        genePoints: intOf(raw.genePoints),
+        // V0.108（作者要求）：基因点数 / 基因修饰点数改成**大数**（{m,e}），突破 1e308 上限 ——
+        //   原来是普通数字，涨到 1.8e308 就变 Infinity、界面会印出「3e+307」这种原生科学计数。
+        //   老存档里的普通数字由 bigOf 自动升级，不需要额外的迁移分支。
+        genePoints: bigOf(raw.genePoints),
         // V0.89：本轮已植入次数（决定下一次植入的价格）；脏档里的离谱值也夹到 9999
         geneImplantCount: Math.min(9999, intOf(raw.geneImplantCount)),
-        modPoints: intOf(raw.modPoints),
+        modPoints: bigOf(raw.modPoints),
         genes: cleanGenes(raw.genes),
         // V0.85：基因实验室（offers 是本轮的随机清单、owned 是已购的永久升级）
         // ⚠️⚠️ 这里**只能写字面量**，绝不能引用 LAB_UPGRADES / LAB_OFFER_COUNT：
@@ -7254,13 +7332,35 @@
     //     超越·64 = ×1.058、超越·99 = ×1.060。
     //   用 √ 而不是线性：档位越高成长越快（严格单调、同档不再撞车），但不会像线性加成那样
     //   几步就把数值顶爆（线性 +0.001n 到 99 档就是 ×1.149/级，Lv.70 时比 ×1.05 强 20 倍以上）。
+    // V0.108（作者反馈：超越·95 与超越·98 的读数完全一样、看不出差别）：
+    //   √ 曲线压得太狠（超越·95 = 1.05974、超越·98 = 1.05990，三位小数都印成 1.060），
+    //   改成**线性**：每上一档 +0.001 —— 超越·1 = ×1.051、超越·2 = ×1.052 … 超越·99 = ×1.149。
+    //   代价是高档位的复利更陡（超越·99 每级 ×1.149，Lv.70 左右就摸到 1e9 保险丝），
+    //   这正是「档位越高越值得追」的设计意图。
     const GENE_GROWTH_HIGH_STEP = 0.001;
     function geneGrowthRatio(g) {
       const t = geneTierOf(g);
       const base = Math.min(PART_CAP_GENE_MAX_STEP, Math.max(0, t.mult - 1) * PART_CAP_GENE_STEP_RATIO);
-      if (t.id < GENE_BASE_TIERS.length) return 1 + base;            // 基础六档：普通 ×1.002 … 神话 ×1.028
+      if (t.id < GENE_BASE_TIERS.length) return 1 + base;            // 基础六档：普通 ×1.002 … 神话 ×1.028（现在只用于旧读数）
       const n = Math.max(1, t.id - GENE_BASE_TIERS.length + 1);      // 超越·n
-      return 1 + PART_CAP_GENE_MAX_STEP + GENE_GROWTH_HIGH_STEP * Math.sqrt(n);
+      return 1 + PART_CAP_GENE_MAX_STEP + GENE_GROWTH_HIGH_STEP * n;
+    }
+    // ===== V0.108（作者要求）「超越之前」的六档基因改成【加法】=====
+    //   原来所有档位都走指数（成长比例 ^ 等级）：普通每级 ×1.002 —— Lv.1 只有 +0.2%，
+    //   低档基因在前期几乎看不出效果（作者：「完全没用」）。
+    //   现在基础六档改成**每级直接加算**：Lv.1 立刻 +0.8%…+5%（看得见、用得上），
+    //   同时每级数值整体抬了一档（普通 0.2%→0.8%、神话 2.8%→5%）。
+    //   超越段保持**乘法复利**——那是它「越级越强」的身份。
+    //   ⚠️ 要调节力度就改这张表（整体乘 0.5 就温和一半）。
+    const GENE_BASE_STEP_ADD = [0.008, 0.012, 0.018, 0.026, 0.036, 0.05];   // 普通 / 优秀 / 稀有 / 史诗 / 传说 / 神话
+    function isGeneAdditive(g) {
+      const t = geneTierOf(g);
+      return t.id < GENE_BASE_TIERS.length;
+    }
+    function geneAddStep(g) {
+      const t = geneTierOf(g);
+      const i = Math.max(0, Math.min(GENE_BASE_STEP_ADD.length - 1, t.id || 0));
+      return GENE_BASE_STEP_ADD[i];
     }
 
     function getPossibility() { return save.possibility; }
@@ -7540,9 +7640,9 @@
     // 例：神话(1.28) Lv.10 → ×11.81；普通(1.02) Lv.10 → ×1.22。
     // V0.96：成长比例走 geneGrowthRatio(g) —— partCap 用它自己那条削弱后的曲线。
     function geneEffect(g) {
-      const r = geneGrowthRatio(g);
       const lv = Math.max(1, Math.floor(g && typeof g.level === "number" ? g.level : 1));
-      const v = Math.pow(r, lv);
+      // V0.108：基础六档 = 1 + 每级数值 × 等级（加法，Lv.1 立刻见效）；超越段 = 成长比例 ^ 等级（复利）
+      const v = isGeneAdditive(g) ? (1 + geneAddStep(g) * lv) : Math.pow(geneGrowthRatio(g), lv);
       return v > GENE_EFFECT_MAX ? GENE_EFFECT_MAX : v;
     }
     // 该档位的等级上限。
@@ -7569,16 +7669,31 @@
       return sum;
     }
     // 效果的可读文本（大数走 E 记法，避免 toFixed 在 1e21 以上变成 "1e+21"）
+    // 效果读数：基础六档是加法（+N%），超越段是复利（N.NNE…）
     function geneEffectText(g) {
+      if (isGeneAdditive(g)) return `+${((geneEffect(g) - 1) * 100).toFixed(1)}%`;
       const lg = Math.log10(geneGrowthRatio(g)) * Math.max(1, Math.floor(g && g.level || 1));
-      if (lg < 6) return Math.pow(10, lg).toFixed(2);
+      // V0.108：小于 10 时给三位小数 —— 超越段每档 +0.001，Lv.1 也能一眼看出差别（×1.145 / ×1.148 / ×1.149）
+      if (lg < 6) { const v = Math.pow(10, lg); return v < 10 ? v.toFixed(3) : v.toFixed(2); }
       const e = Math.floor(lg);
       return `${Math.pow(10, lg - e).toFixed(2)}E${e}`;
     }
-    function geneText(g) {
-      const t = geneTierOf(g);
+    // 带符号的效果读数：加法 +N%、乘法 ×N（尘埃指数类用 ^）
+    function geneEffectLabel(g) {
+      if (isGeneAdditive(g)) return geneEffectText(g);
       const head = g.k === "dustPow" ? "^" : "×";
-      return `${g.label} ${head}${geneEffectText(g)}`;
+      return `${head}${geneEffectText(g)}`;
+    }
+    // 「每级」读数：加法写 +0.8%，复利写 ×1.051
+    function geneGrowthLabel(g) {
+      if (isGeneAdditive(g)) {
+        const pct = (geneAddStep(g) * 100).toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+        return `+${pct}%`;
+      }
+      return `×${geneGrowthRatio(g).toFixed(3)}`;
+    }
+    function geneText(g) {
+      return `${g.label} ${geneEffectLabel(g)}`;
     }
 
     // 宇宙加成 × 基因加成（按 key 连乘）。基因永久作用于所有宇宙，宇宙是当前栖息的那一个有生效。
@@ -7786,8 +7901,8 @@
       const geneGain = Math.max(1, Math.ceil(painMult * painChMult * milestoneMult));
       // 先把本次进入的结果写进可能性（p 对象在重建存档时被原样带过去）
       p.entries = (p.entries || 0) + 1;
-      p.genePoints = (p.genePoints || 0) + geneGain;
-      p.modPoints = (p.modPoints || 0) + modGain;
+      p.genePoints = bigIntFix(bigAdd(p.genePoints, geneGain));
+      p.modPoints = bigIntFix(bigAdd(p.modPoints, modGain));
       p.universe = { name: choice.name, mods: choice.mods };
       p.tabUnlocked = true;
       // V0.68：选定一个宇宙之后，**其余候选全部消散**（不能接着挑剩下的）。
@@ -7992,12 +8107,13 @@
     // 价格可能涨到超出 Number 的精确范围（甚至 Infinity），显示时兜一下
     function geneImplantCostText() {
       const c = getGeneImplantCost();
-      return Number.isFinite(c) ? String(c) : "∞";
+      // V0.108：价格读数一律走 formatNumber —— 超过百万就用计数法（2^n 涨起来很快）
+      return Number.isFinite(c) ? formatCount(c) : "∞";
     }
     function addGene() {
       const p = getPossibility();
       const cost = getGeneImplantCost();
-      if ((p.genePoints || 0) < cost) {
+      if (bigCmp(p.genePoints, cost) < 0) {
         showToast(`基因点数不足——本次植入需要 <b>${geneImplantCostText()}</b> 点` +
           `（每植入一次翻倍；进入下一个宇宙会回到 1 点）。`);
         return;
@@ -8007,7 +8123,7 @@
       const g = rollGene();
       const t = geneTierOf(g);
       p.genes.push(g);
-      p.genePoints -= cost;
+      p.genePoints = bigIntFix(bigSub(p.genePoints, cost));
       p.geneImplantCount = getGeneImplantCount() + 1;
       saveGame(true);
       logEvent("🧬", `植入基因：<b style="color:${t.color}">${t.name}</b>·${geneText(g)}`, "purple");
@@ -8090,26 +8206,26 @@
       const g = p.genes[idx];
       const cap = geneLevelCap(g);
       if (Math.floor(g.level || 1) >= cap) {
-        showToast(`${geneTierOf(g).name}基因已达等级上限（Lv.${cap}，倍率封顶 ×${GENE_EFFECT_MAX.toExponential(0)}）。`);
+        showToast(`${geneTierOf(g).name}基因已达等级上限（Lv.${cap === Infinity ? "∞" : formatCount(cap)}，倍率封顶 ×${formatNumber(GENE_EFFECT_MAX)}）。`);
         return;
       }
       const want = (times === "max" || times === undefined) ? Infinity : Math.max(1, Math.floor(Number(times) || 1));
       let done = 0, spent = 0;
       while (done < want && Math.floor(g.level) < cap) {
         const cost = geneUpgradeCost(g);
-        if ((p.modPoints || 0) < cost) break;
-        p.modPoints -= cost;
+        if (bigCmp(p.modPoints, cost) < 0) break;
+        p.modPoints = bigIntFix(bigSub(p.modPoints, cost));
         spent += cost;
         g.level = Math.floor(g.level) + 1;
         done++;
         if (done >= 10000) break;   // 保险丝
       }
       if (done === 0) {
-        showToast(`基因修饰点数不足（强化 1 级需要 ${geneUpgradeCost(g)} 点，当前 ${p.modPoints || 0} 点）。`);
+        showToast(`基因修饰点数不足（强化 1 级需要 ${formatCount(geneUpgradeCost(g))} 点，当前 ${formatCount(p.modPoints)} 点）。`);
         return;
       }
       saveGame(true);
-      showToast(`${geneTierOf(g).name}·${g.label} 强化 ×${done} → <b>Lv.${formatNumber(g.level)}</b>（${geneText(g)}，花费 ${spent} 点）`);
+      showToast(`${geneTierOf(g).name}·${g.label} 强化 ×${done} → <b>Lv.${formatNumber(g.level)}</b>（${geneText(g)}，花费 ${formatCount(spent)} 点）`);
       renderPossibility();
     }
 
@@ -10960,7 +11076,7 @@
     // 基因点数：进过多元宇宙（或手上已经有基因/点数）之后才显示，和另两个读数一个规矩
     function isGenePointStatUnlocked() {
       const p = save.possibility || {};
-      return (p.entries || 0) > 0 || (p.genePoints || 0) > 0 ||
+      return (p.entries || 0) > 0 || !bigIsZero(p.genePoints) ||
         (Array.isArray(p.genes) && p.genes.length > 0);
     }
 
@@ -10986,7 +11102,7 @@
       setText("originTotal", formatNumber(save.origin));
       setText("transcendedCount", String(save.transcendedHounds.length));
       // V0.89：基因点数也进顶部读数（在「超越猎犬」右边），同样是"碰到过才显示"
-      setText("genePointTotal", String(Math.max(0, Math.floor(getPossibility().genePoints || 0))));
+      setText("genePointTotal", formatCount(getPossibility().genePoints));
       // V0.104：科技点数（有历史才亮）
       toggleHeaderChip("invTechPointChip", (save.invTechPoints || 0) > 0 || (save.invTechBase || 0) > 0);
       setText("invTechPointTotal", formatNumber(save.invTechPoints || 0));
@@ -11846,7 +11962,7 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
-      ["V0.108", "修复一个「展示柜永远打不开」的严重问题，并汇总发布 V0.107。① <b>展示柜（超越回归）以前可能一辈子解锁不了</b>：回归 / 放逐按钮在执行里本来是只看「它自己在不在打」的，但按钮的<b>禁用条件</b>写得太狠 —— 只要有任意一场战斗在进行就把这两个按钮整片禁掉；而<b>自动狩猎</b>开着时战斗几乎不停，于是按钮<b>根本不渲染</b>，玩家手上唯一那只够等级的猎犬永远回归不了，展示柜（要求「至少回归过 1 只」）自然一直锁着（玩家反馈「进入游戏后怎么样都无法开启展示柜」）。现在：回归按钮只要求「够 10 级 + 还有寿命」，它正在打也照样能点 —— 确认时会先把那场战斗就地收掉（战斗面板不会再引用一只已经不存在的犬），并提示「它当时正在战斗，那场战斗已随之中止」；放逐按钮只对「正在打的那一只」禁用，不再被整场战斗卡住。该有的限制一个没少：战斗中<b>时间线入侵</b>按钮照旧禁用（不能同时开两场），放逐的原有守卫全部保留。② 本版一并发布 V0.107 的全部内容：自动回归「打够 N 场就回归」、基因实验室刷新费改成「每次都是上一次的 4 倍」、可能性解锁高亮修复（含「苦痛挑战」子页签点过即熄灭）、苦痛之路入口提前到「基因实验室解锁」、高级基因（超越段）成长比例按档位递增（x1.051 → x1.060）、牙 / 爪 / 沙漏三件永恒部件新增成长曲线（复利）—— 详细条目见下方 V0.107。"],
+      ["V0.108", "修复一个「展示柜永远打不开」的严重问题，并汇总发布 V0.107。① <b>展示柜（超越回归）以前可能一辈子解锁不了</b>：回归 / 放逐按钮在执行里本来是只看「它自己在不在打」的，但按钮的<b>禁用条件</b>写得太狠 —— 只要有任意一场战斗在进行就把这两个按钮整片禁掉；而<b>自动狩猎</b>开着时战斗几乎不停，于是按钮<b>根本不渲染</b>，玩家手上唯一那只够等级的猎犬永远回归不了，展示柜（要求「至少回归过 1 只」）自然一直锁着（玩家反馈「进入游戏后怎么样都无法开启展示柜」）。现在：回归按钮只要求「够 10 级 + 还有寿命」，它正在打也照样能点 —— 确认时会先把那场战斗就地收掉（战斗面板不会再引用一只已经不存在的犬），并提示「它当时正在战斗，那场战斗已随之中止」；放逐按钮只对「正在打的那一只」禁用，不再被整场战斗卡住。该有的限制一个没少：战斗中<b>时间线入侵</b>按钮照旧禁用（不能同时开两场），放逐的原有守卫全部保留。② 本版一并发布 V0.107 的全部内容：自动回归「打够 N 场就回归」、基因实验室刷新费改成「每次都是上一次的 4 倍」、可能性解锁高亮修复（含「苦痛挑战」子页签点过即熄灭）、苦痛之路入口提前到「基因实验室解锁」、高级基因（超越段）成长比例按档位递增（x1.051 → x1.060）、牙 / 爪 / 沙漏三件永恒部件新增成长曲线（复利）—— 详细条目见下方 V0.107。③ <b>反转世界</b>的页签改回「达成条件才现身」：以前（V0.98 起）它一直挂在导航栏上，现在要等<b>历史最高尘埃 1E30080 + 苦痛挑战全部完成</b>之后才出现 —— 现身那一刻会自带「新」高亮，不会让人错过。④ <b>基因点数 / 基因修饰点数不再被 1e308 卡住</b>：这两个点数原本是普通数字，涨到 1.8e308 就到顶、界面会印出 <b>3e+307</b> 这种难看的样子；现在它们和尘埃、本源一样走<b>大数</b>（可以一直涨下去），购买 / 刷新的判定、扣除与所有读数都跟着换过了。⑤ <b>数字显示规则写进底层</b>：凡是显示出来的数字，量级到 <b>100 万</b>（1e6）就自动缩写成 K/M/B/T 或科学计数法（跟随「设置」里的数字偏好）—— 不会再出现「4398046511104 基因点」这种一长串数字；JS 原生的科学计数（<b>3e+307</b>、toExponential 出来的 <b>1e+9</b>）一律改写成游戏的 E 记法，那个多余的「<b>+</b>」号没有了。低于 100 万的数字照旧原样显示，价格看得准。⑥ <b>基因成长重做</b>：<b>超越段</b>每上一档的成长比例至少 +0.001（超越·1 = ×1.051、超越·2 = ×1.052、…… 超越·99 = ×1.149）—— 之前用 √ 曲线压得太狠，超越·95 与超越·98 印出来一模一样；现在每一档都看得出差距。<b>「超越」之前的六档基因改成加法</b>：每级直接加算、数值整体抬一档（普通 +0.8%/级、优秀 +1.2%、稀有 +1.8%、史诗 +2.6%、传说 +3.6%、神话 +5%）—— 普通基因 Lv.1 就有 +0.8%，不再是「每级 ×1.002」这种看不出效果的东西；超越段保持<b>乘法复利</b>（那是它越级越强的身份）。"],
       ["V0.107", "六处改动（部件平衡第一步：给「心」以外的三件补上成长曲线）。① <b>自动回归</b>新增「<b>打够 N 场就回归</b>」：自动化页「自动回归」那一行右侧多了一个场次输入框 —— 出战猎犬打满填写的场数后会立刻回展示柜、把等级换成永久全局加成，随后自动换上仓库里最强的一只继续出战（填 <b>0</b> = 关闭，沿用旧规则：只在寿命只剩 1 点时回归）。后期一场一个目标时把它设小一点，就不用再等寿命耗光才轮换；「寿命将尽必回归」的兜底照旧生效。② <b>基因实验室的「刷新清单」花费改成「每次都是上一次的 4 倍」</b>：第 1 次 <b>1</b> 点、第 2 次 4 点、第 3 次 16 点、第 4 次 64 点、第 5 次 256 点、第 6 次 1024 点……（前 3 次合计 21 点，之后指数上涨）。刷新按钮旁边会直接写清「下次刷新要多少点」；进入下一个宇宙照旧免费重抽、价格归 1。③ 修<b>「可能性」解锁时的高亮</b>：以前如果玩家早先点过这个页签（已读记录里躺着它），五个挑战再次全部完成时就只剩一句「已解锁」的提示、页签一动不动 —— 现在解锁那一刻会<b>强制把页签重新点亮一次</b>（「⚔ 挑战」页里的「🩸 苦痛挑战」子页签同样点亮），重复解锁的提示也改成「已重新点亮」。顺带修掉「苦痛挑战子页签解锁后一直闪、点进去也不灭」，并把「已读页签」记录上限从 24 条放宽到 200 条。④ <b>「🩸 苦痛之路」的入口提前</b>：以前要玩家自己先植入满 10 条基因，那个子页签才冒出来，很多人根本找不到它；现在<b>解锁「🧪 基因实验室」时它就会出现在同一排子页签里</b>（带「新」高亮），点进去写明还差几条基因、凑够 10 条自动变成可预约。⑤ <b>高级基因之间终于有区别了</b>：以前「超越」段的每级成长比例一律钉在 <b>×1.050</b>，档位再高也一模一样；现在按超越档位递增 —— 超越·1 = ×1.051 … 超越·25 = ×1.055 … 超越·99 = ×1.060，越高档每级涨得越快（仍然是严格递增、不会爆表）。⑥ <b>永恒部件第一批平衡（心不动）</b>：<b>牙 / 爪 / 沙漏</b>新增各自的<b>成长曲线</b> —— 除了原来的固定加成，这三件还会按你的<b>升级等级</b>复利放大（牙看尘埃升级、爪看速度升级、沙漏取两者平均），复利率由部件自身等级决定（满配时每级 ×1.008，约等于每 100 级升级 ×2.22）。标定实测：两条升级都到 300 级时，三件合计约为「心」的 11 倍，500 级时约 1.5 倍，约 540 级之后心反超 —— 「一个心顶其他三件」的后期差距被压平了；部件页与属性详情面板都能看到实时读数。"],
       ["V0.106", "两条小调 + 一次结算。① 基因实验室的「刷新清单」花费改为<b>对数增长</b>：第一次 <b>1</b> 点，之后 1、2、2、3、3、3、3、4…（原来按 2×2ⁿ 翻倍、还封顶在 4096 —— 基因点攒多之后刷新等于免费，玩家滚雪球太快）；基因植入的「每次翻倍」保持不变。② 本版把 V0.104 / V0.105 的积累一并发布：反转世界正式开放（进度持久化、科技点数、尖端实验室、灵感、科技跃迁、自动化养成、八条猎犬、精英猎犬、反转里程碑、解析、科技软上限）、基因去除等级上限并统一巨削成长、修复「猎犬刚开始吃不到保底」与「离线奖励后实验室加成缩水」等 —— 详细条目见下方 V0.104 / V0.105。"],
       ["V0.105", "两条新东西 + 一次总收编。① 反转世界迎来<b>第二条猎犬</b>：反转等级到 <b>50</b> 后主界面会多出第二条进度条 —— 基础周期同为 10 秒，但进度快 <b>8 倍</b>（无加成时 1.25 秒就扑一次），捕获强度 <b>800%</b>（第一条猎犬同步上调到 <b>400%</b>）；等级掉下 50 它会暂时消失、升回来再继续。被捕获概率改用新口径：<b>1 − 抵抗 ÷ 强度</b>（抵抗 ≥ 强度即完全免疫）—— 比如 400% 抵抗对 800% 的它 = 50% 被捕获概率；两条进度条上都会实时标出「被这条猎犬捕获的概率」。② 反转铸级加上批量：<b>×1 / ×10 / ×100 / 一键最大</b>，逐级按真实造价扣反转尘埃，买不动自动停。③ 总收编：反转世界的这一批更新（进度持久化、科技点数与尖端实验室、灵感、科技跃迁调整、自动化养成等）都从这一版起算。④ <b>反转里程碑</b>（三档，反转页底部有徽章轨道展示）：每 <b>50</b> 级一层（尘埃/抵抗 +25%，无限叠）；每 <b>500</b> 级一座<b>大里程碑</b>（尘埃/抵抗 +100%、基础科技软上限 ×1.01，并永久解锁「<b>开局直得 5000 次点击收益</b>」的福利 —— 此后每开新局白送一笔尘埃）；每 <b>5000</b> 级一座<b>超级里程碑</b>（尘埃/抵抗 +500%、软上限 ×1.2）。跨档弹提示，层数与软上限倍率实时显示。⑤ 反转世界三件事：<b>自动铸级改成一键最大</b>（每次巡检直接买满买得起的级数）；反转等级到 <b>200</b> 引来<b>第三条猎犬</b> —— 数值是第二条的 8 倍（6400% 强度、64 倍进度速度），而且一口啃掉 <b>2 级</b>；解锁第二条猎犬后，科技跃迁里会多出「<b>🔬 解析</b>」子页 —— 从第二条猎犬起，每被追逐 1 秒积攒<b>数据点</b>（两条 1 点/秒、三条 2 点、四条 4 点、五条 8 点…翻倍递增；解锁后掉回 50 级以下也保留），可在里面购买四种特殊升级：弱点图谱（被捕获概率 −2%/级）、尘埃共鸣（尘埃 +20%/级）、护盾协议（抵抗 +10%/级）、缓速力场（所有猎犬进度 −3%/级）。另外反转世界右上角现在有和主宇宙同款的数值条（反转尘埃 / 反转等级 / 被捕获 / 数据点 / 精英点数 —— 没解锁的不显示）。⑥ 猎犬队伍扩到八条：第四条（反转等级 <b>400</b>）一口啃 <b>8 级</b>；<b>1000 / 2000 / 4000 / 10000</b> 级还会陆续引来第 <b>5~8</b> 条 —— 每一条属性 ×8、伤害 ×4 逐条递增。⑦ 新增「<b>精英</b>」页（反转等级到 <b>500</b> 解锁，解锁即刷第一头）：加强过的<b>精英猎犬</b>数值<b>跟着你的成长走</b> —— 强度以你的总抵抗为基准浮动（0.8~1.6 倍）、速度与伤害随等级放大，档位沿用「普通 → 超越」，属性随机（更快 / 更疼 / 更强 / 带破甲·狂暴·侵蚀·汲取·硬壳等特殊能力）；页面给出<b>预估战力</b>与<b>限时倒计时</b>：挑战后它加入主界面最下面一条进度条，<b>承受 100 次攻击即可击败</b>（打完立刻刷下一头；超时它会逃走，下一头 10 分钟后再来），按等级获得<b>精英点数</b>。另外<b>基础科技的有效等级加了软上限</b>：超过 400 级的部分只按平方根计入 —— 后期抵抗不会无限膨胀，猎犬的等级压制依然打得出来。⑧ 新成就「<b>十全基因</b>」：同时持有 <b>10</b> 条基因解锁（与 12 条满编的「基因满编」是两个档）。⑨ <b>基因强化去掉等级上限</b>：以前除「部件软上限」外，其余基因都会在「倍率封顶 1e9」反推出的等级上满级、把强化锁死；现在所有基因想强化多少级都行 —— 作为补偿，成长比例统一巨削为「每级 = 1 + min(+5%, (品质倍率−1) × 一成)」：普通 ≈ ×1.002/级、神话 ≈ ×1.028/级、超越段一律封顶 ×1.05（原来的指数级涨幅不再存在）。⑩ 修复「<b>猎犬刚开始吃不到保底</b>」：兜底反解的下限从 0.01 放宽到 1e-6（弱猎犬 + 高入侵数时压不下去的问题），并且保底线现在会记住解算时的参考战力 —— 战败腰斩 / 换犬 / 加成变化后自动重织，保底永远按当前战力解算。"],
@@ -12850,12 +12966,12 @@
       const p = getPossibility();
       const genes = Array.isArray(p.genes) ? p.genes : [];
       pruneGeneSelection();
-      const mp = p.modPoints || 0;
+      const mp = p.modPoints;
       // V0.89：植入价格每次翻倍（进一次宇宙归 1 点）—— 先算出来，状态栏/按钮/提示都要用
       const implantCost = getGeneImplantCost();
       setText("geneStatusText",
-        `基因点数 ${p.genePoints || 0} · 基因 ${formatNumber(genes.length)} / ${GENE_MAX} · 修饰点 ${mp} · 下次植入 ${geneImplantCostText()} 点`);
-      const canAdd = (p.genePoints || 0) >= implantCost && genes.length < GENE_MAX;
+        `基因点数 ${formatCount(p.genePoints)} · 基因 ${formatNumber(genes.length)} / ${GENE_MAX} · 修饰点 ${formatCount(mp)} · 下次植入 ${geneImplantCostText()} 点`);
+      const canAdd = bigCmp(p.genePoints, implantCost) >= 0 && genes.length < GENE_MAX;
       const pickedCount = geneSelection.size;
 
       const list = genes.length
@@ -12886,8 +13002,8 @@
               <div class="gene-main">
                 <span class="gene-tier" style="color:${t.color}">${t.name}</span>
                 <span class="gene-name">${g.label}</span>
-                <span class="gene-val">×${geneEffectText(g)}</span>
-                <span class="gene-lv">Lv.${formatNumber(g.level)}${atCap ? "（满级）" : ""} · 每级 ×${growTxt}${inv > 0 ? ` · 已投入 ${inv} 点` : ""}</span>
+                <span class="gene-val">${geneEffectLabel(g)}</span>
+                <span class="gene-lv">Lv.${formatNumber(g.level)}${atCap ? "（满级）" : ""} · 每级 ${geneGrowthLabel(g)}${inv > 0 ? ` · 已投入 ${inv} 点` : ""}</span>
               </div>
               <div class="gene-ops">
                 ${upBtn(1, "×1", c1, !atCap && mp >= c1)}
@@ -12911,7 +13027,7 @@
           ⚠️ 移除基因<b style="color: var(--purple);">不退还任何点数</b>：该基因的 1 基因点数与它已投入的修饰点数都会一并失去——
           基因是随机 roll 出来的，所以植入之前想清楚、强化之前也算清楚。
         </p>
-        <div class="gene-points">基因点数：<b>${p.genePoints || 0}</b> · 基因修饰点数：<b style="color: var(--cyan);">${mp}</b></div>
+        <div class="gene-points">基因点数：<b>${formatCount(p.genePoints)}</b> · 基因修饰点数：<b style="color: var(--cyan);">${formatCount(mp)}</b></div>
         <div class="mv-actions">
           <button class="primary-button" data-gene-add="1" ${canAdd ? "" : "disabled"}>植入基因（${geneImplantCostText()} 点）</button>
           ${canAdd ? "" : `<span class="mv-cost">${genes.length >= GENE_MAX ? `已达上限 ${GENE_MAX} 条` : `基因点数不足（需要 ${geneImplantCostText()} 点）`}</span>`}
@@ -13104,15 +13220,15 @@
       // V0.96：允许重复购买后，盘面永远刷得出来东西 —— 原来的「池子空了什么都不变」守卫
       //   （V0.89 的 BUG 修复）随之退出，只剩「基因点够不够」这一道判断。
       const cost = getLabRerollCost();
-      if ((p.genePoints || 0) < cost) {
-        showToast(`刷新需要 ${cost} 基因点（当前 ${p.genePoints || 0} 点）。`);
+      if (bigCmp(p.genePoints, cost) < 0) {
+        showToast(`刷新需要 ${formatCount(cost)} 基因点（当前 ${formatCount(p.genePoints)} 点）。`);
         return;
       }
-      p.genePoints -= cost;
+      p.genePoints = bigIntFix(bigSub(p.genePoints, cost));
       lab.rerollCount = (lab.rerollCount || 0) + 1;
       rollLabOffers();
       saveGame(true);
-      showToast(`实验清单已刷新（消耗 ${cost} 基因点）；下次刷新要 ${getLabRerollCost()} 点。`);
+      showToast(`实验清单已刷新（消耗 ${formatCount(cost)} 基因点）；下次刷新要 ${formatCount(getLabRerollCost())} 点。`);
       renderPossibility();
     }
     // 已购升级的合计加成（按 key 累加）
@@ -13161,12 +13277,12 @@
       const o = lab.offers[idx];
       if (!o) return;
       const cost = getLabOfferCost(o);
-      if ((p.genePoints || 0) < cost) {
-        showToast(`基因点数不足（需要 ${cost} 点，当前 ${p.genePoints || 0} 点）。`);
+      if (bigCmp(p.genePoints, cost) < 0) {
+        showToast(`基因点数不足（需要 ${formatCount(cost)} 点，当前 ${formatCount(p.genePoints)} 点）。`);
         return;
       }
       if (o.id === LAB_LUCK_ID) {
-        p.genePoints -= cost;
+        p.genePoints = bigIntFix(bigSub(p.genePoints, cost));
         const m = getMerchant();
         m.luck = getGeneLuck() + 1;
         lab.offers.splice(idx, 1);
@@ -13182,7 +13298,7 @@
           showToast(`「货物扩容」最多 +${LAB_CARGO_MAX} 条（实验台十个货物栏已经摆满）。`);
           return;
         }
-        p.genePoints -= cost;
+        p.genePoints = bigIntFix(bigSub(p.genePoints, cost));
         lab.owned.push({ id: o.id, tier: o.tier || 0 });
         lab.offers.splice(idx, 1);
         saveGame(true);
@@ -13383,7 +13499,7 @@
           `<span style="color: var(--muted);">完成第 ${LAB_UNLOCK_ENTRIES} 次多元宇宙之后，这里会亮起来。</span></div>`);
         return;
       }
-      setText("labStatusText", `基因点数 ${p.genePoints || 0} · 已购 ${formatNumber(lab.owned.length)} 份 · 本期货栏 ${formatNumber(lab.offers.length)} / ${LAB_SHELF_MAX}`);
+      setText("labStatusText", `基因点数 ${formatCount(p.genePoints)} · 已购 ${formatNumber(lab.owned.length)} 份 · 本期货栏 ${formatNumber(lab.offers.length)} / ${LAB_SHELF_MAX}`);
       // V0.86：不再罗列"买了什么"，直接把当前的总加成列出来
       const LAB_KEYS = [["dust", "尘埃收益"], ["speed", "时间流速"], ["origin", "本源收益"],
         ["global", "全局收益"], ["part", "部件效果"], ["houndExp", "猎犬经验"], ["shardDrop", "碎片掉落率"]];
@@ -13401,23 +13517,23 @@
       const rerollCost = getLabRerollCost();
       // V0.89：刷新按钮要说清"能不能刷 / 为什么不能刷"，别让玩家点了没反应
       const offerCount = getLabOfferCount();
-      const canAffordReroll = (p.genePoints || 0) >= rerollCost;
+      const canAffordReroll = bigCmp(p.genePoints, rerollCost) >= 0;
       const canReroll = canAffordReroll;
-      const rerollLabel = canAffordReroll ? `刷新清单（${rerollCost} 基因点）` : `基因点数不足（需要 ${rerollCost} 点）`;
+      const rerollLabel = canAffordReroll ? `刷新清单（${formatCount(rerollCost)} 基因点）` : `基因点数不足（需要 ${formatCount(rerollCost)} 点）`;
       const rerollNote = `本轮已刷新 ${formatNumber(lab.rerollCount || 0)} 次 · 下次刷新要 ` +
         `${formatNumber(getLabRerollCost())} 点 · 进入下一个宇宙会重置这个价格`;
       // V0.89：每条升级都带品质（沿用转盘的六档），品质越高效果越强、价格越贵；
       //   另外有 35% 概率上架一件「基因幸运」。
       const offers = lab.offers.map((o, idx) => {
-        const afford0 = (p.genePoints || 0);
+        const afford0 = p.genePoints;
         if (o.id === LAB_LUCK_ID) {
-          const afford = afford0 >= LAB_LUCK_COST;
+          const afford = bigCmp(afford0, LAB_LUCK_COST) >= 0;
           return `
             <div class="lab-card gm-luck">
               <div class="lab-head">
                 <span class="lab-icon">🍀</span>
                 <div><h3>基因幸运</h3><small>永久属性 · 当前 Lv.${getGeneLuck()}</small></div>
-                <span class="lab-cost">${LAB_LUCK_COST} 基因点</span>
+                <span class="lab-cost">${formatCount(LAB_LUCK_COST)} 基因点</span>
               </div>
               <p class="lab-desc">幸运值每级 ×1.1（复利）；每 2 级让抽到的基因档位整体上移一档（超越等级间距 ×1.21）。</p>
               <button class="primary-button" data-lab-buy="${idx}" ${afford ? "" : "disabled"}>
@@ -13433,7 +13549,7 @@
         // V0.96：同一种升级可以反复买 —— 显示已持有份数；只有「货物扩容」到 +4 才禁用
         const copies = getLabOwnedCopies(o.id);
         const cargoFull = o.id === "lab_cargo" && copies >= LAB_CARGO_MAX;
-        const afford = afford0 >= cost && !cargoFull;
+        const afford = bigCmp(afford0, cost) >= 0 && !cargoFull;
         // V0.89：上限类货品显示「+N 级 / +N 条」，百分比类才显示「×倍率」
         const valText = d.int
           ? `效果 <b>+${Math.round(getLabOfferValue(o))} ${d.unit || ""}</b>`
@@ -13448,12 +13564,12 @@
                 <small><b style="color:${t.color}">${t.name}</b> 品质 · ${valText} · ${kindText}` +
                 (copies > 0 ? ` · 已持有 <b style="color: var(--gold);">${copies}</b> 份` : "") + `</small>
               </div>
-              <span class="lab-cost">${cost} 基因点</span>
+              <span class="lab-cost">${formatCount(cost)} 基因点</span>
             </div>
             <p class="lab-desc">${d.desc}</p>
             <button class="primary-button" data-lab-buy="${idx}" ${afford ? "" : "disabled"}>
               ${cargoFull ? `已满（最多 +${LAB_CARGO_MAX} 条）`
-                : afford ? (copies > 0 ? `再买 1 份（涨价后 ${cost} 点）` : "购入（永久生效）")
+                : afford ? (copies > 0 ? `再买 1 份（涨价后 ${formatCount(cost)} 点）` : "购入（永久生效）")
                   : "基因点数不足"}
             </button>
           </div>`;
@@ -16560,8 +16676,17 @@
     function invAutoStep() { invAutoRun(1); }   // 兼容旧入口：一次跑满 1 秒的份额
     // V0.98：反转世界改成「常显页签 + 开发中门页」—— 所有人能看到入口；
     //   真正进场只留给开发者面板（enterInvWorld(true)），解锁条件留作正式开放时的门槛。
+    // V0.108（作者要求）：没达成解锁条件（历史最高尘埃 1E30080 + 苦痛挑战全通）之前，
+    //   这个页签**藏起来**（不再常显）；达成那一刻才现身，并自带「新」高亮。
+    //   ⚠️ 只在「刚解锁的那一帧」强制点亮一次（老存档可能早就把它记成「已读」了，
+    //      不摘掉记录的话它就永远不会闪 —— 和 V0.107 修「可能性」时同一个坑）。
+    let invTabWasUnlocked = null;
     function renderInvTab() {
-      setTabLocked("invTab", false, "◑ 反转世界");
+      const unlocked = isInvUnlocked();
+      const was = invTabWasUnlocked;
+      invTabWasUnlocked = unlocked;
+      setTabLocked("invTab", !unlocked, "◑ 反转世界");
+      if (unlocked && was === false) relightTab("invTab");
       renderInvGatePane();   // V0.104：反转页的两个子页实时刷新
       renderInvLabPane();
     }
