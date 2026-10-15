@@ -1243,6 +1243,42 @@
       0%, 100% { box-shadow: 0 0 0 0 rgba(240, 190, 90, 0.5); }
       50% { box-shadow: 0 0 0 7px rgba(240, 190, 90, 0); }
     }
+    /* V0.104：反转世界的页签（科技 / 科技跃迁）也用同一套「新」高亮 */
+    .inv-tab.new-glow {
+      position: relative;
+      color: var(--gold);
+      border-color: var(--gold);
+      animation: tabNewGlow 1.3s ease-in-out infinite;
+    }
+    .inv-tab.new-glow::after {
+      content: "新";
+      position: absolute; top: -7px; right: -5px;
+      background: var(--red); color: #fff; font-weight: 700;
+      font-size: 9px; line-height: 1; padding: 2px 3px; border-radius: 4px;
+    }
+    /* V0.104：科技跃迁 · 科技爆炸的行 */
+    /* V0.104：门页子页显隐 */
+    .gate-pane { display: none; }
+    .gate-pane.active { display: block; }
+    /* V0.104：跃迁子页显隐（以前只有一页时没写，现在必须收起来） */
+    .leap-sub-pane { display: none; }
+    .leap-sub-pane.active { display: block; }
+    /* V0.104：灵感卡片 */
+    .inspire-card { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: var(--panel-light); display: grid; gap: 6px; margin-top: 8px; }
+    .inspire-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+    .inspire-row > b { color: var(--cyan); }
+    .inspire-card .primary-button { margin-top: 4px; }
+    .inv-leap-list { display: grid; gap: 8px; margin-top: 10px; }
+    .inv-leap-row { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--panel-light); }
+    .inv-leap-row.selected { border-color: var(--gold); }
+    .inv-leap-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .inv-leap-head b { }
+    .inv-leap-arrow { color: var(--muted); margin: 0 2px; }
+    .inv-leap-bar { height: 8px; border-radius: 999px; overflow: hidden; background: rgba(128, 140, 160, 0.25); margin: 7px 0 5px; }
+    .inv-leap-bar > i { display: block; height: 100%; background: var(--gold); border-radius: 999px; transition: width 160ms ease; }
+    .inv-leap-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+    .inv-leap-btns { margin-left: auto; display: flex; gap: 6px; }
+    .inv-leap-btns button { font-size: 12px; padding: 4px 10px; }
     /* 猎犬页的子页签同样适用（V0.77）——只是它们更小，光环收一点 */
     .sub-tab.new-glow {
       position: relative;
@@ -2586,6 +2622,61 @@
     }
     body.inv-mode .panel { background: rgba(255, 255, 255, 0.94); }
     body.inv-mode h1 { color: #0d1117; }
+    /* V0.104（作者要求）：反转世界里右上角不显示主宇宙的资源刻度 —— 那些不是反转世界的资源 */
+    body.inv-mode .header-stats { display: none; }
+    /* V0.105：反转世界的右上角数值条 —— id 选择器优先级更高，反转模式下它顶替主宇宙的那排 */
+    #invHeaderStats { display: none; }
+    body.inv-mode #invHeaderStats { display: flex; }
+    body.inv-mode .stat-chip { background: rgba(255, 255, 255, 0.85); }
+    /* V0.105（作者要求）：科技点数芯片 —— 反转世界同款淡白底 */
+    /* V0.105：反转里程碑轨道（门页底部视觉化） */
+    .ms-rail { display: grid; gap: 8px; margin-top: 8px; }
+    .ms-node { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; background: rgba(17, 23, 34, 0.6); }
+    .ms-medal { flex: 0 0 66px; text-align: center; border-radius: 8px; padding: 6px 4px; font-weight: 800; font-size: 15px; line-height: 1.15; border: 1px solid var(--line); }
+    .ms-medal small { display: block; font-size: 10px; font-weight: 600; color: var(--muted); }
+    .ms-node.base .ms-medal { color: var(--purple); border-color: var(--purple); }
+    .ms-node.big .ms-medal { color: var(--gold); border-color: var(--gold); }
+    .ms-node.mega .ms-medal { color: var(--red); border-color: var(--red); background: rgba(224, 85, 79, 0.1); }
+    .ms-info { flex: 1; min-width: 0; }
+    .ms-info > b { display: block; margin-bottom: 5px; }
+    .ms-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ms-chip { font-size: 11.5px; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+    .ms-chip.gold { color: var(--gold); border-color: rgba(240, 190, 90, 0.5); }
+    .ms-chip.red { color: var(--red); border-color: rgba(224, 85, 79, 0.5); }
+    .ms-node.cy .ms-medal { color: var(--cyan); border-color: var(--cyan); }
+    .ms-node.ok .ms-medal { color: var(--green); border-color: var(--green); }
+    .ms-chip.ok-c { color: var(--green); border-color: var(--green); }
+    .stat-chip.inv-themed {
+      background: rgba(246, 248, 244, 0.95);
+      border-color: #d6dbd2;
+    }
+    .stat-chip.inv-themed span { color: #5c6676; }
+    .stat-chip.inv-themed strong { color: #a06a00; }
+    /* V0.104（作者要求）：反转世界里右下角提示框改白底黑字 —— 它（以及顶栏能打开的弹窗）
+       原本是硬编码深色底 + color:var(--text)，进反转模式后 --text 变深 → 深底深字，等于看不见。 */
+    body.inv-mode .toast {
+      background: #ffffff;
+      color: #161b24;
+      border-color: var(--line);
+      box-shadow: 0 14px 40px rgba(20, 30, 40, 0.18);
+    }
+    /* 顶栏在反转世界里照常可用（设置 / 教程 / 更新日志）—— 这些弹窗一并翻成白底黑字 */
+    body.inv-mode .modal-box,
+    body.inv-mode .modal-box.wide,
+    body.inv-mode .modal-box.paradox,
+    body.inv-mode .modal-box.settings,
+    body.inv-mode .modal-box.transcend {
+      background: #ffffff;
+      color: #161b24;
+      box-shadow: 0 20px 80px rgba(20, 30, 40, 0.25);
+    }
+    body.inv-mode .modal-box input,
+    body.inv-mode .modal-box textarea,
+    body.inv-mode .modal-box select {
+      background: #f4f6f3;
+      color: #161b24;
+      border-color: var(--line);
+    }
     .inv-frame { display: grid; gap: 10px; }
     .inv-nav {
       display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
@@ -2593,6 +2684,18 @@
       padding: 8px 12px;
     }
     .inv-brand { font-weight: 800; letter-spacing: 1px; margin-right: 4px; }
+    /* V0.104：基础科技卡片（反转世界） */
+    .inv-auto-ctl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .inv-auto-ctl button { font-size: 12px; padding: 4px 10px; }
+    .inv-tech-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+    .inv-tech-card { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--panel-light); opacity: 0.55; }
+    .inv-tech-card.owned { opacity: 1; border-color: var(--gold); }
+    .inv-tech-head { display: flex; align-items: center; gap: 6px; }
+    .inv-tech-head b { flex: 1; }
+    .inv-tech-lv { color: var(--cyan); font-weight: 700; }
+    .inv-tech-desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .inv-tech-note { grid-column: 1 / -1; font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.7; }
+    @media (max-width: 720px) { .inv-tech-grid { grid-template-columns: 1fr; } }
     .inv-tab {
       border: 1px solid var(--line); background: var(--panel-light); color: var(--text);
       border-radius: 7px; padding: 5px 12px; cursor: pointer; font-weight: 700;
@@ -2616,6 +2719,29 @@
       border: 1px solid #cdd5cc; background: #f0f2ee; margin: 4px 0 10px;
     }
     .inv-track > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, #e0554f, #f2a35c); transition: width 0.1s linear; }
+    /* V0.105：第三条猎犬的进度条 —— 最深最凶 */
+    #invTrack3 > i { background: linear-gradient(90deg, #5e0a18, #a11d2e); }
+    #invTrack3 { border-color: #5e0a18; }
+    /* V0.105：第四条猎犬的进度条 —— 黑红 */
+    #invTrack4 > i { background: linear-gradient(90deg, #2b060c, #7a1020); }
+    #invTrack4 { border-color: #2b060c; }
+    /* V0.105：第 5~8 条猎犬的进度条 —— 紫色系，越深越凶 */
+    #invTrack5 > i { background: linear-gradient(90deg, #5a0a5a, #a421a4); }
+    #invTrack5 { border-color: #5a0a5a; }
+    #invTrack6 > i { background: linear-gradient(90deg, #3d0640, #6f1080); }
+    #invTrack6 { border-color: #3d0640; }
+    #invTrack7 > i { background: linear-gradient(90deg, #2a0542, #4d0a86); }
+    #invTrack7 { border-color: #2a0542; }
+    #invTrack8 > i { background: linear-gradient(90deg, #170333, #36067a); }
+    #invTrack8 { border-color: #170333; }
+    /* V0.105：精英猎犬的进度条（金色） */
+    #invTrackElite > i { background: linear-gradient(90deg, #b8860b, #f0be5a); }
+    #invTrackElite { border-color: #b8860b; }
+    /* V0.105：反转里程碑行 */
+    .inv-milestone { margin: 9px 0 2px; font-size: 13px; color: var(--muted); }
+    /* V0.105：第二条猎犬的进度条更深、更凶 */
+    #invTrack2 > i { background: linear-gradient(90deg, #a11d2e, #e0554f); }
+    #invTrack2 { border-color: #a11d2e; }
     .inv-track-cap {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
       font-size: 11px; font-weight: 800; color: #39404d;
@@ -2642,10 +2768,10 @@
       <button class="settings-gear help-gear" id="tutorialButton" title="新手教程：这个游戏怎么玩">教程</button>
       <div>
         <p class="eyebrow">CHRONOLOGY / SURVIVAL</p>
-        <h1>时间猎犬增量</h1>
-        <p class="subtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
+        <h1 id="gameTitle">时间猎犬增量</h1>
+        <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.103</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.106</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -2673,6 +2799,35 @@
           title="基因点数：每进入一次多元宇宙获得 1 点（苦痛之路 / 里程碑还会乘算）。用来在「🧬 基因改造」植入基因、在「🧪 基因实验室」买升级。">
           <span>基因点数</span>
           <strong id="genePointTotal">0</strong>
+        </div>
+        <!-- V0.105（作者要求）：科技点数排在基因点数右边，底色用反转世界那套淡白 -->
+        <div class="stat-chip inv-themed" id="invTechPointChip" style="display: none;"
+          title="科技点数：从反转世界带回来的成果。每次【主动退出】反转世界时，按「本次最高反转等级 − 上次结算的等级」发放；下次要超过这次的等级才有新点数。用来在「反转世界 → 尖端实验室」买永久加成。">
+          <span>科技点数</span>
+          <strong id="invTechPointTotal">0</strong>
+        </div>
+      </div>
+      <!-- V0.105（作者要求）：反转世界的右上角数值条（和主宇宙同款；进反转世界时显示，没解锁的不显示） -->
+      <div class="header-stats" id="invHeaderStats">
+        <div class="stat-chip" title="反转世界的尘埃 —— 只在这趟旅程里有效">
+          <span>反转尘埃</span>
+          <strong id="invHeadDust">0</strong>
+        </div>
+        <div class="stat-chip" title="反转等级：越高凝析越快；被猎犬捕获会掉级">
+          <span>反转等级</span>
+          <strong id="invHeadLevel">Lv.1</strong>
+        </div>
+        <div class="stat-chip" title="本局被猎犬捕获的总次数">
+          <span>被捕获</span>
+          <strong id="invHeadCaptures">0</strong>
+        </div>
+        <div class="stat-chip" id="invHeadParseChip" style="display: none;" title="数据点：从第二条猎犬开始，每被追逐 1 秒 +N 点（猎犬越多越快）。在「科技跃迁 → 解析」里购买特殊升级。">
+          <span>数据点</span>
+          <strong id="invHeadParse">0</strong>
+        </div>
+        <div class="stat-chip" id="invHeadEliteChip" style="display: none;" title="精英点数：击败精英猎犬获得（10 + 档位×5）。用途会在后续版本开放。">
+          <span>精英点数</span>
+          <strong id="invHeadElite">0</strong>
         </div>
       </div>
     </header>
@@ -3486,26 +3641,39 @@
     <section id="invScreen" class="screen">
       <!-- V0.98：对外的「开发中」门页 —— 其他玩家点开只能看到这里；
            只有内部测试入口能真正进场（enterInvWorld(true)）。 -->
-      <div class="panel inv-gate" id="invGate" style="text-align: center; padding: 38px 20px;">
-        <div class="big-icon" style="font-size: 46px; color: var(--purple);">◑</div>
-        <h2 style="margin: 10px 0 6px;">反转世界 · 开发中</h2>
-        <p class="inventory-note" style="max-width: 580px; margin: 0 auto 10px;">
-          主宇宙的完全倒影：外面的时间会静止，里面的一切从零开始 —— 在那里，「被捕获」不是恩赐，而是等级 −1。
-        </p>
-        <p class="inventory-note" style="max-width: 580px; margin: 0 auto 10px;">
-          <b style="color: var(--gold);">开放条件（暂定）</b>：历史最高尘埃达到 <b>1E30080</b>，
-          并且<b>苦痛挑战全部通关</b>。功能完成后会正式开放 —— 开发完成前，这里只对内部版本开放。
-        </p>
-        <p class="inventory-note" style="max-width: 580px; margin: 0 auto; color: var(--muted);">
-          反转尘埃上限 1EE10 · 反转主界面 / 自动化 / 永恒背包 三个子界面已在内部搭建中。
-        </p>
+      <!-- V0.104（作者要求）：反转页正常开放 —— 与其他屏幕同一套骨架：页签在最上、内容左对齐 -->
+      <div id="invGate">
+        <div class="sub-tab-bar" id="invGateTabs">
+          <button class="sub-tab active" data-inv-gate="enter">◑ 反转</button>
+          <button class="sub-tab" data-inv-gate="lab">🧪 尖端实验室</button>
+        </div>
+        <div class="gate-pane active" id="invGatePaneEnter">
+          <div class="panel">
+            <div class="section-title">
+              <h2 style="color: var(--purple); margin: 0;">◑ 反转世界</h2>
+              <small>主宇宙的完全倒影 · 里面的成果是科技点数</small>
+            </div>
+            <div id="invGateEnterBody"></div>
+          </div>
+        </div>
+        <div class="gate-pane" id="invGatePaneLab">
+          <div class="panel">
+            <div class="section-title">
+              <h2 style="color: var(--cyan); margin: 0;">🧪 尖端实验室</h2>
+              <small>用科技点数买反转世界的永久加成</small>
+            </div>
+            <div id="invGateLabBody"></div>
+          </div>
+        </div>
       </div>
       <div class="inv-frame" id="invWorldWrap">
         <div class="inv-nav">
           <span class="inv-brand">◑ 反转世界</span>
           <button class="inv-tab active" id="invTabMain">反转主界面</button>
           <button class="inv-tab" id="invTabAuto">自动化</button>
-          <button class="inv-tab" id="invTabBag">永恒背包</button>
+          <button class="inv-tab" id="invTabBag" style="display: none;">科技</button>
+          <button class="inv-tab" id="invTabLeap" style="display: none;">科技跃迁</button>
+          <button class="inv-tab" id="invTabElite" style="display: none;">精英</button>
           <span class="inv-spacer"></span>
           <button class="inv-exit" id="invExit" title="离开反转世界，主宇宙的时间会继续流动">↩ 退出反转世界</button>
         </div>
@@ -3527,18 +3695,57 @@
                 <div>被捕获 <b id="invCapturesVal">0</b> 次</div>
                 <div>本局最高 <b id="invBestVal">Lv.1</b></div>
                 <div>被动凝析 <b id="invRateVal">+2 / 秒</b></div>
+                <div id="invInspireRow" style="display: none;">灵感倍率 <b id="invInspireVal">×1.00</b></div>
               </div>
             </div>
             <div class="inv-track">
               <i id="invCapFill"></i>
-              <span class="inv-track-cap" id="invCapText">捕获逼近 0%</span>
+              <span class="inv-track-cap" id="invCapText">反转猎犬 0%</span>
             </div>
+            <!-- V0.105（作者要求）：第二条猎犬 —— 反转等级 ≥ 50 才现身 -->
+            <div class="inv-track" id="invTrack2" style="display: none;">
+              <i id="invCap2Fill"></i>
+              <span class="inv-track-cap" id="invCap2Text">第二条猎犬 0%</span>
+            </div>
+            <!-- V0.105（作者要求）：第三条猎犬 —— 反转等级 ≥ 200 才现身 -->
+            <div class="inv-track" id="invTrack3" style="display: none;">
+              <i id="invCap3Fill"></i>
+              <span class="inv-track-cap" id="invCap3Text">第三条猎犬 0%</span>
+            </div>
+            <!-- V0.105（作者要求）：第四条猎犬 —— 反转等级 ≥ 400 才现身 -->
+            <div class="inv-track" id="invTrack4" style="display: none;">
+              <i id="invCap4Fill"></i>
+              <span class="inv-track-cap" id="invCap4Text">第四条猎犬 0%</span>
+            </div>
+            <!-- V0.105（作者要求）：第 5~8 条猎犬 —— 1000 / 2000 / 4000 / 10000 级陆续现身 -->
+            <div class="inv-track" id="invTrack5" style="display: none;"><i id="invCap5Fill"></i><span class="inv-track-cap" id="invCap5Text">第五条猎犬 0%</span></div>
+            <div class="inv-track" id="invTrack6" style="display: none;"><i id="invCap6Fill"></i><span class="inv-track-cap" id="invCap6Text">第六条猎犬 0%</span></div>
+            <div class="inv-track" id="invTrack7" style="display: none;"><i id="invCap7Fill"></i><span class="inv-track-cap" id="invCap7Text">第七条猎犬 0%</span></div>
+            <div class="inv-track" id="invTrack8" style="display: none;"><i id="invCap8Fill"></i><span class="inv-track-cap" id="invCap8Text">第八条猎犬 0%</span></div>
+            <!-- V0.105（作者要求）：精英猎犬的进度条（挑战后出现） -->
+            <div class="inv-track" id="invTrackElite" style="display: none;">
+              <i id="invEliteFill"></i>
+              <span class="inv-track-cap" id="invEliteText">👑 精英 0%</span>
+            </div>
+            <!-- V0.105（作者要求）：反转里程碑 —— 本局最高每 50 级一层 -->
+            <div class="inv-milestone" id="invMilestoneLine">🏁 反转里程碑：每 50 级一层</div>
             <div class="inv-actions">
               <button class="secondary-button" id="invHarvestBtn">深度凝析（+6）</button>
               <button class="primary-button" id="invLevelBtn">反转铸级（花费 12）</button>
             </div>
+            <!-- V0.105（作者要求）：铸级支持批量（×1 / ×10 / ×100 / 一键最大），逐级按真实造价扣尘、买不动自动停 -->
+            <div class="bulk-bar" style="margin-top: 8px;">
+              <span class="bulk-bar-label">铸级批量</span>
+              <button class="bulk-btn" data-inv-lv-buy="1">×1</button>
+              <button class="bulk-btn" data-inv-lv-buy="10">×10</button>
+              <button class="bulk-btn" data-inv-lv-buy="100">×100</button>
+              <button class="bulk-btn" data-inv-lv-buy="max">一键最大</button>
+            </div>
             <p class="inv-note">这是主宇宙的完全倒影：<b>被捕获不再是恩赐，而是等级 −1</b>。
-              反转猎犬每 10 秒逼近一次，被抓到就掉一级；用「反转铸级」把等级换回来 —— 等级越高，凝析越快。
+              反转猎犬每 10 秒逼近一次（「静默信标」会拉长这个间隔），被抓到就掉一级；用「反转铸级」把等级换回来 —— 等级越高，凝析越快。
+              <b style="color: var(--red);">反转等级到 50 会引来第二条猎犬</b>（进度快 8 倍、强度 800%），
+              <b style="color: var(--red);">到 200 还有第三条</b>（再 ×8、一口 2 级）、<b style="color: var(--red);">400 第四条</b>（一口 8 级），
+              再到 <b style="color: var(--purple);">1000 / 2000 / 4000 / 10000 还有第 5~8 条</b>（属性 ×8、伤害 ×4 逐条递增）—— 每条进度条上都写明被对应猎犬捕获的概率。本局最高等级每 <b>50</b> 级叠一层<b>反转里程碑</b>（尘埃 +25% · 抵抗 +25%/层，无限叠）。
               反转尘埃的上限是 <b>1EE10</b>；这里的一切只属于这一趟旅程，退出后再进来就从零开始。</p>
           </div>
         </div>
@@ -3549,26 +3756,60 @@
               <h2 style="margin: 0;">自动化</h2>
               <small>反转世界有自己的节奏</small>
             </div>
-            <div class="inv-auto-row">
-              <div class="inv-auto-text"><b>自动凝析</b><small>每秒自动做一次「深度凝析」</small></div>
-              <button class="switch" id="invAutoHarvestBtn">关</button>
-            </div>
-            <div class="inv-auto-row">
-              <div class="inv-auto-text"><b>自动铸级</b><small>反转尘埃够就立刻铸一级</small></div>
-              <button class="switch" id="invAutoLevelBtn">关</button>
-            </div>
-            <p class="inv-note">两件工具都是每秒巡检一次，和一墙之隔的主宇宙互不影响 —— 你在里面时，外面的一切都是静止的。</p>
+            <div class="inv-auto-row" id="invAutoRowHarvest"></div>
+            <div class="inv-auto-row" id="invAutoRowLevel"></div>
+            <p class="inv-note">两件工具都要先用<b>反转尘埃解锁</b>，解锁后还能继续花尘把效率往 <b>3 次/秒</b> 堆；
+              和一墙之隔的主宇宙互不影响 —— 你在里面时，外面的一切都是静止的。</p>
           </div>
         </div>
 
         <div class="inv-pane" id="invPaneBag">
           <div class="panel">
             <div class="section-title">
-              <h2 style="margin: 0;">永恒背包</h2>
+              <h2 style="margin: 0;">科技</h2>
               <small>倒影里的战利品</small>
             </div>
-            <div class="empty">反转世界的背包还空空如也。<br>
-              <span class="lb-sub">主宇宙的永恒部件在这里不生效 —— 反转部件、反转碎片这些只属于倒影的战利品，会在后续版本陆续觉醒。</span></div>
+            <p class="inv-note" style="margin-top: 0;">倒影里的战利品：「<b>深度凝析</b>」有概率爆出<b>基础科技</b>（手动、自动都会掉）——
+              八项科技全部持续生效；同种科技高等级自动替换低等级，被消耗的那份折算成反转尘埃。
+              <span class="lb-sub">主宇宙的永恒部件在这里不生效。</span></p>
+            <div class="inv-tech-grid" id="invTechGrid"></div>
+          </div>
+        </div>
+
+        <div class="inv-pane" id="invPaneElite">
+          <div class="panel">
+            <div class="section-title">
+              <h2 style="color: var(--gold); margin: 0;">👑 精英猎犬</h2>
+              <small>每 10 分钟刷新一头随属性强化的猎犬</small>
+            </div>
+            <div id="invEliteBody"></div>
+          </div>
+        </div>
+
+        <div class="inv-pane" id="invPaneLeap">
+          <div class="panel">
+            <div class="section-title">
+              <h2 style="margin: 0;">科技跃迁</h2>
+              <small>把基础科技丢进去，换对应的进阶科技</small>
+            </div>
+            <!-- V0.104（作者要求）：子页面改成**页签按钮**，以后加新子页直接续在这排后面 -->
+            <div class="sub-tab-bar" id="invLeapSubTabs">
+              <button class="sub-tab active" data-leap-sub="boom">💥 科技爆炸</button>
+              <button class="sub-tab" data-leap-sub="inspire" id="invLeapSubTabInspire" style="display: none;">✨ 灵感</button>
+              <button class="sub-tab" data-leap-sub="parse" id="invLeapSubTabParse" style="display: none;">🔬 解析</button>
+            </div>
+            <div class="leap-sub-pane active" id="invLeapSubBoom">
+              <p class="inv-note" style="margin-top: 8px;">
+                <b>一次只能选择一个基础科技升级</b>：选中它、把整件丢进去 ——
+                它的等级会 <b>1 : 1</b> 折算成对应「进阶科技」的进度（<b>首级 20 点、此后每级 +10% 向下取整</b>），
+                <b>基础件会归零</b>（要回去重新凝析抽）；
+                攒满升级后<b>进度一切归零、从头再来</b>；每一级进阶科技都会
+                <b>放大对应基础科技的效果倍率（+50% / 级）</b>。
+              </p>
+              <div class="inv-leap-list" id="invLeapList"></div>
+            </div>
+            <div class="leap-sub-pane" id="invLeapSubInspire"></div>
+            <div class="leap-sub-pane" id="invLeapSubParse"></div>
           </div>
         </div>
       </div>
@@ -3879,7 +4120,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.103";
+    const GAME_VERSION = "V0.106";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -4867,6 +5108,16 @@
           const best = (save.possibility.genes || []).reduce((m, g) => Math.max(m, (g && g.level) || 1), 1);
           return `Lv.${Math.min(best, 5)} / Lv.5`;
         }
+      },
+      // V0.105（作者要求）：十基因成就 —— 与「基因满编（12 条上限）」区分：这里固定卡 10 条
+      {
+        id: "gene_10",
+        name: "十全基因",
+        icon: "🔟",
+        description: "同时持有 10 条基因。",
+        reward: { origin: 0.15 },
+        check: () => (save.possibility.genes || []).length >= 10,
+        progress: () => `${Math.min((save.possibility.genes || []).length, 10)} / 10 条`
       },
       {
         id: "gene_ten",
@@ -5957,6 +6208,13 @@
       lbPid: "",
       // V0.99：上次上传排行榜的时间戳（4 小时冷却用；跨刷新保留）
       lbLastUploadAt: 0,
+      // V0.104（作者要求）：反转世界的持久化 —— 主动退出后清空、关网页保留；
+      //   科技点数是「主动退出」时按最高等级增量结算的主宇宙货币；尖端实验室花它买永久加成。
+      invSave: null,
+      invBestEver: 0,           // V0.105：历史最高反转等级（大里程碑开局福利的记账）
+      invTechPoints: 0,
+      invTechBase: 0,
+      invLab: { dust: 0, leap: 0, drop: 0, resist: 0 },
       savedAt: 0
     };
 
@@ -6099,6 +6357,16 @@
         s[k] = bigOf(s[k]);
       }
       return s;
+    }
+    // V0.104：尖端实验室等级的清洗（纯函数 —— loadSave 在脚本早期就要用）
+    function sanitizeInvLabRaw(raw) {
+      const out = { dust: 0, leap: 0, drop: 0, resist: 0 };
+      if (!raw || typeof raw !== "object") return out;
+      Object.keys(out).forEach(k => {
+        const v = raw[k];
+        if (typeof v === "number" && isFinite(v) && v > 0) out[k] = Math.floor(v);
+      });
+      return out;
     }
     // Big → Number。超出 double 表示范围时给出 Infinity —— 只用在「确定是小数值」的场合。
     function bigNum(a) {      a = bigOf(a);
@@ -6588,11 +6856,13 @@
               return { id: x.id, tier };
             }
             return null;
-          }).filter(Boolean).slice(0, 40) : [];
+          }).filter(Boolean) : [];   // V0.105 修复：这里原来统一 .slice(0,40) ——
+          //   但「owned」是「可重复购买、无上限」的清单，40 条硬截会把买超 40 份的加成在每次读档时静默吞掉
+          //   （玩家反馈：离线奖励弹窗后实验室加成缩水）。截断只留给 offers，owned 用大保险丝。
           return {
             // V0.89：「货物扩容」会让每轮上架条数超过 5，这里的上限要跟着放宽
             offers: norm(src.offers).slice(0, 24),
-            owned: norm(src.owned),
+            owned: norm(src.owned).slice(0, 10000),   // 保险丝：正常玩法摸不到；不再按 40 截断
             rerollCount: Math.max(0, Math.floor(typeof src.rerollCount === "number" && isFinite(src.rerollCount) ? src.rerollCount : 0))
           };
         })(),
@@ -6774,6 +7044,15 @@
         if (typeof good.lbName !== "string") good.lbName = "";
         if (typeof good.lbPid !== "string") good.lbPid = "";
         if (!(typeof good.lbLastUploadAt === "number" && isFinite(good.lbLastUploadAt) && good.lbLastUploadAt >= 0)) good.lbLastUploadAt = 0;
+        // V0.104：反转世界的持久化字段（防坏数据）
+        if (!(typeof good.invBestEver === "number" && isFinite(good.invBestEver) && good.invBestEver >= 0)) good.invBestEver = 0;
+        good.invBestEver = Math.floor(good.invBestEver);
+        if (!(typeof good.invTechPoints === "number" && isFinite(good.invTechPoints) && good.invTechPoints >= 0)) good.invTechPoints = 0;
+        if (!(typeof good.invTechBase === "number" && isFinite(good.invTechBase) && good.invTechBase >= 0)) good.invTechBase = 0;
+        good.invTechPoints = Math.floor(good.invTechPoints);
+        good.invTechBase = Math.floor(good.invTechBase);
+        good.invLab = sanitizeInvLabRaw(good.invLab);
+        if (!(good.invSave && typeof good.invSave === "object")) good.invSave = null;
         // V0.96：自动上传已移除（后端按调用计费）—— 老存档里残留的 lbAuto 字段直接删掉，
         //   免得它在导出档里继续存在、让玩家以为还在自动上报。
         delete good.lbAuto;
@@ -6824,6 +7103,9 @@
       if (!force && now - lastSaveAt < SAVE_INTERVAL_MS) return;
       lastSaveAt = now;
       saveDirty = false;
+      // V0.104：人在反转世界里时，把进度同步进存档 —— 关网页后下次能接着玩；
+      //   主动退出（exitInvWorld）会把 save.invSave 清掉 = 进度作废。
+      if (invActive && invWorld) save.invSave = snapshotInvWorld();
       // 只有真正写入时才更新 savedAt，保证它是「最后一次落盘时刻」，
       // 离线结算读的就是它（节流跳过的写入不会污染时间戳）。
       save.savedAt = now;
@@ -6850,7 +7132,7 @@
     // ② 强化花费【与稀有度无关】，所以高稀有度基因的「性价比」严格优于普通基因——
     //    这是刻意的：让玩家主动去强化高级词条，而不是把所有点数摊在普通基因上。
     // ③ 单条基因的效果上限 GENE_EFFECT_MAX：乘法会指数爆炸，必须封顶（否则 Number 会变 Infinity
-    //    并顺着收益链传染）。等级上限由它反推：geneLevelCap(tier) = floor(log(MAX)/log(tier.mult))。
+    //    并顺着收益链传染）。V0.105 起它只当「数值保险丝」用（成长比例已被巨削，正常玩法摸不到）。
     const GENE_UPGRADE_BASE = 12;   // 强化花费：首级 12 点基因修饰点数
     const GENE_UPGRADE_GROWTH = 1.5; // 每级花费 ×1.5
     const GENE_EFFECT_MAX = 1e9;    // 单条基因的倍率上限（12 条同类叠乘 ≈ 1e108，安全）
@@ -6864,17 +7146,17 @@
     //   且单级加成封顶 +PART_CAP_GENE_MAX_STEP（+5%）。
     //   实感：普通 ×1.002/级、神话 ×1.028/级、超越段一律 ×1.05/级；
     //   等效总倍率仍受 GENE_EFFECT_MAX 保险丝保护（正常玩法到不了，到得了也不会炸）。
-    //   ⚠️ 只改 partCap 这一条；其余基因的「每级 ×品质倍率 + 等级上限」完全照旧。
+    //   ⚠️ V0.105（作者要求）起，这套「去上限 + 巨削」推广到了**全部基因**（见 geneLevelCap / geneGrowthRatio）。
     const PART_CAP_GENE_STEP_RATIO = 0.1;
     const PART_CAP_GENE_MAX_STEP = 0.05;
-    // 基因的「每级成长比例」：普通基因 = 品质倍率；partCap = 削弱后的单级比例（见上）
+    // 基因的「每级成长比例」——
+    // V0.105（作者要求）：统一走「巨削」公式（原来是 partCap 专属，其余基因按 每级 ×品质倍率
+    //   指数膨胀、几步就撞 1e9 上限）。现在：每级 = 1 + min(+5%, (品质倍率 − 1) × 一成)，
+    //   普通 ≈ ×1.002/级、神话 ≈ ×1.028/级、超越段一律封顶 ×1.05 —— 等级因此可以无限强化。
     function geneGrowthRatio(g) {
       const t = geneTierOf(g);
-      if (g && g.k === "partCap") {
-        return 1 + Math.min(PART_CAP_GENE_MAX_STEP,
-          Math.max(0, t.mult - 1) * PART_CAP_GENE_STEP_RATIO);
-      }
-      return t.mult;
+      return 1 + Math.min(PART_CAP_GENE_MAX_STEP,
+        Math.max(0, t.mult - 1) * PART_CAP_GENE_STEP_RATIO);
     }
 
     function getPossibility() { return save.possibility; }
@@ -7029,15 +7311,34 @@
     //   焦点 = 幸运等级 ÷ 2（见 getGeneFocusTier），越靠近焦点概率越高、远离快速衰减。
     //   ⚠️ 基础六档刻意**不吃幸运倾斜**（保持固定权重）：那会让「神话」随幸运越滚越重，
     //     反而把整条超越段压到不可见，与「幸运 = 越高档越容易摸到」的直觉相反。
+    // V0.104（作者反馈：幸运拉到极高、焦点都到「超越·99」了还能抽到普通）——
+    //   基础六档以前**从不吃淘汰**（权重刻意固定 46/26/15/8/4/1），所以低档永远在池子里。
+    //   现在给所有档位统一加「低档逐步淘汰」，与转盘同思路：
+    //   把位置统一成「焦点档位」的刻度：普通 −5 / 优秀 −4 / 稀有 −3 / 史诗 −2 / 传说 −1 /
+    //   神话 0 / 超越·n = n（与焦点同一把尺子）。
+    //   焦点往下 GENE_TIER_KEEP(6) 档以内：原样（早期体验保护：幸运 0~2 级时谁都淘汰不掉）；
+    //   再往下按 6 档宽的带线性递减；到 GENE_TIER_FADE(12) 档之外：权重归零 —— 抽不到就是抽不到。
+    //   于是普通最先消失（幸运约 6 级起变少、14 级左右绝迹），之后优秀 / 稀有 / 史诗……
+    //   一路往上啃；到「超越·99」焦点时基础六档早已全部绝迹，只剩焦点附近的超越段。
+    const GENE_TIER_KEEP = 6;
+    const GENE_TIER_FADE = 12;
+    function geneTierAlive(i, focus) {
+      const pos = i - (GENE_BASE_TIERS.length - 1);   // 统一刻度：神话 = 0、超越·n = n
+      const d = focus - pos;
+      if (d <= GENE_TIER_KEEP) return 1;
+      return Math.max(0, Math.min(1, (GENE_TIER_FADE - d) / (GENE_TIER_FADE - GENE_TIER_KEEP)));
+    }
     function getGeneTierWeights() {
       const focus = getGeneFocusTier();
       const sigma = getGeneTailSigma(focus);
       const twoSigma2 = 2 * sigma * sigma;
       return GENE_TIERS.map((t, i) => {
-        if (i < GENE_BASE_TIERS.length) return t.weight;
+        const alive = geneTierAlive(i, focus);
+        if (alive <= 0) return 0;                    // 被淘汰：概率精确为 0（不是「很小」）
+        if (i < GENE_BASE_TIERS.length) return t.weight * alive;
         const n = i - GENE_BASE_TIERS.length + 1;   // 超越·n
         const d = n - focus;
-        return GENE_TAIL_WEIGHT * Math.exp(-(d * d) / twoSigma2);
+        return GENE_TAIL_WEIGHT * Math.exp(-(d * d) / twoSigma2) * alive;
       });
     }
     // 实验室的「品质」单独一个入口：只滚**基础六档**。
@@ -7045,7 +7346,12 @@
     //   让实验室也吃到「超越」档会把加成炸掉，所以这里只取六档。
     function rollBaseGeneTierIndex() {
       const luck = getGeneLuck();
-      const w = GENE_BASE_TIERS.map((t, i) => t.weight * (1 + luck * GENE_LUCK_WEIGHT_STEP * i));
+      const focus = getGeneFocusTier();
+      // V0.104：实验室的货物品质也吃「低档淘汰」（幸运高了不再上架普通货）；
+      //   「神话」是实验室的上限档，永远保留（否则档位全被淘汰时会 fallback 回普通，反而更糟）。
+      const topBase = GENE_BASE_TIERS.length - 1;
+      const w = GENE_BASE_TIERS.map((t, i) => t.weight * (1 + luck * GENE_LUCK_WEIGHT_STEP * i) *
+        (i === topBase ? 1 : geneTierAlive(i, focus)));
       const total = w.reduce((a, b) => a + b, 0) || 1;
       let roll = Math.random() * total;
       for (let i = 0; i < w.length; i++) { roll -= w[i]; if (roll <= 0) return i; }
@@ -7096,6 +7402,8 @@
             抽法对标转盘：<b style="color: var(--cyan);">基因幸运</b>每升一级，幸运值 <b>×1.1</b>（当前
             ${luckVal >= 1e6 ? formatNumber(luckVal) : luckVal.toFixed(2)}）；每上一个「超越等级」所需的幸运是 <b>×1.21</b>
             —— 正好 1.1²，所以<b>每买 2 级基因幸运，抽到的基因档位整体上移一档</b>。
+            而且和转盘一样：<b style="color: var(--gold);">低档会被逐步淘汰</b> —— 幸运够高之后，普通 / 优秀这些
+            底层档位会先变稀、再彻底抽不到（面板下方实时标出已淘汰数量与最低可抽档位）。
             它由「🧪 基因实验室」偶尔上架出售（永久属性、可叠加）。
           </p>
           <div class="gm-prob-row">
@@ -7104,6 +7412,12 @@
           <div class="gm-prob-row">
             <span class="gm-high">高级（稀有及以上）合计 <b>${(high * 100).toFixed(1)}%</b>${luck > 0 ? ` · 幸运 Lv.${luck} 已生效` : " · 还没买过基因幸运"}</span>
             ${hidden > 0 ? `<span class="mv-cost">（另有 ${formatNumber(hidden)} 个更高档位的概率低于 0.5%，未列出）</span>` : ""}
+          </div>
+          <div class="gm-prob-row">
+            <span class="mv-cost">🔻 低档淘汰：焦点下方 6 档以内原样、12 档外直接绝迹 —— 当前已淘汰 <b>${formatNumber(probs.filter(p => p <= 0).length)}</b> 个低档${
+              probs.some(p => p <= 0)
+                ? `，最低可抽档位是 <b style="color:${GENE_TIERS[probs.findIndex(p => p > 0)].color}">${GENE_TIERS[probs.findIndex(p => p > 0)].name}</b>`
+                : "（幸运还不够，暂时一个都淘汰不掉）"}。</span>
           </div>
         </div>`);
     }
@@ -7127,12 +7441,12 @@
       const v = Math.pow(r, lv);
       return v > GENE_EFFECT_MAX ? GENE_EFFECT_MAX : v;
     }
-    // 该档位的等级上限（到顶后倍率不再涨，UI 会禁用强化）。
-    // V0.96：partCap 没有等级上限（成长比例已被巨幅削弱，靠 GENE_EFFECT_MAX 兜底即可）。
+    // 该档位的等级上限。
+    // V0.105（作者要求）：**所有基因都去掉等级上限**（原来除 partCap 外都会在「倍率封顶 1e9」
+    //   反推出的等级上「满级」，把强化按钮锁死）。补偿：所有基因的成长比例统一巨削（见 geneGrowthRatio），
+    //   数值安全由 geneEffect 的 GENE_EFFECT_MAX(1e9) 保险丝兜底（正常玩法摸不到）。
     function geneLevelCap(g) {
-      if (g && g.k === "partCap") return Infinity;
-      const t = geneTierOf(g);
-      return Math.max(1, Math.floor(Math.log(GENE_EFFECT_MAX) / Math.log(t.mult)));
+      return Infinity;
     }
     // 强化花费（基因修饰点数）：与稀有度无关，只随等级 ×1.5
     function geneUpgradeCost(g) {
@@ -7939,7 +8253,7 @@
       setSettledMark(Date.now());
       saveGame(true);
       // V0.98.1：导入前先退出反转世界（否则会留在淡白主题里，像卡死了一样）
-      exitInvWorld();
+      exitInvWorld(true);   // V0.104：被动离开 —— 不结算科技点数
       ensureLines();
       render();
       logEvent("💾", "导入了外部存档", "cyan");
@@ -7954,7 +8268,7 @@
 
     function resetSave() {
       // V0.98.1：清档前先退出反转世界（否则会留在淡白主题里，像卡死了一样）
-      exitInvWorld();
+      exitInvWorld(true);   // V0.104：被动离开 —— 不结算科技点数
       // V0.96：删档前先原样留一份「误删备份」（只留最近一份），给手滑一个后悔的机会
       try {
         const raw = localStorage.getItem(SAVE_KEY);
@@ -9573,11 +9887,15 @@
           cleared: false,
           // 记下这条保底是按哪只猎犬解算的：换犬时 renderLineGrid 会据此重织，
           // 免得「先按强犬算好的保底线，换上一只弱犬后打不过」。
-          refHoundId: refHound.id
+          refHoundId: refHound.id,
+          refPower: Math.round(Number.isFinite(refPower) ? refPower : ENEMY_STAT_MAX)   // V0.105：解算时的参考战力（掉级 / 换犬后据此重织）
         };
       };
       // enemyScale 一律走这个钳制：既避免 Infinity（存盘会变 null），也避免后续乘出 Infinity
-      const clampScale = v => Number(Math.max(0.01, Math.min(ENEMY_STAT_MAX, Number.isFinite(v) ? v : ENEMY_STAT_MAX)).toFixed(3));
+      // V0.105 修复（玩家反馈「猎犬刚开始就吃不到保底」）：原来下限 0.01 + 只留 3 位小数 ——
+      //   弱猎犬 + 高入侵数时，要把它压到「打得过」需要比 0.01 还小的 scale，被硬顶回 0.01，保底线就失效了。
+      //   现在下限放到 1e-6、保留 6 位小数，兜底反解一定压得下去。
+      const clampScale = v => Number(Math.max(1e-6, Math.min(ENEMY_STAT_MAX, Number.isFinite(v) ? v : ENEMY_STAT_MAX)).toFixed(6));
       const scaleFor = d => clampScale((0.5 + d * 0.28) * spread);
       // 枚举 1..10 档，留下所有「确定性战力 < 强度上限」的档位
       const ok = [];
@@ -10504,6 +10822,9 @@
       setText("transcendedCount", String(save.transcendedHounds.length));
       // V0.89：基因点数也进顶部读数（在「超越猎犬」右边），同样是"碰到过才显示"
       setText("genePointTotal", String(Math.max(0, Math.floor(getPossibility().genePoints || 0))));
+      // V0.104：科技点数（有历史才亮）
+      toggleHeaderChip("invTechPointChip", (save.invTechPoints || 0) > 0 || (save.invTechBase || 0) > 0);
+      setText("invTechPointTotal", formatNumber(save.invTechPoints || 0));
       toggleHeaderChip("originChip", isOriginStatUnlocked());
       toggleHeaderChip("transcendedChip", isTranscendedStatUnlocked());
       toggleHeaderChip("genePointChip", isGenePointStatUnlocked());
@@ -10996,7 +11317,12 @@
         //   ②保底线是按「另一只猎犬」解算的（换了出战猎犬，强度对不上了）。
         //   战斗中一律不动，避免正在打的这条线路凭空消失。
         const ref = getLineReferenceHound();
-        if (!busy && ref && !save.lines.some(l => l.guaranteed && l.refHoundId === ref.id)) {
+        const refPowNow = ref ? houndPower(ref) : 0;
+        // V0.105 修复：除了「没有保底 / 换犬」，参考战力**掉下来**（战败腰斩、加成变化）也要重织 ——
+        //   否则保底线还是按旧的强战力解的，弱化后的猎犬根本吃不到。
+        const stale = save.lines.some(l => l.guaranteed && l.refHoundId === ref.id &&
+          typeof l.refPower === "number" && Math.abs(l.refPower - refPowNow) > Math.max(1, l.refPower * 0.02));
+        if (!busy && ref && (!save.lines.some(l => l.guaranteed && l.refHoundId === ref.id) || stale)) {
           save.lines = generateLines();
         }
       }
@@ -11335,6 +11661,9 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.106", "两条小调 + 一次结算。① 基因实验室的「刷新清单」花费改为<b>对数增长</b>：第一次 <b>1</b> 点，之后 1、2、2、3、3、3、3、4…（原来按 2×2ⁿ 翻倍、还封顶在 4096 —— 基因点攒多之后刷新等于免费，玩家滚雪球太快）；基因植入的「每次翻倍」保持不变。② 本版把 V0.104 / V0.105 的积累一并发布：反转世界正式开放（进度持久化、科技点数、尖端实验室、灵感、科技跃迁、自动化养成、八条猎犬、精英猎犬、反转里程碑、解析、科技软上限）、基因去除等级上限并统一巨削成长、修复「猎犬刚开始吃不到保底」与「离线奖励后实验室加成缩水」等 —— 详细条目见下方 V0.104 / V0.105。"],
+      ["V0.105", "两条新东西 + 一次总收编。① 反转世界迎来<b>第二条猎犬</b>：反转等级到 <b>50</b> 后主界面会多出第二条进度条 —— 基础周期同为 10 秒，但进度快 <b>8 倍</b>（无加成时 1.25 秒就扑一次），捕获强度 <b>800%</b>（第一条猎犬同步上调到 <b>400%</b>）；等级掉下 50 它会暂时消失、升回来再继续。被捕获概率改用新口径：<b>1 − 抵抗 ÷ 强度</b>（抵抗 ≥ 强度即完全免疫）—— 比如 400% 抵抗对 800% 的它 = 50% 被捕获概率；两条进度条上都会实时标出「被这条猎犬捕获的概率」。② 反转铸级加上批量：<b>×1 / ×10 / ×100 / 一键最大</b>，逐级按真实造价扣反转尘埃，买不动自动停。③ 总收编：反转世界的这一批更新（进度持久化、科技点数与尖端实验室、灵感、科技跃迁调整、自动化养成等）都从这一版起算。④ <b>反转里程碑</b>（三档，反转页底部有徽章轨道展示）：每 <b>50</b> 级一层（尘埃/抵抗 +25%，无限叠）；每 <b>500</b> 级一座<b>大里程碑</b>（尘埃/抵抗 +100%、基础科技软上限 ×1.01，并永久解锁「<b>开局直得 5000 次点击收益</b>」的福利 —— 此后每开新局白送一笔尘埃）；每 <b>5000</b> 级一座<b>超级里程碑</b>（尘埃/抵抗 +500%、软上限 ×1.2）。跨档弹提示，层数与软上限倍率实时显示。⑤ 反转世界三件事：<b>自动铸级改成一键最大</b>（每次巡检直接买满买得起的级数）；反转等级到 <b>200</b> 引来<b>第三条猎犬</b> —— 数值是第二条的 8 倍（6400% 强度、64 倍进度速度），而且一口啃掉 <b>2 级</b>；解锁第二条猎犬后，科技跃迁里会多出「<b>🔬 解析</b>」子页 —— 从第二条猎犬起，每被追逐 1 秒积攒<b>数据点</b>（两条 1 点/秒、三条 2 点、四条 4 点、五条 8 点…翻倍递增；解锁后掉回 50 级以下也保留），可在里面购买四种特殊升级：弱点图谱（被捕获概率 −2%/级）、尘埃共鸣（尘埃 +20%/级）、护盾协议（抵抗 +10%/级）、缓速力场（所有猎犬进度 −3%/级）。另外反转世界右上角现在有和主宇宙同款的数值条（反转尘埃 / 反转等级 / 被捕获 / 数据点 / 精英点数 —— 没解锁的不显示）。⑥ 猎犬队伍扩到八条：第四条（反转等级 <b>400</b>）一口啃 <b>8 级</b>；<b>1000 / 2000 / 4000 / 10000</b> 级还会陆续引来第 <b>5~8</b> 条 —— 每一条属性 ×8、伤害 ×4 逐条递增。⑦ 新增「<b>精英</b>」页（反转等级到 <b>500</b> 解锁，解锁即刷第一头）：加强过的<b>精英猎犬</b>数值<b>跟着你的成长走</b> —— 强度以你的总抵抗为基准浮动（0.8~1.6 倍）、速度与伤害随等级放大，档位沿用「普通 → 超越」，属性随机（更快 / 更疼 / 更强 / 带破甲·狂暴·侵蚀·汲取·硬壳等特殊能力）；页面给出<b>预估战力</b>与<b>限时倒计时</b>：挑战后它加入主界面最下面一条进度条，<b>承受 100 次攻击即可击败</b>（打完立刻刷下一头；超时它会逃走，下一头 10 分钟后再来），按等级获得<b>精英点数</b>。另外<b>基础科技的有效等级加了软上限</b>：超过 400 级的部分只按平方根计入 —— 后期抵抗不会无限膨胀，猎犬的等级压制依然打得出来。⑧ 新成就「<b>十全基因</b>」：同时持有 <b>10</b> 条基因解锁（与 12 条满编的「基因满编」是两个档）。⑨ <b>基因强化去掉等级上限</b>：以前除「部件软上限」外，其余基因都会在「倍率封顶 1e9」反推出的等级上满级、把强化锁死；现在所有基因想强化多少级都行 —— 作为补偿，成长比例统一巨削为「每级 = 1 + min(+5%, (品质倍率−1) × 一成)」：普通 ≈ ×1.002/级、神话 ≈ ×1.028/级、超越段一律封顶 ×1.05（原来的指数级涨幅不再存在）。⑩ 修复「<b>猎犬刚开始吃不到保底</b>」：兜底反解的下限从 0.01 放宽到 1e-6（弱猎犬 + 高入侵数时压不下去的问题），并且保底线现在会记住解算时的参考战力 —— 战败腰斩 / 换犬 / 加成变化后自动重织，保底永远按当前战力解算。"],
+      ["V0.104", "① 基因抽档加入「低档逐步淘汰」（作者反馈：幸运拉到极高还能抽到普通）。规则与转盘同思路：以焦点为尺，焦点下方 6 档以内原样、再远按 6 档宽的带线性递减、12 档之外直接绝迹 —— 普通最先消失（幸运约 6 级起变少、14 级左右绝迹），之后优秀 / 稀有 / 史诗 / 传说 / 神话依次被淘汰；到「超越·99」焦点时基础六档早已全部抽不到，最低可抽档位一路升到「超越·88」附近。基因幸运面板新增实时读数（已淘汰多少个低档、最低可抽档位是谁）；早期完全不受影响（幸运 0~2 级一个都淘汰不掉）。实验室的货物品质同步吃这套淘汰（神话保底，不再上架普通货）。② 反转世界四项调整：进场改为<b>最高优先级</b> —— 战斗 / 猎影 / 转盘进行中也能随时进入；进去后外面的一切<b>真正暂停</b>，猎影 8 秒窗口、猎影冷却、自动狩猎 / 自动悖论 / 自动重织的倒计时在退场时全部按暂停时长顺延，回来时从按下暂停的那一刻原样继续；右上角的主宇宙资源刻度在反转世界里不再显示（那些不是反转世界的资源）；反转世界内的「永恒背包」子页更名为<b>「科技」</b>；左上角标题在反转世界里换成「时间科技增量 / 在时间猎犬发现你之前，收集尽可能多的反转尘埃」。③ 反转世界新增「<b>基础科技</b>」：「深度凝析」每次有 <b>1%</b> 概率爆出一项基础科技（手动与自动都算；共八项，掉落等级 = 当前反转等级）；八项科技全部被动持续生效、目前没有上限 —— 凝析矩阵（手动凝析 +10%/级）、自动核心（自动凝析 +12%/级）、被动采集器（被动凝析 +15%/级）、铸级蓝图（铸级花费 −6%/级）、静默信标（猎犬逼近间隔 +10%/级）、衰减抑制器（每 2 级 +1% 概率抵抗被捕获，200 级 = 100%、可超 100%）、采样增幅器（爆率 +0.2%/级）、回响电容（按损失等级返还反转尘埃）。同种科技高等级自动替换低等级，被消耗的那份按「等级 × 6」折算成反转尘埃（新件不够高时消耗的是新件）；「科技」页里可以查看八项科技当前等级与掉落概率。④ 反转世界观感补完：右下角提示框（toast）在反转世界里也翻成<b>白底黑字</b>；顺带把从顶栏能打开的弹窗（设置 / 教程 / 更新日志）一并翻白 —— 它们以前都是硬编码深色底 + 跟随主题的文字色，进反转模式后成了「深底深字」等于看不见。⑤ 反转世界三项体验调整：「深度凝析」普通点击不再弹提示框（读数就在面板上，只有爆出科技才提示）；「科技」页签在拿到第一件基础科技之前隐藏，首次获得时挂「新」高亮、看过即熄灭；反转等级（本局最高）达到 <b>20</b> 解锁新页签「<b>科技跃迁</b>」—— 第一个子页面「科技爆炸」可以把基础科技丢进去：一次只能选择一个目标，整件 1:1 折算成对应「进阶科技」的进度（每级 20 点），基础件归零、升级后进度清零从头再来；进阶科技每级把对应基础科技的效果倍率 +50%。⑥ 反转世界两处修正（作者要求）：科技页「只解锁不回收」—— 拿到过第一件基础科技后，科技跃迁把它丢光（归零）也不会让页签黑回去；科技跃迁的进度成本改成<b>首级 20 点、此后每级 +10%（向下取整）</b>，一次丢入溢出的经验会<b>顺延到下一级</b>（不再清零）；并且「科技爆炸」从标题改成了<b>子页签按钮</b>（方便以后往这排续新的子页面）。⑨ 反转世界正式开放：入口不再挂「开发中」—— 条件仍是历史最高尘埃 1E30080 + 苦痛全通；「反转世界」页里新增两个子页：<b>「◑ 反转」</b>（进入反转世界）与<b>「🧪 尖端实验室」</b>（花科技点数买反转世界的永久加成：尘埃增幅 / 跃迁校准 / 掉落校准 / 抑制外壳）。新货币<b>「科技点数」</b>：<b>主动退出</b>反转世界时按「本次最高反转等级 − 上次结算过的等级」发放（比如上次结了 100 级，这次到 200 级 = +100 点；没超过就没有）；<b>关掉网页不算退出</b> —— 进度会存档，下次打开直接回到反转世界继续（外面照旧暂停），只有主动点「退出反转世界」（带二次确认）才会清空进度、从零重来。⑧ 灵感：任意一件进阶科技到 <b>5 级</b>，科技跃迁里会多出一个新子页<b>「✨ 灵感」</b>—— 把<b>当前全部反转等级</b>一次献祭，换一个反转尘埃倍率（每 1 级 +10%）；倍率<b>持续整局有效、不衰减</b>（直到退出反转世界），献祭后等级清零，<b>下一次必须用更高的等级</b>才能再换。⑦ 反转世界的「自动化」变成养成线：自动凝析 / 自动铸级都要先用<b>反转尘埃解锁</b>（50 / 200），解锁后还能继续花尘提升效率 —— 每级 +0.2 次/秒，<b>最高 3 次/秒</b>；效率按帧结算，一秒三次也是实打实的。"],
       ["V0.103", "排行榜暂时下线。入口按钮已移除，游戏不再上传或拉取任何排行榜数据（此前已部署的服务端也加了总开关，默认一律拒收，不接收任何数据）。之前上传过的排名保留在服务端 —— 身份、4 小时冷却、版本门这些代码全部原地保留，之后想重新开放只需翻两个开关就能原样复活。"],
       ["V0.102", "两条修正。① 排行榜身份与 4 小时冷却改「设备级」保存：以前它们只存在存档里 —— 清空存档（或导入一份老档）就能把上传冷却和「我是谁」一起重置，服务端还会把你当成新玩家、在榜上多出一条记录。现在清档不再影响身份与冷却（时间戳取「设备与存档的较大值」，导入老档也倒不回冷却）。② 服务端加「一个昵称只占一行」：自定义昵称按名字去重，同名旧行会被清掉、只留最新的一条（换设备 / 清档 / 旧数据留下的副本一并清理）；默认名「无名猎手」不参与去重，仍是一人一条。匹配这份更新，服务端已同步升级 —— 部署一次即可全部生效。"],
       ["V0.101", "四条修正。① 修「自动战斗卡死」：自动狩猎遇到「四条时间线一条都打不过」时会静默空转（以前只会悄悄等着）。现在三层兜底 —— 先换仓库里打得过的更强猎犬、够门槛就回归、谁都不够就打不过时自动重织时间线（20 秒节流），保证永远转得下去。② 修超越展示柜排版错乱：软上限警告与「只列 20 只」说明以前被拼进了卡片网格里、占了第一行两个格子，把第一张卡挤到旁边；现在统一收进顶部汇总框。③ 修「先挑衅猎犬、8 秒内开挑战或发动超越悖论会继承保险箱」：重置现在会连同保险箱一起清零、并打断进行中的猎影。④ 修苦痛挑战「累计本源」进度把 log10 直接拼成「1E0.06」的怪文案，改为正常数值；排行榜全链路收紧（只收最新版成绩、每 4 小时一次、在线时长有物理上限）。"],
@@ -12198,41 +12527,46 @@
       const mileCh = getMilestoneChallengeCount();
       setHTML("mvMilestone",
         `<div class="mv-milestone">` +
-        `<div class="mv-milestone-head"><span>🏛 多元宇宙里程碑</span>` +
-        `<b>已完成 ${mileN} 次</b></div>` +
-        `<div class="mv-milestone-body">` +
-        `当前基因点数倍率：<b style="color: var(--gold);">×${painMultText(mileMult)}</b>` +
-        `<span class="mv-cost">（每进行一次多元宇宙 +${(MILESTONE_GENE_STEP * 100).toFixed(0)}%）：` +
-        `下一次若再进一个宇宙，将变成 ×${painMultText(nextMult)}</span>` +
-        `<br>永久通关主线挑战：<b style="color: var(--gold);">${mileCh} / ${CHALLENGES.length}</b>` +
-        `<span class="mv-cost">（每 2 次多元宇宙 +1 关，第 10 次全部通关）` +
+        `<div class="mv-milestone-head"><span>🏛 多元宇宙里程碑</span><b>已完成 ${mileN} 次</b></div>` +
+        `<div class="ms-rail">` +
+        `<div class="ms-node base"><div class="ms-medal">+20%<small>每次</small></div><div class="ms-info">` +
+        `<b>基因点数倍率</b><div class="ms-chips">` +
+        `<span class="ms-chip">当前 ×${painMultText(mileMult)}</span>` +
+        `<span class="ms-chip">下一次 ×${painMultText(nextMult)}</span>` +
+        `</div></div></div>` +
+        `<div class="ms-node big"><div class="ms-medal">挑战<small>每 2 次</small></div><div class="ms-info">` +
+        `<b>永久通关主线挑战</b><div class="ms-chips">` +
+        `<span class="ms-chip gold">已永久通关 ${mileCh} / ${CHALLENGES.length}</span>` +
         (mileCh >= CHALLENGES.length
-          ? ` —— 已全部永久通关，此后不必再重打挑战`
-          : ` —— 第 ${(mileCh + 1) * 2} 次进入时再解锁「${CHALLENGES[mileCh].name}」`) +
-        `</span>` +
-        // V0.91：里程碑的第三份奖励 —— 自动悖论越走越快
-        `<br>自动悖论间隔：<b style="color: var(--cyan);">${autoParadoxIntervalText()} 秒</b>` +
-        `<span class="mv-cost">（每进一次宇宙 −${(AUTO_PARADOX_SPEED_STEP_MS / 1000)} 秒，最快 ${AUTO_PARADOX_MIN_MS / 1000} 秒一次` +
-        (getAutoParadoxIntervalMs() <= AUTO_PARADOX_MIN_MS ? ` —— 已经触底，此后不会再更快` : "") +
-        `）</span>` +
-        // V0.92：里程碑的第四份奖励 —— 被捕获不再清空尘埃 / 进度 / 升级
-        `<br>被捕获不再清空尘埃 / 进度 / 升级：` +
+          ? `<span class="ms-chip gold">已全部通关</span>`
+          : `<span class="ms-chip gold">第 ${(mileCh + 1) * 2} 次解锁「${CHALLENGES[mileCh].name}」</span>`) +
+        `</div></div></div>` +
+        `<div class="ms-node cy"><div class="ms-medal">−${(AUTO_PARADOX_SPEED_STEP_MS / 1000)}s<small>每次</small></div><div class="ms-info">` +
+        `<b>自动悖论加速</b><div class="ms-chips">` +
+        `<span class="ms-chip">当前 ${autoParadoxIntervalText()} 秒</span>` +
+        `<span class="ms-chip">最快 ${AUTO_PARADOX_MIN_MS / 1000} 秒一次</span>` +
+        (getAutoParadoxIntervalMs() <= AUTO_PARADOX_MIN_MS ? `<span class="ms-chip">已触底</span>` : "") +
+        `</div></div></div>` +
+        `<div class="ms-node ${isCaptureGraceOn() ? "ok" : ""}"><div class="ms-medal">🛡<small>第 ${MILESTONE_CAPTURE_GRACE_ENTRIES} 次</small></div><div class="ms-info">` +
+        `<b>被捕获不再清空尘埃 / 进度 / 升级</b><div class="ms-chips">` +
         (isCaptureGraceOn()
-          ? `<b style="color: var(--gold);">已生效</b>`
-          : `<b style="color: var(--muted);">未生效（${mileN} / ${MILESTONE_CAPTURE_GRACE_ENTRIES} 次）</b>`) +
-        `<span class="mv-cost">（第 ${MILESTONE_CAPTURE_GRACE_ENTRIES} 次进入宇宙后生效；<b>苦痛挑战中不生效</b>）</span>` +
-        // V0.93：里程碑的第五份奖励 —— 发动悖论不再清空尘埃与升级
-        `<br>发动悖论不再清空尘埃 / 升级：` +
+          ? `<span class="ms-chip ok-c">已生效</span>`
+          : `<span class="ms-chip">未生效（${mileN} / ${MILESTONE_CAPTURE_GRACE_ENTRIES} 次）</span>`) +
+        `<span class="ms-chip">苦痛挑战中不生效</span>` +
+        `</div></div></div>` +
+        `<div class="ms-node ${isParadoxGraceOn() ? "ok" : ""}"><div class="ms-medal">🌀<small>第 ${MILESTONE_PARADOX_GRACE_ENTRIES} 次</small></div><div class="ms-info">` +
+        `<b>发动悖论不再清空尘埃 / 升级</b><div class="ms-chips">` +
         (isParadoxGraceOn()
-          ? `<b style="color: var(--gold);">已生效</b>`
-          : `<b style="color: var(--muted);">未生效（${mileN} / ${MILESTONE_PARADOX_GRACE_ENTRIES} 次）</b>`) +
-        `<span class="mv-cost">（第 ${MILESTONE_PARADOX_GRACE_ENTRIES} 次进入宇宙后生效；<b>苦痛挑战中不生效</b>）</span>` +
-        // V0.96：里程碑的第六份奖励 —— 自动升级悖论商店
-        `<br>自动升级悖论商店：` +
+          ? `<span class="ms-chip ok-c">已生效</span>`
+          : `<span class="ms-chip">未生效（${mileN} / ${MILESTONE_PARADOX_GRACE_ENTRIES} 次）</span>`) +
+        `<span class="ms-chip">苦痛挑战中不生效</span>` +
+        `</div></div></div>` +
+        `<div class="ms-node ${isAutoShopUnlocked() ? "ok" : ""}"><div class="ms-medal">🔧<small>第 ${MILESTONE_SHOP_AUTO_ENTRIES} 次</small></div><div class="ms-info">` +
+        `<b>自动升级悖论商店</b><div class="ms-chips">` +
         (isAutoShopUnlocked()
-          ? `<b style="color: var(--gold);">已解锁</b>`
-          : `<b style="color: var(--muted);">未解锁（${mileN} / ${MILESTONE_SHOP_AUTO_ENTRIES} 次）</b>`) +
-        `<span class="mv-cost">（第 ${MILESTONE_SHOP_AUTO_ENTRIES} 次进入宇宙后解锁；到 <b>⚙ 自动化</b> 里开启，每秒自动买 1 级）</span>` +
+          ? `<span class="ms-chip ok-c">已解锁</span><span class="ms-chip">到 ⚙ 自动化里开启</span>`
+          : `<span class="ms-chip">未解锁（${mileN} / ${MILESTONE_SHOP_AUTO_ENTRIES} 次）</span>`) +
+        `</div></div></div>` +
         `</div></div>`);
       // 折算预览：进入会把当前进度换成多少基因修饰点数（让玩家看得见代价与收益）
       const breakdown = getWipeScoreBreakdown();
@@ -12337,7 +12671,7 @@
             const atCap = Math.floor(g.level || 1) >= cap;
             // V0.96：成长比例走 geneGrowthRatio —— partCap 是削弱后的三位小数（如 ×1.028）
             const grow = geneGrowthRatio(g);
-            const growTxt = g.k === "partCap" ? grow.toFixed(3) : grow.toFixed(2);
+            const growTxt = grow.toFixed(3);   // V0.105：所有基因的成长比例都走三位小数（多为 1.002~1.05）
             const c1 = geneUpgradeCost(g);
             const c10 = geneUpgradeBulkCost(g, 10);
             const c100 = geneUpgradeBulkCost(g, 100);
@@ -12528,8 +12862,11 @@
     }
 
     const LAB_UNLOCK_ENTRIES = 2;      // 完成第 N 次多元宇宙后实验室显形
-    const LAB_REROLL_COST_BASE = 2;    // 主动刷新清单：第一次 2 基因点
-    const LAB_REROLL_COST_CAP = 4096;  // 翻倍上限（2^n 涨太快时兜一下）
+    const LAB_REROLL_COST_BASE = 1;    // 主动刷新清单：第一次 1 基因点（V0.106 起）
+    // V0.106（作者要求）：刷新花费改成**对数增长**（1、2、2、3、3、3、3、4…）——
+    //   原来的「2×2ⁿ 翻倍、封顶 4096」在基因点攒多之后等于免费，玩家滚雪球太快；
+    //   对数曲线让刷新永远有成本、又永远不会爆炸。基因植入的「每次翻倍」保持不变。
+    function labRerollCostFor(n) { return LAB_REROLL_COST_BASE + Math.floor(Math.log2(Math.max(0, n) + 1)); }
     function getLabDef(id) { return LAB_UPGRADES.filter(d => d.id === id)[0] || null; }
     function getLab() {
       const p = getPossibility();
@@ -12545,7 +12882,7 @@
     // 主动刷新清单的花费：第一次 2 基因点，之后每用一次翻倍（逼玩家去走多元宇宙）
     function getLabRerollCost() {
       const n = Math.max(0, Math.floor(getLab().rerollCount || 0));
-      return Math.min(LAB_REROLL_COST_CAP, LAB_REROLL_COST_BASE * Math.pow(2, n));
+      return labRerollCostFor(n);   // V0.106：对数增长（第一次 1 点）
     }
     function rerollLabOffers() {
       const p = getPossibility();
@@ -12915,7 +13252,7 @@
           偶尔还会上架一件「<b style="color: var(--cyan);">基因幸运</b>」（永久属性：每级幸运值 ×1.1，每 2 级让抽到的基因档位整体上移一档）。</span><br>
           <span style="color: var(--muted);">V0.96：同一条升级可以<b>反复购买</b>——刷新清单有机会再刷到它，买下的<b>每一份都单独算加成</b>，购买<b>没有总量上限</b>；
           唯一的代价是同一种升级每多买一份，价格 <b>×${LAB_REPEAT_STEP}</b>。实验台一共 <b>${LAB_SHELF_MAX}</b> 个货物栏：基础 ${LAB_OFFER_COUNT} 件、「货物扩容」最多再 +${LAB_CARGO_MAX} 条、外加偶尔上架的「基因幸运」。</span><br>
-          <span style="color: var(--muted);">也可以花基因点当场刷新清单：第一次 ${LAB_REROLL_COST_BASE} 点，往后每刷一次翻一倍。
+          <span style="color: var(--muted);">也可以花基因点当场刷新清单：第一次 ${LAB_REROLL_COST_BASE} 点，之后按对数缓慢增长（越刷越贵，但永远不会爆炸）。
           不过进入下一个宇宙是<b>免费重抽</b>的——所以能省就省。</span>
         </p>
         <div class="lab-summary"><h3 class="lab-title" style="margin-top:0;">当前实验室总加成</h3>${summary}</div>
@@ -14698,7 +15035,7 @@
         // V0.98.1b：内存看门狗先行（反转世界内外都看）—— 接近浏览器崩溃线就提前存档提醒
         memoryWatchdog();
         // V0.98：反转世界模式下，主宇宙的自动步骤整段跳过（时间暂停），改跑反转世界自己的巡检
-        if (invActive) { invAutoStep(); return; }
+        if (invActive) return;   // V0.104：反转世界的自动化改由 invStep 每帧驱动（支持 1 秒 3 次）
         checkChallenges();
       // V0.90：自动悖论搬进「自动化」面板 —— 解锁后还要把那个开关打开才会跑
       if (isAutoUnlocked("paradox") && save.auto.paradox) autoParadoxStep();
@@ -14822,8 +15159,457 @@
     const INV_HARVEST_PER_LEVEL = 3;   // 每级再 +3
     const INV_LEVEL_COST_BASE = 12;    // 反转铸级：基础 12 反转尘埃
     const INV_LEVEL_COST_GROWTH = 1.4; // 每级造价 ×1.4
+    // ===== V0.104（作者要求）：基础科技 =====
+    //   · 手动「深度凝析」每次点击有 INV_TECH_DROP_CHANCE 概率爆出 1 项基础科技（自动凝析不掉）；
+    //   · 共八项，掉落等级 = 当前反转等级；
+    //   · 全部被动持续生效；同种科技高等级自动替换低等级，被消耗的那份折算成反转尘埃；
+    //   · 目前先不加软上限（等级能堆多高就多高）。
+    const INV_TECH_DROP_CHANCE = 0.01;        // 手动凝析的基础爆率 1%
+    const INV_TECH_REFUND_PER_LEVEL = 6;      // 被消耗的科技：每级折算 6 反转尘埃
+    const INV_TECH_DEFS = [
+      { id: "harvest",  icon: "🧪", name: "凝析矩阵",   adv: "超导矩阵",   desc: "手动深度凝析收益 +10% / 级" },
+      { id: "auto",     icon: "⚙", name: "自动核心",   adv: "自进化核心", desc: "自动凝析收益 +12% / 级" },
+      { id: "passive",  icon: "🌱", name: "被动采集器", adv: "永动采集器", desc: "被动凝析 +15% / 级" },
+      { id: "forge",    icon: "🔧", name: "铸级蓝图",   adv: "完美蓝图",   desc: "反转铸级花费 −6% / 级（复利，最低 1）" },
+      { id: "beacon",   icon: "📡", name: "静默信标",   adv: "深渊信标",   desc: "反转猎犬逼近间隔 +10% / 级" },
+      { id: "dampener", icon: "🛡", name: "衰减抑制器", adv: "永固抑制器", desc: "每 2 级 +1% 概率抵抗被捕获（200 级 = 100%，可超 100%）" },
+      { id: "sampler",  icon: "🧲", name: "采样增幅器", adv: "超采样阵列", desc: "科技掉落几率 +0.2% / 级（基础 1%）" },
+      { id: "echo",     icon: "🔔", name: "回响电容",   adv: "共鸣回廊",   desc: "被捕获时按损失等级返还 6 × 等级 反转尘埃" }
+    ];
+    // V0.104（作者要求）：科技跃迁 —— 反转等级（本局最高）到 INV_LEAP_UNLOCK_LEVEL 解锁，
+    //   第一个子页面「科技爆炸」：选中 1 件基础科技丢入 → 等级 1:1 折算成对应进阶科技的进度，
+    //   每 INV_LEAP_COST_PER_LEVEL 点进度升 1 级（升级后进度一切归零、从头再来）；
+    //   进阶科技每级把对应基础科技的效果倍率 +INV_LEAP_BONUS_PER_LEVEL（有效等级 = 基础等级 × 倍率）。
+    // V0.104（作者要求）：反转世界的自动化改成「解锁 + 效率」养成 ——
+    //   花反转尘埃解锁后，再花尘提升每秒执行次数，最高 3 次/秒。
+    const INV_AUTO_UNLOCK_COST = { harvest: 50, level: 200 };   // 解锁价
+    const INV_AUTO_EFF_BASE = { harvest: 30, level: 80 };       // 效率升级基础价（每级 ×1.5）
+    const INV_AUTO_EFF_GROWTH = 1.5;
+    const INV_AUTO_RATE_BASE = 1;      // 起步 1 次/秒
+    const INV_AUTO_RATE_STEP = 0.2;    // 每级 +0.2 次/秒
+    const INV_AUTO_EFF_MAX = 10;       // 10 级 = 3 次/秒（上限）
+    const INV_LEAP_UNLOCK_LEVEL = 20;
+    // V0.104（作者口径修正）：跃迁**每一级**都是 20 点经验，不再有「第一级特价」
+    const INV_LEAP_COST_PER_LEVEL = 20;
+    const INV_LEAP_BONUS_PER_LEVEL = 0.5;
+    // V0.104（作者要求）：灵感 —— 科技跃迁的下一阶段（任意进阶科技到 5 级解锁）。
+    //   献祭当前**全部**反转等级 → 换一个「反转尘埃倍率」；下一次必须用更高的等级才能再换。
+    //   V0.104（作者口径修正）：倍率**持续整局、不衰减** —— 直到主动退出反转世界为止。
+    const INV_INSPIRE_UNLOCK_LEAP_LEVEL = 5;   // 任一进阶科技达到 5 级 → 解锁「灵感」子页
+    const INV_INSPIRE_PER_LEVEL = 0.1;         // 每 1 级反转等级 = +0.1 倍率（M = 1 + 0.1 × L）
+    // ===== V0.104（作者要求）：尖端实验室 —— 花科技点数买「在反转世界的永久加成」 =====
+    const INV_LAB_DEFS = [
+      { id: "dust",   icon: "🌫", name: "尘埃增幅", desc: "反转尘埃收益 +25% / 级",              base: 2, growth: 1.6 },
+      { id: "leap",   icon: "⚡", name: "跃迁校准", desc: "科技爆炸的升级成本 −5% / 级（复利）",   base: 4, growth: 1.8 },
+      { id: "drop",   icon: "🧲", name: "掉落校准", desc: "科技掉落几率 +0.2% / 级",             base: 3, growth: 1.8 },
+      { id: "resist", icon: "🛡", name: "抑制外壳", desc: "捕获抵抗 +5% / 级（与其余来源叠加）", base: 4, growth: 1.8 }
+    ];
+    function invLabLv(id) {
+      const v = save.invLab ? save.invLab[id] : 0;
+      return (typeof v === "number" && isFinite(v) && v > 0) ? Math.floor(v) : 0;
+    }
+    function invLabCost(def) { return Math.ceil(def.base * Math.pow(def.growth, invLabLv(def.id))); }
+    function invLabDustMult() { return 1 + 0.25 * invLabLv("dust"); }
+    function invLabDropBonus() { return 0.002 * invLabLv("drop"); }
+    function invLabResistBonus() { return 0.05 * invLabLv("resist"); }
+    function invLabBuy(id) {
+      const def = INV_LAB_DEFS.filter(d => d.id === id)[0];
+      if (!def) return false;
+      const cost = invLabCost(def);
+      const pts = Math.max(0, Math.floor(save.invTechPoints || 0));
+      if (pts < cost) { showToast(`科技点数不足：${def.name}升到下一级需要 <b>${formatNumber(cost)}</b> 点（现有 ${formatNumber(pts)}）。`); return false; }
+      save.invTechPoints = pts - cost;
+      if (!save.invLab || typeof save.invLab !== "object") save.invLab = { dust: 0, leap: 0, drop: 0, resist: 0 };
+      save.invLab[id] = invLabLv(id) + 1;
+      saveGame(true);
+      renderInvLabPane();
+      renderHeader();
+      showToast(`🧪 尖端实验室：<b>${def.name}</b> → Lv.${formatNumber(save.invLab[id])}（剩 ${formatNumber(save.invTechPoints)} 点）。`);
+      return true;
+    }
+    function invTechLv(id) {
+      if (!invWorld || !invWorld.techs) return 0;
+      const v = invWorld.techs[id];
+      return (typeof v === "number" && isFinite(v) && v > 0) ? Math.floor(v) : 0;
+    }
+    // V0.105（作者要求）：基础科技的**有效等级软上限** —— 超出部分只按平方根计入。
+    //   不设的话后期抵抗无限膨胀，猎犬的等级压制就完全打不出来了。
+    //   例：有效等级 400 以内原样；4000 → 400 + √3600 ≈ 460（原来 ×10 的收益只剩 ×1.15）。
+    const INV_TECH_EFF_SOFT_CAP = 400;
+    function invTechEffSoft(raw) {
+      const cap = INV_TECH_EFF_SOFT_CAP * invMilestoneCapMult();   // V0.105：软上限吃里程碑倍率
+      if (!(raw > cap)) return Math.max(0, raw || 0);
+      return cap + Math.sqrt(raw - cap);
+    }
+    // V0.104：进阶科技放大对应基础科技的效果倍率 —— 有效等级 = 软上限(基础等级 ×（1 + 0.5 × 进阶等级）)
+    function invTechEffLv(id) {
+      return invTechEffSoft(invTechLv(id) * (1 + INV_LEAP_BONUS_PER_LEVEL * invLeapLevel(id)));
+    }
+    function invTechMult(id, perLevel) { return 1 + perLevel * invTechEffLv(id); }
+    function invTechCount() {
+      if (!invWorld || !invWorld.techs) return 0;
+      return INV_TECH_DEFS.filter(d => invTechLv(d.id) > 0).length;
+    }
+    // V0.104（作者要求）：科技页「只解锁不回收」—— 拿到过第一件就永久点亮，
+    //   之后科技跃迁把科技丢光（归零）也不会让页签黑回去。
+    function isInvBagUnlocked() {
+      if (!invWorld) return false;
+      if (invWorld.bagUnlocked) return true;
+      if (invTechCount() > 0) { invWorld.bagUnlocked = true; return true; }
+      return false;
+    }
+    function isInvLeapUnlocked() {
+      return !!invWorld && Math.max(invWorld.best || 0, invLevelNow()) >= INV_LEAP_UNLOCK_LEVEL;
+    }
+    function invLeapState() {
+      if (!invWorld) return { levels: {}, progress: {}, sel: null };
+      if (!invWorld.leap || typeof invWorld.leap !== "object") invWorld.leap = { levels: {}, progress: {}, sel: null };
+      const L = invWorld.leap;
+      if (!L.levels || typeof L.levels !== "object") L.levels = {};
+      if (!L.progress || typeof L.progress !== "object") L.progress = {};
+      return L;
+    }
+    function invLeapLevel(id) {
+      const v = invLeapState().levels[id];
+      return (typeof v === "number" && isFinite(v) && v > 0) ? Math.floor(v) : 0;
+    }
+    function invLeapProgress(id) {
+      const v = invLeapState().progress[id];
+      // V0.104（作者要求）：经验一律**向下取整** —— 坏数据 / 手改存档也不会冒出小数
+      return (typeof v === "number" && isFinite(v) && v > 0) ? Math.floor(v) : 0;
+    }
+    // V0.104（作者口径）：跃迁成本曲线 —— 首级 20 点，每级 +10%，**整体向下取整**：
+    //   20 / 22 / 24 / 26 / 29 / 32 / 35 / 38 / 42 / 47 / 51 …（= floor(20 × 1.1^等级)）
+    function invLeapCostFor(level) {
+      const n = Math.max(0, Math.min(400, Math.floor(level) || 0));
+      let c = Math.max(1, Math.floor(INV_LEAP_COST_PER_LEVEL * Math.pow(1.1, n)));
+      // V0.104：尖端实验室「跃迁校准」—— 升级成本 −5%/级（复利，最低 1）
+      const off = Math.pow(0.95, invLabLv("leap"));
+      if (off < 1) c = Math.max(1, Math.floor(c * off));
+      return c;
+    }
+    function invLeapCost(id) { return invLeapCostFor(invLeapLevel(id)); }
+    // V0.104：灵感子系统
+    function invInspireState() {
+      if (!invWorld) return { last: 0, at: 0, m0: 1 };
+      if (!invWorld.inspire || typeof invWorld.inspire !== "object") invWorld.inspire = { last: 0, at: 0, m0: 1 };
+      const I = invWorld.inspire;
+      if (typeof I.last !== "number" || !isFinite(I.last) || I.last < 0) I.last = 0;
+      if (typeof I.at !== "number" || !isFinite(I.at) || I.at < 0) I.at = 0;
+      if (typeof I.m0 !== "number" || !isFinite(I.m0) || I.m0 < 1) I.m0 = 1;
+      return I;
+    }
+    function isInvInspireUnlocked() {
+      return !!invWorld && INV_TECH_DEFS.some(d => invLeapLevel(d.id) >= INV_INSPIRE_UNLOCK_LEAP_LEVEL);
+    }
+    function invInspireNeed() { const I = invInspireState(); return I.last > 0 ? I.last + 1 : 1; }
+    // 当前生效的反转尘埃倍率 —— V0.104（作者口径修正）：**持续整局、不衰减**
+    function invInspireMult() {
+      const I = invInspireState();
+      return (I.m0 > 1) ? I.m0 : 1;
+    }
+    function invInspireUse() {
+      if (!invActive || !invWorld) return false;
+      if (!isInvInspireUnlocked()) { showToast("「灵感」还没解锁：任意一件进阶科技到 5 级才会出现。"); return false; }
+      const need = invInspireNeed();
+      const lv = invLevelNow();
+      if (lv < need) {
+        showToast(`灵感需要 <b>Lv.${formatNumber(need)}</b> 的反转等级（你当前 Lv.${formatNumber(lv)}）—— 下一次必须比上一次更高。`);
+        return false;
+      }
+      const I = invInspireState();
+      const m = 1 + INV_INSPIRE_PER_LEVEL * lv;
+      I.last = lv;
+      I.m0 = m;
+      I.at = Date.now();
+      invWorld.level = 0;   // 消耗当前所有的反转等级
+      saveGame(true);
+      renderInvWorld();
+      showToast(`✨ 灵感迸发：献祭了全部 <b>Lv.${formatNumber(lv)}</b> 反转等级 → 反转尘埃倍率 <b>×${m.toFixed(2)}</b>；` +
+        `它持续整局有效、不衰减；下一次需要 <b>Lv.${formatNumber(lv + 1)}</b> 才能再换。`);
+      return true;
+    }
+    // 献祭前的确认（自绘弹窗 —— 它会清空当前全部等级，值得拦一道）
+    function invInspireConfirm() {
+      if (!invActive || !invWorld || !isInvInspireUnlocked()) return;
+      const need = invInspireNeed();
+      const lv = invLevelNow();
+      if (lv < need) {
+        showToast(`灵感需要 <b>Lv.${formatNumber(need)}</b> 的反转等级（你当前 Lv.${formatNumber(lv)}）。`);
+        return;
+      }
+      showConfirm({
+        icon: "✨", title: "灵感迸发",
+        text: `将献祭<b>当前全部 Lv.${formatNumber(lv)}</b> 的反转等级，换一个 <b>×${(1 + INV_INSPIRE_PER_LEVEL * lv).toFixed(2)}</b> 的反转尘埃倍率。<br>` +
+          `<span style="color: var(--muted);">倍率持续整局有效（不衰减）；下一次需要 <b>Lv.${formatNumber(lv + 1)}</b> 才能再换。确定吗？</span>`,
+        ok: "献祭"
+      }, () => invInspireUse());
+    }
+    function invCapSec() { return INV_CAPTURE_SEC * invTechMult("beacon", 0.10); }
+    // V0.104（作者要求）：衰减抑制器改成「概率抵抗被捕获」——
+    //   每两级 +1% 抵抗（即每级 0.5%；200 级 = 100%，可超 100%）。
+    // V0.105（作者要求）：两条猎犬与新的概率模型 ——
+    //   被捕获概率 = max(0, 1 − 抵抗 ÷ 强度)；抵抗 ≥ 强度 = 完全免疫。
+    //   第一条猎犬：强度 400%；反转等级到 50 会引来第二条：强度 800%、进度快 8 倍（10s → 1.25s）。
+    const INV_HOUND1_STRENGTH = 4;       // 400%
+    const INV_HOUND2_STRENGTH = 8;       // 800%
+    const INV_HOUND2_UNLOCK_LEVEL = 50;  // 反转等级 ≥ 50 才会现身（掉下 50 就消失，升回来继续）
+    const INV_HOUND2_SPEED_MULT = 8;     // 第二条的进度条速度 = 8×（基础周期 10s → 1.25s）
+    // V0.105（作者要求）：第三条猎犬 —— 反转等级 200 解锁，数值是第二条的 8 倍，一口啃 2 级。
+    const INV_HOUND3_UNLOCK_LEVEL = 200;
+    const INV_HOUND3_STRENGTH = 64;      // 800% × 8 = 6400%
+    const INV_HOUND3_SPEED_MULT = 64;    // 8×8 = 64 倍速（10s → 0.156s 一圈）
+    const INV_HOUND3_DAMAGE = 2;         // 每次命中掉 2 级
+    // V0.105（作者要求）：第四条猎犬 —— 反转等级 400 解锁，数值是第三条的 8 倍。
+    const INV_HOUND4_UNLOCK_LEVEL = 400;
+    const INV_HOUND4_STRENGTH = 512;     // 6400% × 8 = 51200%
+    const INV_HOUND4_SPEED_MULT = 512;   // 64 × 8（10s → 0.0195s 一圈）
+    const INV_HOUND4_DAMAGE = 8;         // V0.105（作者改）：一口 8 级（原 16 回调为 8）
+    // V0.105（作者要求）：第 5~8 条猎犬 —— 1000 / 2000 / 4000 / 10000 级登场，
+    //   每一条属性 ×8、伤害 ×4 逐条递增（速度极快，靠补帧批处理消化）。
+    const INV_HOUND_EXTRA = [
+      { n: 5, unlock: 1000,  strength: 4096,    speed: 4096,    damage: 32 },
+      { n: 6, unlock: 2000,  strength: 32768,   speed: 32768,   damage: 128 },
+      { n: 7, unlock: 4000,  strength: 262144,  speed: 262144,  damage: 512 },
+      { n: 8, unlock: 10000, strength: 2097152, speed: 2097152, damage: 2048 }
+    ];
+    const INV_HOUND_NAMES = ["反转猎犬", "第二条猎犬", "第三条猎犬", "第四条猎犬", "第五条猎犬", "第六条猎犬", "第七条猎犬", "第八条猎犬"];
+    function invHoundNameOfStrength(s) {
+      if (s === INV_HOUND1_STRENGTH) return INV_HOUND_NAMES[0];
+      if (s === INV_HOUND2_STRENGTH) return INV_HOUND_NAMES[1];
+      if (s === INV_HOUND3_STRENGTH) return INV_HOUND_NAMES[2];
+      if (s === INV_HOUND4_STRENGTH) return INV_HOUND_NAMES[3];
+      const d = INV_HOUND_EXTRA.filter(h => h.strength === s)[0];
+      return d ? INV_HOUND_NAMES[d.n - 1] : "反转猎犬";
+    }
+    // V0.105（作者要求）：精英猎犬 —— 每 10 分钟刷新一头随属性强化的精英；挑战后它加入进度条
+    //   （最下面一条），承受它 100 次攻击即可击败、获得精英点数。等级围绕你的反转等级上下波动，
+    //   档位沿用基因/转盘那套「普通 → 超越」命名。
+    const INV_ELITE_UNLOCK_LEVEL = 500;          // V0.105（作者补）：反转等级到 500 才解锁
+    const INV_ELITE_SPAWN_MS = 10 * 60 * 1000;   // 逃走后 10 分钟刷下一头
+    const INV_ELITE_WINDOW_MIN_SEC = 180;        // 限时下限：3 分钟
+    // V0.105（作者返修）：限时的秒数按它的速度自适应 —— 给它「打完 100 口」留 1.5 倍余量。
+    function invEliteWindowSec(speedMult) {
+      return Math.max(INV_ELITE_WINDOW_MIN_SEC, Math.ceil(1500 / Math.max(1, speedMult)));
+    }
+    function isInvEliteUnlocked() {
+      return !!invWorld && Math.max(invWorld.best || 0, invLevelNow()) >= INV_ELITE_UNLOCK_LEVEL;
+    }
+    const INV_ELITE_DEFEAT_ATTACKS = 100;        // 被它攻击 100 次后击败
+    const INV_ELITE_STRENGTHS = [2, 4, 8];       // 基础强度池：200% / 400% / 800%
+    const INV_ELITE_SPEEDS = [1, 1.5, 2, 3];     // 速度池（×）
+    const INV_ELITE_DAMAGES = [1, 2, 3];         // 一口掉几级
+    const INV_ELITE_SPECIALS = [
+      { id: "pierce", name: "破甲",  desc: "50% 无视防御（你的抵抗减半参与计算）" },
+      { id: "rage",   name: "狂暴",  desc: "每次攻击后攻速 +10%（越打越快）" },
+      { id: "erode",  name: "侵蚀",  desc: "每次命中随机削掉 1 级一项基础科技" },
+      { id: "drain",  name: "汲取",  desc: "每次命中吸走你 2% 的反转尘埃" },
+      { id: "shell",  name: "硬壳",  desc: "捕获强度额外 ×1.5" }
+    ];
+    function invElitePower(e) {
+      const el = e || (invWorld && invWorld.elite);
+      if (!el) return 0;
+      const sp = 1 + 0.3 * el.specials.length;
+      return Math.round(el.strength * 100 * el.speedMult * el.damage * sp);
+    }
+    function invEliteChance() {
+      const el = invWorld && invWorld.elite;
+      if (!el) return 0;
+      let resist = invTechResistPct() + invLabResistBonus() + invMilestoneResist() + invParseResistBonus();
+      if (el.specials.indexOf("pierce") >= 0) resist *= 0.5;   // 破甲：抵抗减半
+      return Math.max(0, Math.min(1, 1 - resist / el.strength - invParseChanceCut()));
+    }
+    function invSpawnElite() {
+      if (!invWorld || !isInvEliteUnlocked()) return null;   // V0.105：500 级解锁
+      const lv = Math.max(1, invLevelNow());
+      const level = Math.max(1, Math.round(lv * (0.8 + Math.random() * 0.4)));   // 围绕当前等级 ±20% 波动
+      const tierIdx = Math.max(0, Math.min(GENE_TIERS.length - 1, Math.floor(level / 10)));
+      // V0.105（作者返修）：数值跟着玩家成长走 ——
+      //   强度基准 = 你现在全部来源的抵抗（含软上限后的基础科技），在 0.8 ~ 1.6 倍之间浮动，
+      //   保证它打你打得动；再加一条随等级的保底（就算 0 抵抗也会随等级变强）。
+      //   速度/伤害随等级线性放大（等级越高，精英越疯）。
+      const estR = invTechResistPct() + invLabResistBonus() + invMilestoneResist() + invParseResistBonus();
+      //   强度完全跟着抵抗走（0 抵抗时保底 800%）；速度/伤害的等级放大已经让等级有意义，
+      //   不再加等级保底 —— 否则 500 级的保底（8800%）会远超玩家抵抗，变成必死局。
+      const strengthBase = Math.max(8, estR * (0.8 + Math.random() * 0.8));
+      const speedMult = pick(INV_ELITE_SPEEDS) * (1 + level / 500);
+      const damage = pick(INV_ELITE_DAMAGES) + Math.floor(level / 400);
+      const pool = INV_ELITE_SPECIALS.slice();
+      const n = Math.floor(Math.random() * 3);   // 0 ~ 2 个特殊属性
+      const specials = [];
+      for (let i = 0; i < n && pool.length; i++) {
+        specials.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0].id);
+      }
+      const effStrength = strengthBase * (specials.indexOf("shell") >= 0 ? 1.5 : 1);   // 保留小数（显示层面格式化）
+      const windowSec = invEliteWindowSec(speedMult);
+      const nowMs = Date.now();
+      invWorld.elite = {
+        level: level, tier: tierIdx, strength: effStrength, speedMult: speedMult,
+        damage: damage, specials: specials, attacks: 0, progress: 0, active: false,
+        born: nowMs, deadline: nowMs + windowSec * 1000
+      };
+      const tierName = GENE_TIERS[tierIdx] ? GENE_TIERS[tierIdx].name : "普通";
+      showToast(`👑 精英猎犬刷新：<b>${tierName} · Lv.${formatNumber(level)}</b> —— 预估战力 <b>${formatNumber(invElitePower())}</b>，限时 <b>${formatDuration(windowSec)}</b>，打完立刻刷下一头；超时它会逃走。`);
+      return invWorld.elite;
+    }
+    function invEliteChallenge() {
+      const el = invWorld && invWorld.elite;
+      if (!el || el.active) return false;
+      el.active = true;
+      el.progress = 0;
+      el.attacks = 0;
+      renderInvWorld();
+      const tierName = GENE_TIERS[el.tier] ? GENE_TIERS[el.tier].name : "普通";
+      showToast(`⚔ 已挑战精英猎犬（${tierName} · Lv.${formatNumber(el.level)}）—— 它加入了最下面的进度条，承受 <b>100</b> 次攻击就能击败它。`);
+      return true;
+    }
+    function invEliteAttack(quiet) {
+      const el = invWorld && invWorld.elite;
+      if (!el || !el.active) return;
+      el.attacks += 1;
+      // 击败判定：被打满 100 次
+      if (el.attacks >= INV_ELITE_DEFEAT_ATTACKS) {
+        const gain = 10 + Math.floor(el.level / 10) * 5;
+        invWorld.elitePts = Math.max(0, Math.floor(invWorld.elitePts || 0)) + gain;
+        const tierName = GENE_TIERS[el.tier] ? GENE_TIERS[el.tier].name : "普通";
+        invWorld.elite = null;
+        invWorld.eliteNextAt = Date.now();   // V0.105（作者要求）：打完后立刻刷下一条猎犬
+        saveGame(true);
+        renderInvWorld();
+        showToast(`🏆 击败精英猎犬（${tierName} · Lv.${formatNumber(el.level)}）！获得 <b>+${formatNumber(gain)}</b> 精英点数（共 ${formatNumber(invWorld.elitePts)}）—— 下一头马上就来。`);
+        return;
+      }
+      // 攻击结算
+      const chance = invEliteChance();
+      if (Math.random() < chance) {
+        invWorld.captures += 1;
+        const before = invLevelNow();
+        invWorld.level = Math.max(0, before - el.damage);
+        const echo = INV_TECH_REFUND_PER_LEVEL * invTechEffLv("echo");
+        if (echo > 0) invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, bigOf(echo)));
+        const extra = [];
+        if (el.specials.indexOf("erode") >= 0) {
+          const def = pick(INV_TECH_DEFS);
+          const cur = invTechLv(def.id);
+          if (cur > 0) { invWorld.techs[def.id] = cur - 1; extra.push(`侵蚀：${def.name} Lv.${cur}→${cur - 1}`); }
+        }
+        if (el.specials.indexOf("drain") >= 0) {
+          const lost = bigMul(invWorld.dust, bigOf(0.02));
+          invWorld.dust = bigSub(invWorld.dust, lost);
+          extra.push("汲取：−2% 尘埃");
+        }
+        if (!quiet) {
+          showToast(`👑 精英猎犬命中：<b>等级 −${formatNumber(el.damage)} → Lv.${formatNumber(invWorld.level)}</b>` +
+            `${extra.length ? "（" + extra.join(" · ") + "）" : ""}（第 ${formatNumber(el.attacks)}/100 次攻击）。`);
+        }
+      } else if (!quiet) {
+        showToast(`👑 精英猎犬的攻击被挡下（第 ${formatNumber(el.attacks)}/100 次攻击）。`);
+      }
+      // 狂暴：每次攻击后攻速 +10%
+      if (el.specials.indexOf("rage") >= 0) el.speedMult *= 1.1;
+    }
+    function invHoundCount() {
+      const lv2 = invLevelNow();
+      let n = 1;
+      if (lv2 >= INV_HOUND2_UNLOCK_LEVEL) n++;
+      if (lv2 >= INV_HOUND3_UNLOCK_LEVEL) n++;
+      if (lv2 >= INV_HOUND4_UNLOCK_LEVEL) n++;
+      INV_HOUND_EXTRA.forEach(h => { if (lv2 >= h.unlock) n++; });   // V0.105：第 5~8 条
+      return n;
+    }
+    // V0.105（作者要求）：解析 —— 解锁第二条猎犬后永久解锁（掉回 50 级以下也保留）。
+    //   从第二条猎犬起，每被追逐 1 秒积攒数据点：两条 1 点/秒、三条 2 点、四条 4 点…翻倍递增。
+    //   数据点在本趟旅程里花（退出即清），可买四种特殊升级。
+    const INV_PARSE_DEFS = [
+      { id: "weak",   icon: "🎯", name: "弱点图谱", desc: "被捕获概率 −2% / 级",                 base: 2, growth: 1.6 },
+      { id: "dust",   icon: "🌫", name: "尘埃共鸣", desc: "反转尘埃收益 +20% / 级",              base: 3, growth: 1.6 },
+      { id: "shield", icon: "🛡", name: "护盾协议", desc: "捕获抵抗 +10% / 级",                  base: 3, growth: 1.6 },
+      { id: "slow",   icon: "🐌", name: "缓速力场", desc: "所有猎犬进度速度 −3% / 级（最低 10%）", base: 4, growth: 1.8 }
+    ];
+    function invParseState() {
+      if (!invWorld) return { pts: 0, lv: {} };
+      if (!invWorld.parse || typeof invWorld.parse !== "object") invWorld.parse = { pts: 0, lv: {} };
+      const P = invWorld.parse;
+      if (typeof P.pts !== "number" || !isFinite(P.pts) || P.pts < 0) P.pts = 0;
+      if (!P.lv || typeof P.lv !== "object") P.lv = {};
+      return P;
+    }
+    function isInvParseUnlocked() { return !!(invWorld && invWorld.parseUnlocked); }
+    function invParseRate() {
+      const n = invHoundCount();
+      return n >= 2 ? Math.pow(2, n - 2) : 0;   // 两条 1 / 三条 2 / 四条 4 / 五条 8 …
+    }
+    function invParseLv(id) {
+      const v = invParseState().lv[id];
+      return (typeof v === "number" && isFinite(v) && v > 0) ? Math.floor(v) : 0;
+    }
+    function invParseCost(def) { return Math.ceil(def.base * Math.pow(def.growth, invParseLv(def.id))); }
+    function invParseDustMult() { return 1 + 0.20 * invParseLv("dust"); }
+    function invParseResistBonus() { return 0.10 * invParseLv("shield"); }
+    function invParseChanceCut() { return 0.02 * invParseLv("weak"); }
+    function invHoundSpeedMult() { return Math.max(0.1, 1 - 0.03 * invParseLv("slow")); }
+    function invParseBuy(id) {
+      if (!invActive || !invWorld || !isInvParseUnlocked()) return false;
+      const def = INV_PARSE_DEFS.filter(d => d.id === id)[0];
+      if (!def) return false;
+      const P = invParseState();
+      const cost = invParseCost(def);
+      if (Math.floor(P.pts) < cost) { showToast(`数据点不足：${def.name}升到下一级需要 <b>${formatNumber(cost)}</b>（现有 ${formatNumber(Math.floor(P.pts))}）。`); return false; }
+      P.pts -= cost;
+      P.lv[id] = invParseLv(id) + 1;
+      saveGame(true);
+      renderInvWorld();
+      showToast(`🔬 解析：<b>${def.name}</b> → Lv.${formatNumber(P.lv[id])}（剩 ${formatNumber(Math.floor(P.pts))} 数据点）。`);
+      return true;
+    }
+    function invTechResistPct() { return 0.005 * invTechEffLv("dampener"); }
+    // V0.105（作者要求）：反转里程碑 —— 本局最高反转等级每 50 级一层，自动获得奖励加成：
+    //   每层：反转尘埃收益 +25%、捕获抵抗 +25%（无限叠）。
+    const INV_MILESTONE_STEP = 50;
+    const INV_MILESTONE_DUST_STEP = 0.25;
+    const INV_MILESTONE_RESIST_STEP = 0.25;
+    // V0.105（作者要求）：大里程碑 —— 每 500 级一座（巨额奖励）、每 5000 级一座（超级巨额）。
+    const INV_MILESTONE_BIG_STEP = 500;
+    const INV_MILESTONE_MEGA_STEP = 5000;
+    const INV_MILESTONE_BIG_BONUS = 1.0;    // 每座大里程碑：尘埃 +100% · 抵抗 +100%
+    const INV_MILESTONE_MEGA_BONUS = 5.0;   // 每座超级里程碑：尘埃 +500% · 抵抗 +500%
+    // V0.105（作者要求）：里程碑还会抬高「基础科技软上限」——
+    //   每座大里程碑 ×1.01、每座超级里程碑 ×1.2（逐座复利）。
+    const INV_MILESTONE_CAP_STEP_BIG = 1.01;
+    const INV_MILESTONE_CAP_STEP_MEGA = 1.2;
+    function invMilestoneCapMult() {
+      return Math.pow(INV_MILESTONE_CAP_STEP_BIG, invMilestoneBigCount())
+        * Math.pow(INV_MILESTONE_CAP_STEP_MEGA, invMilestoneMegaCount());
+    }
+    function invMilestoneCount() {
+      return Math.floor(Math.max(0, (invWorld && invWorld.best) || 0) / INV_MILESTONE_STEP);
+    }
+    function invMilestoneBigCount() {
+      return Math.floor(Math.max(0, (invWorld && invWorld.best) || 0) / INV_MILESTONE_BIG_STEP);
+    }
+    function invMilestoneMegaCount() {
+      return Math.floor(Math.max(0, (invWorld && invWorld.best) || 0) / INV_MILESTONE_MEGA_STEP);
+    }
+    function invMilestoneDustMult() {
+      return 1 + INV_MILESTONE_DUST_STEP * invMilestoneCount()
+        + INV_MILESTONE_BIG_BONUS * invMilestoneBigCount()
+        + INV_MILESTONE_MEGA_BONUS * invMilestoneMegaCount();
+    }
+    function invMilestoneResist() {
+      return INV_MILESTONE_RESIST_STEP * invMilestoneCount()
+        + INV_MILESTONE_BIG_BONUS * invMilestoneBigCount()
+        + INV_MILESTONE_MEGA_BONUS * invMilestoneMegaCount();
+    }
+    // V0.105：被某条猎犬捕获的概率（0~1）
+    function invCaptureChance(strength) {
+      const resist = invTechResistPct() + invLabResistBonus() + invMilestoneResist() + invParseResistBonus();
+      const s = (typeof strength === "number" && strength > 0) ? strength : INV_HOUND1_STRENGTH;
+      return Math.max(0, Math.min(1, 1 - resist / s - invParseChanceCut()));
+    }
+    function invTechDropChance() { return Math.min(1, INV_TECH_DROP_CHANCE + 0.002 * invTechEffLv("sampler") + invLabDropBonus()); }
 
     let invActive = false;             // 会话级开关（不落盘）：在不在反转世界里
+    let invEnteredAt = 0;              // V0.104：本次进场时刻（退场时用来顺延主宇宙的挂钟状态）
     let invWorld = null;               // 反转世界的全部状态（进场重建）
     let invPane = "main";              // main | auto | bag
     function invCapBig() { return bigFromLog10(INV_CAP_LOG10); }
@@ -14839,15 +15625,125 @@
         best: INV_START_LEVEL,
         captures: 0,
         progress: 0,
+        progress2: 0,                               // V0.105：第二条猎犬的逼近进度
+        progress3: 0,                               // V0.105：第三条猎犬的逼近进度
+        progress4: 0,                               // V0.105：第四条猎犬的逼近进度
+        progress5: 0, progress6: 0, progress7: 0, progress8: 0,   // V0.105：第 5~8 条猎犬
+        milestoneSeen: 0,                           // V0.105：里程碑提示到第几层了
+        milestoneBigSeen: 0,                        // V0.105：大里程碑（500 级档）发到第几座
+        milestoneMegaSeen: 0,                       // V0.105：超级里程碑（5000 级档）发到第几座
+        parseUnlocked: false,                       // V0.105：解析（解锁第二条猎犬后永久保留）
+        parseSeen: false,                           // V0.105：解析子页的「新」高亮已读标记
+        parse: { pts: 0, lv: {} },                  // V0.105：数据点与解析升级等级
+        eliteUnlocked: false,                       // V0.105：精英（反转等级 500 后粘性解锁）
+        eliteSeen: false,                           // V0.105：精英页签的「新」高亮已读标记
+        elite: null,                                // V0.105：精英猎犬（刷新中 / 待挑战 / 激战）
+        eliteNextAt: 0,                             // V0.105：下一头精英的刷新时刻（墙钟）
+        elitePts: 0,                                // V0.105：精英点数
+        techs: {},                                  // V0.104：基础科技 id → 等级
+        bagUnlocked: false,                         // V0.104：科技页「解锁过」的粘性标记（丢光也不回收）
+        bagSeen: false,                             // V0.104：科技页的「新」高亮是否已熄灭
+        leapSeen: false,                            // V0.104：科技跃迁的「新」高亮是否已熄灭
+        leap: { levels: {}, progress: {}, sel: null },   // V0.104：进阶科技等级 / 进度 / 当前选中
+        inspire: { last: 0, at: 0, m0: 1 },              // V0.104：灵感（上次献祭等级 / 生效时刻 / 初始倍率）
+        inspireSeen: false,                              // V0.104：灵感子页的「新」高亮已读标记
+        autoUnlock: { harvest: false, level: false },    // V0.104：自动化是否已花尘解锁
+        autoEff: { harvest: 0, level: 0 },               // V0.104：自动化效率等级（0~10 → 1~3 次/秒）
+        autoAcc: { harvest: 0, level: 0 },               // V0.104：自动化速率累加器
         auto: { harvest: false, level: false }
       };
     }
+    // V0.104：快照（Big 直接进 JSON —— 项目里 Big 本来就是 {m,e}）与恢复（骨架 + 合并）
+    function snapshotInvWorld() {
+      if (!invWorld) return null;
+      return {
+        level: invWorld.level, best: invWorld.best, captures: invWorld.captures,
+        progress: invWorld.progress, progress2: invWorld.progress2 || 0,
+        progress3: invWorld.progress3 || 0, progress4: invWorld.progress4 || 0,
+        progress5: invWorld.progress5 || 0, progress6: invWorld.progress6 || 0,
+        progress7: invWorld.progress7 || 0, progress8: invWorld.progress8 || 0, dust: invWorld.dust,
+        milestoneSeen: invWorld.milestoneSeen || 0,
+        milestoneBigSeen: invWorld.milestoneBigSeen || 0, milestoneMegaSeen: invWorld.milestoneMegaSeen || 0,
+        parseUnlocked: !!invWorld.parseUnlocked, parseSeen: !!invWorld.parseSeen, parse: invWorld.parse,
+        eliteUnlocked: !!invWorld.eliteUnlocked, eliteSeen: !!invWorld.eliteSeen,
+        elite: invWorld.elite, eliteNextAt: invWorld.eliteNextAt || 0, elitePts: Math.max(0, Math.floor(invWorld.elitePts || 0)),
+        techs: invWorld.techs, leap: invWorld.leap, inspire: invWorld.inspire,
+        auto: invWorld.auto, autoUnlock: invWorld.autoUnlock, autoEff: invWorld.autoEff,
+        bagUnlocked: invWorld.bagUnlocked, bagSeen: invWorld.bagSeen,
+        leapSeen: invWorld.leapSeen, inspireSeen: invWorld.inspireSeen,
+        at: Date.now()
+      };
+    }
+    function normalizeInvState(raw) {
+      const d = freshInvState();
+      if (!raw || typeof raw !== "object") return d;
+      const num = (v, dv) => (typeof v === "number" && isFinite(v) && v >= 0) ? v : dv;
+      d.dust = bigMin(invCapBig(), bigOf(raw.dust));
+      d.level = Math.floor(num(raw.level, d.level));
+      d.best = Math.max(d.level, Math.floor(num(raw.best, d.level)));
+      d.captures = Math.floor(num(raw.captures, 0));
+      d.progress = Math.max(0, Math.min(1, num(raw.progress, 0)));
+      d.progress2 = Math.max(0, Math.min(1, num(raw.progress2, 0)));
+      d.progress3 = Math.max(0, Math.min(1, num(raw.progress3, 0)));
+      d.progress4 = Math.max(0, Math.min(1, num(raw.progress4, 0)));
+      d.progress5 = Math.max(0, Math.min(1, num(raw.progress5, 0)));
+      d.progress6 = Math.max(0, Math.min(1, num(raw.progress6, 0)));
+      d.progress7 = Math.max(0, Math.min(1, num(raw.progress7, 0)));
+      d.progress8 = Math.max(0, Math.min(1, num(raw.progress8, 0)));
+      d.milestoneSeen = Math.floor(num(raw.milestoneSeen, 0));
+      d.parseUnlocked = !!raw.parseUnlocked;
+      d.parseSeen = !!raw.parseSeen;
+      if (raw.parse && typeof raw.parse === "object") d.parse = raw.parse;
+      d.eliteUnlocked = !!raw.eliteUnlocked;
+      d.eliteSeen = !!raw.eliteSeen;
+      if (raw.elite && typeof raw.elite === "object") d.elite = raw.elite;
+      d.eliteNextAt = (typeof raw.eliteNextAt === "number" && isFinite(raw.eliteNextAt) && raw.eliteNextAt > 0) ? raw.eliteNextAt : 0;
+      d.elitePts = Math.floor(num(raw.elitePts, 0));
+      // 恢复时把「已提示」顶到当前层数：老里程碑不重复弹提示
+      d.milestoneSeen = Math.max(d.milestoneSeen, Math.floor(d.best / INV_MILESTONE_STEP));
+      d.milestoneBigSeen = Math.max(Math.floor(num(raw.milestoneBigSeen, 0)), Math.floor(d.best / INV_MILESTONE_BIG_STEP));
+      d.milestoneMegaSeen = Math.max(Math.floor(num(raw.milestoneMegaSeen, 0)), Math.floor(d.best / INV_MILESTONE_MEGA_STEP));
+      if (d.best > (save.invBestEver || 0)) save.invBestEver = Math.floor(d.best);   // V0.105：历史最高记账
+      if (raw.techs && typeof raw.techs === "object") d.techs = raw.techs;
+      if (raw.leap && typeof raw.leap === "object") {
+        d.leap = raw.leap;
+        if (!d.leap.levels || typeof d.leap.levels !== "object") d.leap.levels = {};
+        if (!d.leap.progress || typeof d.leap.progress !== "object") d.leap.progress = {};
+      }
+      if (raw.inspire && typeof raw.inspire === "object") d.inspire = raw.inspire;
+      if (raw.auto && typeof raw.auto === "object") d.auto = { harvest: !!raw.auto.harvest, level: !!raw.auto.level };
+      if (raw.autoUnlock && typeof raw.autoUnlock === "object") d.autoUnlock = { harvest: !!raw.autoUnlock.harvest, level: !!raw.autoUnlock.level };
+      if (raw.autoEff && typeof raw.autoEff === "object") d.autoEff = { harvest: Math.floor(num(raw.autoEff.harvest, 0)), level: Math.floor(num(raw.autoEff.level, 0)) };
+      d.bagUnlocked = !!raw.bagUnlocked;
+      d.bagSeen = !!raw.bagSeen;
+      d.leapSeen = !!raw.leapSeen;
+      d.inspireSeen = !!raw.inspireSeen;
+      d.autoAcc = { harvest: 0, level: 0 };   // 累加器不恢复（回来从 0 攒起）
+      return d;
+    }
+    // V0.104：主动退出的结算 —— 按「本次最高等级 − 上次结算基线」发科技点数（必须更高才有）
+    function settleInvTechPoints() {
+      const best = Math.max(0, Math.floor((invWorld && invWorld.best) || 0));
+      const base = Math.max(0, Math.floor(save.invTechBase || 0));
+      const gained = Math.max(0, best - base);
+      if (gained > 0) {
+        save.invTechPoints = Math.max(0, Math.floor(save.invTechPoints || 0)) + gained;
+        save.invTechBase = best;
+      }
+      return { best: best, base: base, gained: gained };
+    }
     function invLevelNow() { return Math.max(0, Math.floor((invWorld && invWorld.level) || 0)); }
-    function invHarvestGain() { return INV_HARVEST_BASE + INV_HARVEST_PER_LEVEL * invLevelNow(); }
+    // V0.104：手动与自动各吃各的科技乘区（mode 省略 = 手动）
+    function invHarvestGain(mode) {
+      const base = INV_HARVEST_BASE + INV_HARVEST_PER_LEVEL * invLevelNow();
+      const mult = mode === "auto" ? invTechMult("auto", 0.12) : invTechMult("harvest", 0.10);
+      return base * mult * invInspireMult() * invLabDustMult() * invMilestoneDustMult() * invParseDustMult();   // V0.104：灵感 + 实验室 + V0.105 里程碑/解析乘区
+    }
     function invLevelCost() {
       const lv = invLevelNow();
-      const c = INV_LEVEL_COST_BASE * Math.pow(INV_LEVEL_COST_GROWTH, Math.max(0, lv - 1));
-      return isFinite(c) ? Math.ceil(c) : Number.MAX_VALUE;   // 保险丝：越高越贵，永远算不出 Infinity
+      let c = INV_LEVEL_COST_BASE * Math.pow(INV_LEVEL_COST_GROWTH, Math.max(0, lv - 1));
+      c *= Math.pow(0.94, invTechEffLv("forge"));   // V0.104：铸级蓝图 −6%/级（复利，含进阶放大）
+      return isFinite(c) ? Math.max(1, Math.ceil(c)) : Number.MAX_VALUE;   // 保险丝：越高越贵，永远算不出 Infinity
     }
     // 正式开放后的公开入口（自绘确认框 → 进场）。⚠️ 目前只有开发者面板能进，
     //   这条通道先留着 —— 等反转世界做完、去掉开发锁之后，把它接回页签即可。
@@ -14857,108 +15753,340 @@
         showToast("反转世界尚未解锁：需要<b>历史最高尘埃 ≥ 1E30080</b>，并且<b>苦痛挑战全部通关</b>。");
         return;
       }
-      if (activeBattle || isHunting() || wheelSpinning) {
-        showToast("战斗 / 猎影进行中：等这一轮结束再进入反转世界。");
-        return;
-      }
+      // V0.104（作者要求）：进场是最高优先级 —— 战斗 / 猎影 / 转盘进行中也能随时进入，
+      //   进去后外面的一切会真正暂停（挂钟状态在退场时统一顺延，见 exitInvWorld）。
+      const resumable = !!(save.invSave && typeof save.invSave === "object");
       showConfirm({
         icon: "◑", title: "进入反转世界",
-        text: `反转世界是主宇宙的完全倒影：进去之后<b>外面的一切都会静止</b>（时间暂停），` +
-              `里面的一切<b>从零开始</b> —— 每次进入都会重来，随时可以退出。<br>` +
-              `<span style="color: var(--muted);">在那里，「被捕获」不是恩赐，而是<b>等级 −1</b>。确定现在进去吗？</span>`,
+        text: `反转世界是主宇宙的完全倒影：进去之后<b>外面的一切都会静止</b>（时间暂停）。<br>` +
+              `<span style="color: var(--muted);">「被捕获」在那里不是恩赐，而是<b>等级 −1</b>；` +
+              `主动退出会<b>清空这趟进度</b>（但按最高等级结算科技点数），<b>关掉网页不算退出</b> —— 下次打开会接着玩。` +
+              (resumable ? "<br><b style=\"color: var(--gold);\">检测到一局没有结束的旅程，进去会直接继续。</b>" : "") + "</span>",
         ok: "进入"
       }, () => enterInvWorld());
     }
     function enterInvWorld(force) {
       if (invActive) return;
       if (!force && !isInvUnlocked()) return;   // force = 开发者通道（跳过解锁条件）
-      if (activeBattle || isHunting() || wheelSpinning) {
-        showToast("战斗 / 猎影进行中：等这一轮结束再进入反转世界。");
-        return;
+      // V0.104（作者要求）：不再拦截战斗 / 猎影 / 转盘 —— 进场最高优先级，外面的一切在退场时顺延。
+      // V0.104（作者要求）：关网页不算退出 —— 存档里有没结束的进度就直接恢复它；否则从零开始。
+      const resuming = !!(save.invSave && typeof save.invSave === "object");
+      invWorld = resuming ? normalizeInvState(save.invSave) : freshInvState();
+      // V0.105（作者要求）：大里程碑的开局福利 —— 历史最高到过 500 之后，
+      //   **每次开新局**开局直接获得「5000 次点击收益」的尘埃（恢复中的局不重复发）。
+      if (!resuming && Math.max(0, Math.floor(save.invBestEver || 0)) >= INV_MILESTONE_BIG_STEP) {
+        const opener = bigOf(Math.floor(invHarvestGain("manual") * 5000));
+        invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, opener));
+        showToast(`💥 <b>大里程碑福利</b>：开局直接获得 <b>5000 次点击收益</b>的尘埃（+${formatNumber(opener)}）。`);
       }
-      invWorld = freshInvState();      // 「下次进入从头开始」：每次进场整个重建
       invActive = true;
+      invEnteredAt = Date.now();       // 退场时按这个把主宇宙的挂钟状态整体顺延
       document.body.classList.add("inv-mode");
+      applyInvHeader(true);            // 标题换皮：时间科技增量 / 反转尘埃
       switchTab("inv");
       switchInvPane("main");
       showToast(`◑ 已进入反转世界：外面的时间静止了，这里从 Lv.${INV_START_LEVEL} 开始。`);
     }
-    function exitInvWorld() {
+    // V0.104（作者要求）：反转世界的标题换皮 —— 主宇宙叫「时间猎犬增量 / 时间尘埃」，
+    //   倒影里叫「时间科技增量 / 反转尘埃」；右上角的资源刻度在反转世界里直接隐藏（见 CSS）。
+    function applyInvHeader(on) {
+      setText("gameTitle", on ? "时间科技增量" : "时间猎犬增量");
+      setText("gameSubtitle", on
+        ? "在时间猎犬发现你之前，收集尽可能多的反转尘埃。"
+        : "在时间猎犬发现你之前，收集尽可能多的时间尘埃。");
+    }
+    function exitInvWorld(skipSettle) {
       if (!invActive) return;
+      // V0.104（作者要求）：主动退出 = 放弃这趟旅程 —— 先按最高等级增量结算科技点数，再清掉进度。
+      //   skipSettle = 清档 / 导入存档这类「被动离开」，不结算、不提示。
+      const settled = skipSettle ? null : settleInvTechPoints();
       invActive = false;
+      save.invSave = null;          // 进度作废：下次进场从零开始
+      invWorld = null;
       document.body.classList.remove("inv-mode");
+      applyInvHeader(false);
       switchTab("game");
+      // V0.104（作者要求）：外面「真正暂停」—— 主循环虽然一直在跑（只是跳过 gameStep），
+      //   但所有**挂墙钟**的状态（猎影 8 秒窗口、猎影冷却、自动狩猎 / 自动悖论 / 自动重织的
+      //   下一次时刻）在暂停期间照走。把暂停时长整体补回去，回来时一切从按下暂停的那一刻继续。
+      const pausedMs = Math.max(0, Date.now() - (invEnteredAt || 0));
+      if (pausedMs > 0) {
+        if (hunt && typeof hunt.startAt === "number") hunt.startAt += pausedMs;
+        if (save.huntCooldownUntil > 0) save.huntCooldownUntil += pausedMs;
+        if (autoHuntNextAt > 0) autoHuntNextAt += pausedMs;
+        if (autoParadoxNextAt > 0) autoParadoxNextAt += pausedMs;
+        if (lastAutoReweaveAt > 0) lastAutoReweaveAt += pausedMs;
+        saveGame(true);
+      }
       render();
-      showToast("已退出反转世界 —— 主宇宙的时间继续流动。");
+      const pausedNote = pausedMs > 60000 ? `（外面一共暂停了 ${formatDuration(Math.round(pausedMs / 1000))}）` : "";
+      if (settled) {
+        showToast(settled.gained > 0
+          ? `已退出反转世界 ${pausedNote}。本次最高 <b>Lv.${formatNumber(settled.best)}</b> → 获得 <b>+${formatNumber(settled.gained)}</b> 科技点数（下次要超过 Lv.${formatNumber(settled.best)} 才有新点数）。`
+          : `已退出反转世界 ${pausedNote}。本次最高 Lv.${formatNumber(settled.best)} <b>没有超过</b>上次结算的 Lv.${formatNumber(settled.base)} —— 没有新科技点数。`);
+      } else {
+        showToast("已退出反转世界。");
+      }
+    }
+    // V0.104：主动退出的二次确认（会清空进度 —— 必须拦一道）
+    function confirmExitInvWorld() {
+      if (!invActive || !invWorld) return;
+      const best = Math.max(0, Math.floor(invWorld.best || 0));
+      const gained = Math.max(0, best - Math.max(0, Math.floor(save.invTechBase || 0)));
+      showConfirm({
+        icon: "◑", title: "退出反转世界",
+        text: `退出会<b>清空本次全部反转进度</b>（下次进场从零开始），并结算科技点数：` +
+          `本次最高 <b>Lv.${formatNumber(best)}</b> → <b>+${formatNumber(gained)}</b> 点。` +
+          (gained <= 0 ? `<br><span style="color: var(--muted);">（没有超过上次结算的 Lv.${formatNumber(save.invTechBase || 0)}，这次没有点数）</span>` : "") +
+          `<br><span style="color: var(--muted);">关掉网页不算退出 —— 进度会保留，下次打开继续。</span>`,
+        ok: "确认退出"
+      }, () => exitInvWorld());
+    }
+    // V0.104（作者要求）：科技跃迁的子页面改用页签按钮切换（现在只有「科技爆炸」一页）
+    let invLeapSub = "boom";
+    function switchInvLeapSub(name) {
+      if (name !== "boom" && name !== "inspire" && name !== "parse") name = "boom";   // 白名单
+      if (name === "inspire" && !isInvInspireUnlocked()) name = "boom"; // 灵感要 5 级进阶才解锁
+      if (name === "parse" && !isInvParseUnlocked()) name = "boom";     // 解析要解锁第二条猎犬
+      invLeapSub = name;
+      if (name === "inspire" && invWorld) invWorld.inspireSeen = true;   // 看过即熄灭「新」
+      if (name === "parse" && invWorld) invWorld.parseSeen = true;
+      const tabs = el("invLeapSubTabs");
+      if (tabs) tabs.querySelectorAll("[data-leap-sub]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.leapSub === name);
+      });
+      const boom = el("invLeapSubBoom");
+      if (boom) boom.classList.toggle("active", name === "boom");
+      const ins = el("invLeapSubInspire");
+      if (ins) ins.classList.toggle("active", name === "inspire");
+      const par = el("invLeapSubParse");
+      if (par) par.classList.toggle("active", name === "parse");
     }
     function switchInvPane(name) {
-      if (name !== "main" && name !== "auto" && name !== "bag") name = "main";
+      if (name !== "main" && name !== "auto" && name !== "bag" && name !== "leap" && name !== "elite") name = "main";
+      // V0.104：还没解锁的页签切不进去 —— 科技页要拿到第一件基础科技，跃迁页要本局最高等级到 20
+      if (name === "bag" && !isInvBagUnlocked()) name = "main";
+      if (name === "elite" && !isInvEliteUnlocked()) name = "main";   // V0.105：精英要 500 级
+      if (name === "leap" && !isInvLeapUnlocked()) name = "main";
       invPane = name;
       el("invPaneMain").classList.toggle("active", name === "main");
       el("invPaneAuto").classList.toggle("active", name === "auto");
       el("invPaneBag").classList.toggle("active", name === "bag");
+      el("invPaneLeap").classList.toggle("active", name === "leap");
+      el("invPaneElite").classList.toggle("active", name === "elite");
       el("invTabMain").classList.toggle("active", name === "main");
       el("invTabAuto").classList.toggle("active", name === "auto");
       el("invTabBag").classList.toggle("active", name === "bag");
+      el("invTabLeap").classList.toggle("active", name === "leap");
+      el("invTabElite").classList.toggle("active", name === "elite");
+      // 看过即熄灭「新」高亮（会话级）
+      if (invWorld) {
+        if (name === "bag") invWorld.bagSeen = true;
+        if (name === "elite") invWorld.eliteSeen = true;
+        if (name === "leap") invWorld.leapSeen = true;
+      }
       renderInvWorld();
     }
     // 深度凝析：手动 / 自动共用
     function invHarvest(silent) {
       if (!invActive || !invWorld) return;
-      const gain = bigOf(invHarvestGain());
+      const gain = bigOf(invHarvestGain(silent ? "auto" : "manual"));
       invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, gain));
-      if (!silent) {
-        showToast(`深度凝析：<b>+${formatNumber(gain)}</b> 反转尘埃。`);
-        renderInvWorld();
+      // V0.104（作者要求）：普通点击不再弹提示框 —— 尘埃读数就在面板上，只有爆出科技才值得提示
+      // V0.104（作者要求）：**自动凝析同样能爆科技** —— 概率与手动一致（基础 1% + 采样增幅器）
+      const dropped = invRollTechDrop();
+      if (!silent || dropped) renderInvWorld();
+    }
+    // V0.104：基础科技的掉落与替换规则
+    //   掉落等级 = 当前反转等级；同种科技高等级替换低等级，被消耗的那份按等级折算反转尘埃。
+    function invRollTechDrop() {
+      if (Math.random() >= invTechDropChance()) return null;
+      const def = pick(INV_TECH_DEFS);
+      return invGrantTech(def.id, invLevelNow());
+    }
+    function invGrantTech(id, level) {
+      if (!invWorld) return null;
+      if (!invWorld.techs) invWorld.techs = {};
+      const def = INV_TECH_DEFS.filter(d => d.id === id)[0];
+      if (!def) return null;
+      const lv = Math.max(1, Math.floor(level));
+      const cur = invTechLv(id);
+      let consumed, kept;
+      if (lv > cur) {
+        consumed = cur;      // 旧的被换下 → 折算
+        kept = lv;
+        invWorld.techs[id] = lv;
+      } else {
+        consumed = lv;       // 新的不够高（含相等）→ 新件被消耗
+        kept = cur;
       }
+      const refund = consumed * INV_TECH_REFUND_PER_LEVEL;
+      if (refund > 0) invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, bigOf(refund)));
+      const refundNote = refund > 0 ? `，折算 <b>+${formatNumber(refund)}</b> 反转尘埃` : "";
+      if (cur === 0) {
+        showToast(`🧪 爆出基础科技：<b>${def.icon} ${def.name} Lv.${formatNumber(lv)}</b>！`);
+      } else if (lv > cur) {
+        showToast(`🧪 爆出 <b>${def.icon} ${def.name} Lv.${formatNumber(lv)}</b>：替换掉 Lv.${formatNumber(cur)} 的旧件${refundNote}。`);
+      } else {
+        showToast(`🧪 爆出 <b>${def.icon} ${def.name} Lv.${formatNumber(lv)}</b>，但不如此前的 Lv.${formatNumber(cur)} —— 新件被消耗${refundNote}。`);
+      }
+      if (invTechCount() > 0) invWorld.bagUnlocked = true;   // V0.104：拿到过就永久点亮科技页
+      return { id: id, kept: kept, consumed: consumed, refund: refund };
+    }
+    // V0.104：科技爆炸 —— 一次只能选择一个基础科技；选中后把它整件丢入
+    function invLeapSelect(id) {
+      if (!invWorld || !isInvLeapUnlocked()) return;
+      if (!INV_TECH_DEFS.some(d => d.id === id)) return;
+      const L = invLeapState();
+      L.sel = (L.sel === id) ? null : id;   // 再点一次 = 取消选择
+      renderInvWorld();
+    }
+    function invLeapFeed(id) {
+      if (!invWorld || !isInvLeapUnlocked()) return null;
+      const L = invLeapState();
+      const target = id && L.sel === id ? id : L.sel;
+      if (!target) { showToast("先在列表里<b>选择一个</b>要升级的基础科技。"); return null; }
+      const def = INV_TECH_DEFS.filter(d => d.id === target)[0];
+      const lv = invTechLv(target);
+      if (lv <= 0) { showToast(`「${def.name}」现在没有等级可丢 —— 先回去凝析抽一件（掉落等级 = 当前反转等级）。`); return null; }
+      // 整件消耗：基础科技归零；等级 1:1 转成进度
+      invWorld.techs[target] = 0;
+      L.progress[target] = invLeapProgress(target) + lv;
+      // V0.104（作者要求）：逐级扣进度（首级 20、此后每级 +10% 取整）——
+      //   **超出的经验留在进度条上、顺延到下一级**（不再清零）。
+      let gained = 0;
+      let newLv = invLeapLevel(target);
+      while (L.progress[target] >= invLeapCostFor(newLv)) {
+        L.progress[target] -= invLeapCostFor(newLv);
+        newLv += 1;
+        gained += 1;
+      }
+      if (gained > 0) L.levels[target] = newLv;   // 剩余进度自然顺延到下一级
+      if (gained > 0) {
+        showToast(`⚡ 科技爆炸：丢入 <b>${def.icon} ${def.name} Lv.${formatNumber(lv)}</b> —— ` +
+          `进阶科技「<b style="color: var(--gold);">${def.adv}</b>」升到 <b>Lv.${formatNumber(newLv)}</b>` +
+          `（基础件已归零，剩余进度 <b>${formatNumber(L.progress[target])}</b> 已顺延到下一级）。`);
+      } else {
+        showToast(`⚡ 科技爆炸：丢入 <b>${def.icon} ${def.name} Lv.${formatNumber(lv)}</b> —— ` +
+          `「${def.adv}」进度 <b>${formatNumber(L.progress[target])} / ${formatNumber(invLeapCostFor(newLv))}</b>（基础件已归零）。`);
+      }
+      saveGame(true);
+      renderInvWorld();
+      return { id: target, consumedLevel: lv, gained: gained, advLevel: newLv };
     }
     // 反转铸级：花反转尘埃换等级（等级越高凝析越快），被捕获时掉的也是它
-    function invTryLevelUp(silent) {
+    // V0.105（作者要求）：支持批量 —— times 次逐级按真实造价扣尘，买不动就自动停下；返回「是否至少升了一级」。
+    //   times = Infinity / "max" = 一键最大（配 10000 级保险丝防极端循环）。
+    function invTryLevelUp(silent, times) {
       if (!invActive || !invWorld) return false;
-      const cost = invLevelCost();
-      if (bigCmp(invWorld.dust, bigOf(cost)) < 0) {
-        if (!silent) showToast(`反转尘埃不足：铸级需要 <b>${formatNumber(cost)}</b>。`);
-        return false;
+      let n = Math.floor(times || 1);
+      if (!isFinite(n) || n <= 0) n = 10000;   // 一键最大 / 异常输入
+      n = Math.min(10000, n);
+      const startLv = invLevelNow();
+      let spent = 0;
+      for (let i = 0; i < n; i++) {
+        const cost = invLevelCost();
+        if (bigCmp(invWorld.dust, bigOf(cost)) < 0) break;
+        invWorld.dust = bigSub(invWorld.dust, bigOf(cost));
+        invWorld.level = invLevelNow() + 1;
+        if (invWorld.level > invWorld.best) invWorld.best = invWorld.level;
+        spent += cost;
       }
-      invWorld.dust = bigSub(invWorld.dust, bigOf(cost));
-      invWorld.level = invLevelNow() + 1;
-      if (invWorld.level > invWorld.best) invWorld.best = invWorld.level;
+      const done = invLevelNow() - startLv;
+      // V0.105（作者要求）：里程碑 —— 本局最高跨过 50 的倍数时报一次（批量连跨只报一次汇总）
+      const mNow = invMilestoneCount();
+      const mSeen = Math.max(0, Math.floor(invWorld.milestoneSeen || 0));
+      if (mNow > mSeen) {
+        invWorld.milestoneSeen = mNow;
+        showToast(`🏁 <b>反转里程碑</b>：本局最高到 Lv.${formatNumber(invWorld.best)} —— 累计 <b>${formatNumber(mNow)}</b> 层` +
+          `（尘埃 <b>×${invMilestoneDustMult().toFixed(2)}</b> · 抵抗 <b>+${(invMilestoneResist() * 100).toFixed(0)}%</b>）。`);
+      }
+      // V0.105（作者要求）：大里程碑（每 500 级）/ 超级里程碑（每 5000 级）——
+      //   大：尘埃/抵抗 +100%/座、软上限 ×1.01/座、「开局直得 5000 次点击收益」的福利永久解锁（按历史最高记账）；
+      //   超级：尘埃/抵抗 +500%/座、软上限 ×1.2/座。
+      const bestEver = Math.max(0, Math.floor(save.invBestEver || 0));
+      if (Math.floor(invWorld.best || 0) > bestEver) save.invBestEver = Math.floor(invWorld.best || 0);
+      const bigNow = invMilestoneBigCount();
+      const bigSeen = Math.max(0, Math.floor(invWorld.milestoneBigSeen || 0));
+      if (bigNow > bigSeen) {
+        invWorld.milestoneBigSeen = bigNow;
+        showToast(`🏆 <b>大里程碑</b> Lv.${formatNumber(bigNow * INV_MILESTONE_BIG_STEP)} 达成！灵魂应用：` +
+          `尘埃/抵抗各 <b>+${formatNumber(bigNow * INV_MILESTONE_BIG_BONUS * 100)}%</b>、基础科技软上限 <b>×${invMilestoneCapMult().toFixed(3)}</b>；` +
+          `并且此后<b>每次进入反转世界，开局直接获得 5000 次点击收益</b>的尘埃（已记账，永久生效）。`);
+      }
+      const megaNow = invMilestoneMegaCount();
+      const megaSeen = Math.max(0, Math.floor(invWorld.milestoneMegaSeen || 0));
+      if (megaNow > megaSeen) {
+        invWorld.milestoneMegaSeen = megaNow;
+        showToast(`👑 <b>超级里程碑</b> Lv.${formatNumber(megaNow * INV_MILESTONE_MEGA_STEP)} 达成！！` +
+          `尘埃/抵抗各 <b>+${formatNumber(megaNow * INV_MILESTONE_MEGA_BONUS * 100)}%</b>、基础科技软上限 <b>×${invMilestoneCapMult().toFixed(3)}</b>。`);
+      }
+      saveGame();   // V0.105：历史最高（开局福利记账）及时落盘
       if (!silent) {
-        showToast(`反转铸级：<b>Lv.${formatNumber(invWorld.level)}</b>（花费 ${formatNumber(cost)} 反转尘埃）。`);
-        renderInvWorld();
+        if (done > 0) {
+          showToast(done > 1
+            ? `反转铸级 ×${formatNumber(done)}：<b>Lv.${formatNumber(startLv)} → Lv.${formatNumber(invLevelNow())}</b>（共花费 ${formatNumber(spent)} 反转尘埃）。`
+            : `反转铸级：<b>Lv.${formatNumber(invLevelNow())}</b>（花费 ${formatNumber(spent)} 反转尘埃）。`);
+          renderInvWorld();
+        } else {
+          showToast(`反转尘埃不足：铸级需要 <b>${formatNumber(invLevelCost())}</b>。`);
+        }
       }
-      return true;
+      return done > 0;
     }
     // 被捕获：倒影规则 —— 等级 −1（主宇宙里这一步是赐予部件成长）
     //   quiet=true 时静默结算（补帧批处理用，避免一帧几百条提示把页面顶住）
     //   ⚠️ 进度由调用方扣减（批处理要一次扣一档），这里不碰 progress
-    function invCapture(quiet) {
+    function invCapture(quiet, strength, damage) {
       if (!invWorld) return;
+      // V0.105（作者口径）：被捕获概率 = max(0, 1 − 抵抗 ÷ 强度)；抵抗 ≥ 强度 = 完全免疫。
+      //   被挡下 / 被免疫都算「这次捕获整个无效」：不掉级、也不计入被捕获次数。
+      const s = (typeof strength === "number" && strength > 0) ? strength : INV_HOUND1_STRENGTH;
+      const dmg = Math.max(1, Math.floor(damage || 1));   // V0.105：第三条猎犬一口 2 级
+      const houndName = invHoundNameOfStrength(s);   // V0.105：泛化到八条
+      const resistPct = invTechResistPct() + invLabResistBonus() + invMilestoneResist() + invParseResistBonus();
+      const chance = Math.max(0, Math.min(1, 1 - resistPct / s - invParseChanceCut()));
+      if (chance <= 0) {
+        if (!quiet) {
+          showToast(`◑ ${houndName}扑了上来，但<b>完全啃不动</b>（抵抗 ${(resistPct * 100).toFixed(1)}% ≥ 强度 ${(s * 100).toFixed(0)}%）。`);
+        }
+        return;
+      }
+      if (Math.random() >= chance) {
+        if (!quiet) {
+          showToast(`◑ ${houndName}扑了上来，被<b>硬扛了过去</b>（被捕获概率只有 ${(chance * 100).toFixed(1)}%）。`);
+        }
+        return;
+      }
       invWorld.captures += 1;
       const before = invLevelNow();
-      invWorld.level = Math.max(0, before - 1);
+      invWorld.level = Math.max(0, before - dmg);
+      // V0.104：回响电容 —— 按实际损失等级返还反转尘埃（被抵抗 = 没损失 = 不返）
+      const echo = INV_TECH_REFUND_PER_LEVEL * invTechEffLv("echo");
+      if (echo > 0) invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, bigOf(echo)));
       if (quiet) return;
+      const echoNote = echo > 0 ? `，回响电容返还 <b>+${formatNumber(echo)}</b> 反转尘埃` : "";
       if (before > 0) {
-        showToast(`◑ 被反转猎犬捕获：<b>等级 −1 → Lv.${formatNumber(invWorld.level)}</b>（本局第 ${formatNumber(invWorld.captures)} 次）。`);
+        showToast(`◑ 被<b>${houndName}</b>捕获：<b>等级 −${formatNumber(dmg)} → Lv.${formatNumber(invWorld.level)}</b>${echoNote}（本局第 ${formatNumber(invWorld.captures)} 次）。`);
       } else {
-        showToast(`◑ 被反转猎犬捕获：等级已经归零，没有等级可掉了（本局第 ${formatNumber(invWorld.captures)} 次）。`);
+        showToast(`◑ 被<b>${houndName}</b>捕获：等级已经归零，没有等级可掉了（本局第 ${formatNumber(invWorld.captures)} 次）。`);
       }
     }
     // 独立结算：只在反转世界模式下由 runLoop 调用 —— 主宇宙的 gameStep 整段跳过
     function invStep(dt) {
       if (!invWorld) return;
       const lv = invLevelNow();
-      // 被动凝析：每秒 +（1 + 等级）
-      invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, bigMul(bigOf(1 + lv), dt)));
-      // 捕获逼近：反转猎犬每 INV_CAPTURE_SEC 秒到访一次
-      invWorld.progress += dt / INV_CAPTURE_SEC;
+      // 被动凝析：每秒 +（1 + 等级）—— V0.104：被动采集器再加成
+      invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, bigMul(bigOf((1 + lv) * invTechMult("passive", 0.15) * invInspireMult() * invLabDustMult() * invMilestoneDustMult() * invParseDustMult()), dt)));
+      // 捕获逼近：反转猎犬每 INV_CAPTURE_SEC 秒到访一次（V0.104：静默信标拉长间隔）
+      invWorld.progress += dt * invHoundSpeedMult() / invCapSec();
       if (invWorld.progress >= 1) {
         // V0.98.1：切后台回来的补帧可能一口气跨过好几次捕获 —— 逐次结算（等级照扣），
         //   但只出「一条汇总提示」；再配一道每次最多 200 次的保险丝，极端 dt 也顶得住。
         let n = 0;
         while (invWorld.progress >= 1 && n < 200) {
           invWorld.progress -= 1;
-          invCapture(n > 0);      // 第一次照常提示，后续静默
+          invCapture(n > 0, INV_HOUND1_STRENGTH);      // 第一次照常提示，后续静默
           n++;
         }
         if (invWorld.progress >= 1) invWorld.progress = 0;   // 兜底：不给残留
@@ -14966,17 +16094,293 @@
           showToast(`◑ 补帧结算：一口气被反转猎犬捕获了 <b>${formatNumber(n)}</b> 次，当前 Lv.${formatNumber(invLevelNow())}。`);
         }
       }
+      // V0.105（作者要求）：第二条猎犬 —— 反转等级 ≥ 50 现身（基础周期同为 10 秒，但进度快 8 倍）；
+      //   掉下 50 就消失（进度清零），升回来再继续。
+      if (lv >= INV_HOUND2_UNLOCK_LEVEL) {
+        invWorld.progress2 = (invWorld.progress2 || 0) + dt * INV_HOUND2_SPEED_MULT * invHoundSpeedMult() / invCapSec();
+        if (invWorld.progress2 >= 1) {
+          let m = 0;
+          while (invWorld.progress2 >= 1 && m < 200) {
+            invWorld.progress2 -= 1;
+            invCapture(m > 0, INV_HOUND2_STRENGTH);
+            m++;
+          }
+          if (invWorld.progress2 >= 1) invWorld.progress2 = 0;
+          if (m > 1) {
+            showToast(`◑ 补帧结算：一口气被<b>第二条猎犬</b>扑了 <b>${formatNumber(m)}</b> 次，当前 Lv.${formatNumber(invLevelNow())}。`);
+          }
+        }
+      } else if (invWorld.progress2) {
+        invWorld.progress2 = 0;   // 等级掉下 50：第二条猎犬暂时消失
+      }
+      // V0.105（作者要求）：第三条猎犬 —— 反转等级 ≥ 200 现身（64 倍速、一口 2 级）
+      if (lv >= INV_HOUND3_UNLOCK_LEVEL) {
+        invWorld.progress3 = (invWorld.progress3 || 0) + dt * INV_HOUND3_SPEED_MULT * invHoundSpeedMult() / invCapSec();
+        if (invWorld.progress3 >= 1) {
+          let k = 0;
+          while (invWorld.progress3 >= 1 && k < 200) {
+            invWorld.progress3 -= 1;
+            invCapture(k > 0, INV_HOUND3_STRENGTH, INV_HOUND3_DAMAGE);
+            k++;
+          }
+          if (invWorld.progress3 >= 1) invWorld.progress3 = 0;
+          if (k > 1) {
+            showToast(`◑ 补帧结算：一口气被<b>第三条猎犬</b>啃了 <b>${formatNumber(k)}</b> 口，当前 Lv.${formatNumber(invLevelNow())}。`);
+          }
+        }
+      } else if (invWorld.progress3) {
+        invWorld.progress3 = 0;   // 等级掉下 200：第三条猎犬暂时消失
+      }
+      // V0.105（作者要求）：第四条猎犬 —— 反转等级 ≥ 400 现身（512 倍速、一口 16 级）
+      if (lv >= INV_HOUND4_UNLOCK_LEVEL) {
+        invWorld.progress4 = (invWorld.progress4 || 0) + dt * INV_HOUND4_SPEED_MULT * invHoundSpeedMult() / invCapSec();
+        if (invWorld.progress4 >= 1) {
+          let q = 0;
+          while (invWorld.progress4 >= 1 && q < 200) {
+            invWorld.progress4 -= 1;
+            invCapture(q > 0, INV_HOUND4_STRENGTH, INV_HOUND4_DAMAGE);
+            q++;
+          }
+          if (invWorld.progress4 >= 1) invWorld.progress4 = 0;
+          if (q > 1) {
+            showToast(`◑ 补帧结算：一口气被<b>第四条猎犬</b>啃了 <b>${formatNumber(q)}</b> 口，当前 Lv.${formatNumber(invLevelNow())}。`);
+          }
+        }
+      } else if (invWorld.progress4) {
+        invWorld.progress4 = 0;   // 等级掉下 400：第四条猎犬暂时消失
+      }
+      // V0.105（作者要求）：第 5~8 条猎犬 —— 1000 / 2000 / 4000 / 10000 级现身，属性 ×8、伤害 ×4 逐条递增
+      INV_HOUND_EXTRA.forEach(h => {
+        const key = "progress" + h.n;
+        if (lv >= h.unlock) {
+          invWorld[key] = (invWorld[key] || 0) + dt * h.speed * invHoundSpeedMult() / invCapSec();
+          if (invWorld[key] >= 1) {
+            let z = 0;
+            while (invWorld[key] >= 1 && z < 200) {
+              invWorld[key] -= 1;
+              invCapture(z > 0, h.strength, h.damage);
+              z++;
+            }
+            if (invWorld[key] >= 1) invWorld[key] = 0;
+            if (z > 1) showToast(`◑ 补帧结算：一口气被<b>${INV_HOUND_NAMES[h.n - 1]}</b>啃了 <b>${formatNumber(z)}</b> 口，当前 Lv.${formatNumber(invLevelNow())}。`);
+          }
+        } else if (invWorld[key]) {
+          invWorld[key] = 0;   // 等级掉下去：暂时消失
+        }
+      });
+      // V0.105（作者要求）：精英猎犬 —— 反转等级到 500 解锁（解锁即刷第一头），之后每 10 分钟刷新
+      if (!invWorld.eliteUnlocked && isInvEliteUnlocked()) {
+        invWorld.eliteUnlocked = true;
+        invWorld.eliteNextAt = Date.now();   // 解锁后立刻刷一头
+        showToast("👑 <b>精英猎犬</b>已解锁 —— 导航栏多了「精英」页，每 10 分钟会刷新一头强化猎犬。");
+      }
+      // V0.105（作者要求）：限时 —— 到点还没打完（或没挑战）就逃走，下一头回到 10 分钟节奏
+      if (invWorld.elite && Date.now() >= (invWorld.elite.deadline || 0)) {
+        const esc = invWorld.elite;
+        const escTier = GENE_TIERS[esc.tier] ? GENE_TIERS[esc.tier].name : "普通";
+        invWorld.elite = null;
+        invWorld.eliteNextAt = Date.now() + INV_ELITE_SPAWN_MS;
+        showToast(`👑 精英猎犬逃走了（${escTier} · Lv.${formatNumber(esc.level)} 没能在限时内打完）—— 下一头 10 分钟后再来。`);
+      }
+      if (invWorld.eliteUnlocked && (!invWorld.elite || !invWorld.elite.active)) {
+        const nowMs = Date.now();
+        if (!invWorld.eliteNextAt) invWorld.eliteNextAt = nowMs + INV_ELITE_SPAWN_MS;
+        if (nowMs >= invWorld.eliteNextAt) {
+          invSpawnElite();
+          invWorld.eliteNextAt = nowMs + INV_ELITE_SPAWN_MS;
+        }
+      }
+      // 激战中的精英：进度按它的速度推进（缓速力场对它同样生效）
+      {
+        const el = invWorld.elite;
+        if (el && el.active) {
+          el.progress = (el.progress || 0) + dt * el.speedMult * invHoundSpeedMult() / invCapSec();
+          let m = 0;
+          while (el.progress >= 1 && m < 100) {
+            el.progress -= 1;
+            invEliteAttack(m > 0);   // 批处理：只提示第一次
+            m++;
+            if (!invWorld.elite || !invWorld.elite.active) break;   // 已被击败
+          }
+          if (invWorld.elite && invWorld.elite.active && invWorld.elite.progress >= 1) invWorld.elite.progress = 0;
+          if (m > 1) showToast(`👑 补帧结算：精英猎犬一口气攻击了 <b>${formatNumber(m)}</b> 次。`);
+        }
+      }
+      // V0.105（作者要求）：解析 —— 解锁第二条猎犬后永久解锁（掉回 50 级以下也保留）；
+      //   从第二条猎犬起，每被追逐 1 秒积攒数据点（两条 1 点/秒、三条 2 点、四条 4 点…翻倍递增）。
+      if (lv >= INV_HOUND2_UNLOCK_LEVEL && !invWorld.parseUnlocked) {
+        invWorld.parseUnlocked = true;
+        showToast("🔬 <b>解析</b>已解锁 —— 科技跃迁里多了一个新子页：被猎犬追逐时积攒数据点，可买特殊升级。");
+      }
+      if (invWorld.parseUnlocked) {
+        invParseState().pts += invParseRate() * dt;
+      }
+      invAutoRun(dt);   // V0.104：自动化（解锁 + 效率速率）每帧按 dt 推进 —— 支持到 1 秒 3 次
     }
-    // 反转世界的自动化：随 autoStep 的秒级节拍跑（主宇宙的自动步骤整段跳过）
-    function invAutoStep() {
-      if (!invWorld) return;
-      if (invWorld.auto.harvest) invHarvest(true);
-      if (invWorld.auto.level) invTryLevelUp(true);
+    // ===== V0.104（作者要求）：自动化 = 花尘解锁 + 花尘堆效率（最高 3 次/秒） =====
+    function invAutoUnlocked(kind) {
+      return !!(invWorld && invWorld.autoUnlock && invWorld.autoUnlock[kind]);
     }
+    function invAutoEffLv(kind) {
+      const v = invWorld && invWorld.autoEff ? invWorld.autoEff[kind] : 0;
+      return Math.max(0, Math.min(INV_AUTO_EFF_MAX, Math.floor((typeof v === "number" && isFinite(v)) ? v : 0)));
+    }
+    function invAutoRate(kind) { return INV_AUTO_RATE_BASE + INV_AUTO_RATE_STEP * invAutoEffLv(kind); }
+    function invAutoEffCost(kind) {
+      return Math.ceil(INV_AUTO_EFF_BASE[kind] * Math.pow(INV_AUTO_EFF_GROWTH, invAutoEffLv(kind)));
+    }
+    function invAutoKindName(kind) { return kind === "harvest" ? "自动凝析" : "自动铸级"; }
+    function invAutoPay(cost, what) {
+      if (!invWorld) return false;
+      if (bigCmp(invWorld.dust, bigOf(cost)) < 0) {
+        showToast(`${what}需要 <b>${formatNumber(cost)}</b> 反转尘埃（现有 ${formatNumber(invWorld.dust)}）—— 先回去凝析攒一攒。`);
+        return false;
+      }
+      invWorld.dust = bigSub(invWorld.dust, bigOf(cost));
+      return true;
+    }
+    function invAutoUnlock(kind) {
+      if (!invActive || !invWorld) return false;
+      if (invAutoUnlocked(kind)) return true;
+      const cost = INV_AUTO_UNLOCK_COST[kind];
+      if (!invAutoPay(cost, `解锁「${invAutoKindName(kind)}」`)) return false;
+      invWorld.autoUnlock[kind] = true;
+      invWorld.auto[kind] = true;   // 解锁即开启，少点一次
+      saveGame(true);
+      renderInvWorld();
+      showToast(`⚙ 已解锁「<b>${invAutoKindName(kind)}</b>」（花费 ${formatNumber(cost)} 反转尘埃），默认已开启。`);
+      return true;
+    }
+    function invAutoUpgrade(kind) {
+      if (!invActive || !invWorld) return false;
+      if (!invAutoUnlocked(kind)) { showToast(`先解锁「${invAutoKindName(kind)}」。`); return false; }
+      const lv = invAutoEffLv(kind);
+      if (lv >= INV_AUTO_EFF_MAX) { showToast(`「${invAutoKindName(kind)}」效率已满级（3 次/秒）。`); return false; }
+      const cost = invAutoEffCost(kind);
+      if (!invAutoPay(cost, `「${invAutoKindName(kind)}」效率升级`)) return false;
+      invWorld.autoEff[kind] = lv + 1;
+      saveGame(true);
+      renderInvWorld();
+      showToast(`⚙ 「${invAutoKindName(kind)}」效率 → <b>Lv.${lv + 1}</b>（<b>${invAutoRate(kind).toFixed(1)} 次/秒</b>）。`);
+      return true;
+    }
+    function invAutoToggle(kind) {
+      if (!invActive || !invWorld) return;
+      if (!invAutoUnlocked(kind)) { invAutoUnlock(kind); return; }   // 未解锁时点开关 = 试着解锁
+      invWorld.auto[kind] = !invWorld.auto[kind];
+      renderInvWorld();
+    }
+    // 执行器：按「每秒 N 次」的速率跑（累加器按 dt 推进；上限 3 次/秒）
+    //   ⚠️ 老入口 invAutoStep() 保留为「跑满 1 秒的份额」（测试 / 兼容）；
+    //      游戏里由 invStep 每帧喂 dt —— 这样才到得了 1 秒 3 次。
+    function invAutoRun(dtSeconds) {
+      if (!invWorld || !(dtSeconds > 0)) return;
+      if (!invWorld.autoAcc) invWorld.autoAcc = { harvest: 0, level: 0 };
+      const jobs = [
+        ["harvest", () => invHarvest(true)],
+        // V0.105（作者要求）：自动铸级改成一键最大 —— 每次巡检买满买得起的级数
+        ["level", () => invTryLevelUp(true, Infinity)]
+      ];
+      jobs.forEach(pair => {
+        const kind = pair[0], run = pair[1];
+        if (!invWorld.auto[kind] || !invAutoUnlocked(kind)) { invWorld.autoAcc[kind] = 0; return; }
+        const step = 1 / invAutoRate(kind);
+        invWorld.autoAcc[kind] += dtSeconds;
+        let n = 0;
+        while (invWorld.autoAcc[kind] >= step && n < 60) {   // 单帧保险丝：最多 60 次
+          invWorld.autoAcc[kind] -= step;
+          run();
+          n++;
+        }
+        if (invWorld.autoAcc[kind] > step) invWorld.autoAcc[kind] = 0;   // 兜底：不给残留
+      });
+    }
+    function invAutoStep() { invAutoRun(1); }   // 兼容旧入口：一次跑满 1 秒的份额
     // V0.98：反转世界改成「常显页签 + 开发中门页」—— 所有人能看到入口；
     //   真正进场只留给开发者面板（enterInvWorld(true)），解锁条件留作正式开放时的门槛。
     function renderInvTab() {
       setTabLocked("invTab", false, "◑ 反转世界");
+      renderInvGatePane();   // V0.104：反转页的两个子页实时刷新
+      renderInvLabPane();
+    }
+    // V0.104（作者要求）：反转页正常开放 —— 「◑ 反转」（进入）/「🧪 尖端实验室」（科技点商店）
+    let invGatePane = "enter";
+    function switchInvGatePane(name) {
+      if (name !== "enter" && name !== "lab") name = "enter";
+      invGatePane = name;
+      const tabs = el("invGateTabs");
+      if (tabs) tabs.querySelectorAll("[data-inv-gate]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.invGate === name);
+      });
+      const e1 = el("invGatePaneEnter");
+      if (e1) e1.classList.toggle("active", name === "enter");
+      const e2 = el("invGatePaneLab");
+      if (e2) e2.classList.toggle("active", name === "lab");
+    }
+    const INV_GATE_INTRO = "主宇宙的完全倒影：外面的时间会静止，里面的一切从零开始 —— 在那里，「被捕获」不是恩赐，而是等级 −1。带回来的成果是<b style=\"color: var(--cyan);\">科技点数</b>。";
+    // V0.105（作者要求）：反转页底部的里程碑视觉化 —— 三档轨道（徽章 + 奖励胶囊），不再用文字列表
+    const INV_GATE_MILESTONE_HTML =
+      `<div class="ms-rail">` +
+      `<div class="ms-node base"><div class="ms-medal">50<small>级</small></div><div class="ms-info">` +
+      `<b>基础里程碑 · 每 50 级</b><div class="ms-chips">` +
+      `<span class="ms-chip">反转尘埃 +25%</span><span class="ms-chip">捕获抵抗 +25%</span><span class="ms-chip">无限叠加</span>` +
+      `</div></div></div>` +
+      `<div class="ms-node big"><div class="ms-medal">500<small>级</small></div><div class="ms-info">` +
+      `<b>大里程碑 · 每 500 级 · 巨额奖励</b><div class="ms-chips">` +
+      `<span class="ms-chip gold">尘埃 +100%</span><span class="ms-chip gold">抵抗 +100%</span>` +
+      `<span class="ms-chip gold">💥 开局直得 5000 次点击收益</span>` +
+      `<span class="ms-chip gold">🧪 基础科技软上限 ×1.01 / 座</span>` +
+      `</div></div></div>` +
+      `<div class="ms-node mega"><div class="ms-medal">5000<small>级</small></div><div class="ms-info">` +
+      `<b>超级里程碑 · 每 5000 级 · 超级巨额</b><div class="ms-chips">` +
+      `<span class="ms-chip red">尘埃 +500%</span><span class="ms-chip red">抵抗 +500%</span>` +
+      `<span class="ms-chip red">🧪 基础科技软上限 ×1.2 / 座</span>` +
+      `</div></div></div>` +
+      `<p class="inventory-note" style="margin: 2px 0 0;">（层数/软上限按本局最高等级实时生效，退出即清零；` +
+      `「开局直得」= 历史最高到过 500 级后，<b>此后每开一局</b>都白送 5000 次点击收益的尘埃。）</p></div>`;
+    function renderInvGatePane() {
+      const box = el("invGateEnterBody");
+      if (!box) return;
+      const unlocked = isInvUnlocked();
+      const pts = Math.max(0, Math.floor(save.invTechPoints || 0));
+      const base = Math.max(0, Math.floor(save.invTechBase || 0));
+      const painHave = painClearedCount();
+      const painAll = PAIN_CHALLENGES.length;
+      if (!unlocked) {
+        setHTML("invGateEnterBody",
+          `<p class="inventory-note">${INV_GATE_INTRO}</p>` +
+          `<p class="inventory-note">开放条件：历史最高尘埃达到 <b>1E30080</b>（当前 ${formatNumber(save.bestDust)}${bigLog10(save.bestDust) >= INV_UNLOCK_E - 0.001 ? " ✔" : ""}），` +
+          `并且<b>苦痛挑战全部通关</b>（${formatNumber(painHave)} / ${formatNumber(painAll)}${painHave >= painAll ? " ✔" : ""}）。</p>` +
+          `<button class="primary-button" disabled>尚未解锁</button>` + INV_GATE_MILESTONE_HTML);
+        return;
+      }
+      setHTML("invGateEnterBody",
+        `<p class="inventory-note">${INV_GATE_INTRO}</p>` +
+        INV_GATE_MILESTONE_HTML +
+        `<p class="inventory-note">成就条件：历史最高尘埃 ${formatNumber(save.bestDust)} ✔ · 苦痛挑战 ${formatNumber(painHave)} / ${formatNumber(painAll)} ✔</p>` +
+        `<p class="inventory-note">科技点数 <b style="color: var(--cyan);">${formatNumber(pts)}</b>` +
+        `${base > 0 ? ` · 下次结算需要最高反转等级超过 <b>Lv.${formatNumber(base)}</b>` : ""}</p>` +
+        `<button class="primary-button" data-inv-enter="1">◑ 进入反转世界</button>` +
+        `<p class="inventory-note" style="color: var(--muted);">主动退出会清空本次进度、并按最高等级的增量结算科技点数；` +
+        `<b>关掉网页不算退出</b> —— 下次打开会接着玩。</p>`);
+    }
+    function renderInvLabPane() {
+      const box = el("invGateLabBody");
+      if (!box) return;
+      const pts = Math.max(0, Math.floor(save.invTechPoints || 0));
+      setHTML("invGateLabBody",
+        `<p class="inventory-note">用<b style="color: var(--cyan);">科技点数</b>` +
+        `（主动退出反转世界时按最高等级的增量结算）买<b>永久加成</b> —— 当前科技点数：<b>${formatNumber(pts)}</b></p>` +
+        INV_LAB_DEFS.map(def => {
+          const lv = invLabLv(def.id);
+          const cost = invLabCost(def);
+          const can = pts >= cost;
+          return `<div class="inv-leap-row"><div class="inv-leap-head"><span class="inv-tech-icon">${def.icon}</span>` +
+            `<b>${def.name}</b><span class="inv-tech-lv">Lv.${formatNumber(lv)}</span></div>` +
+            `<div class="inv-tech-desc">${def.desc}</div>` +
+            `<div class="inv-leap-meta"><span>升级花费 <b>${formatNumber(cost)}</b> 科技点数</span>` +
+            `<span class="inv-leap-btns"><button class="primary-button" data-inv-lab="${def.id}" ${can ? "" : "disabled"}>升级（${formatNumber(cost)}）</button></span></div></div>`;
+        }).join(""));
     }
     function renderInvWorld() {
       if (!invActive || !invWorld) return;
@@ -14986,12 +16390,71 @@
       setText("invLevelVal", "Lv." + formatNumber(lv));
       setText("invCapturesVal", formatNumber(invWorld.captures));
       setText("invBestVal", "Lv." + formatNumber(invWorld.best));
-      setText("invRateVal", "+" + formatNumber(1 + lv) + " / 秒");
+      setText("invRateVal", "+" + formatNumber((1 + lv) * invTechMult("passive", 0.15) * invInspireMult() * invLabDustMult() * invMilestoneDustMult() * invParseDustMult()) + " / 秒");
       const pct = Math.max(0, Math.min(1, invWorld.progress)) * 100;
       setStyle("invCapFill", "width", pct.toFixed(1) + "%");
+      // V0.105（作者要求）：进度条上写明「被这条猎犬捕获的概率」
       setText("invCapText", invWorld.progress >= 1
-        ? "捕获逼近 100%"
-        : `捕获逼近 ${pct.toFixed(0)}% · 还有 ${Math.max(0, (1 - invWorld.progress) * INV_CAPTURE_SEC).toFixed(1)} 秒`);
+        ? `反转猎犬 100% · 被捕获概率 ${(invCaptureChance(INV_HOUND1_STRENGTH) * 100).toFixed(1)}%`
+        : `反转猎犬 ${pct.toFixed(0)}% · 还有 ${Math.max(0, (1 - invWorld.progress) * invCapSec()).toFixed(1)} 秒 · 被捕获概率 ${(invCaptureChance(INV_HOUND1_STRENGTH) * 100).toFixed(1)}%`);
+      const track4 = el("invTrack4");
+      if (track4) {
+        const show4 = lv >= INV_HOUND4_UNLOCK_LEVEL;
+        setStyle("invTrack4", "display", show4 ? "" : "none");
+        if (show4) {
+          const pr4 = Math.max(0, Math.min(1, invWorld.progress4 || 0));
+          setStyle("invCap4Fill", "width", (pr4 * 100).toFixed(1) + "%");
+          setText("invCap4Text", `第四条猎犬 ${Math.floor(pr4 * 100)}% · 还有 ${Math.max(0, (1 - pr4) * invCapSec() / INV_HOUND4_SPEED_MULT).toFixed(3)} 秒 · 被捕获概率 ${(invCaptureChance(INV_HOUND4_STRENGTH) * 100).toFixed(1)}% · 一口 ${INV_HOUND4_DAMAGE} 级`);
+        }
+      }
+      // V0.105：第 5~8 条猎犬的进度条（表驱动；毫秒级倒计时专门格式化）
+      INV_HOUND_EXTRA.forEach(h => {
+        const tr = el("invTrack" + h.n);
+        if (!tr) return;
+        const showN = lv >= h.unlock;
+        setStyle("invTrack" + h.n, "display", showN ? "" : "none");
+        if (!showN) return;
+        const prN = Math.max(0, Math.min(1, invWorld["progress" + h.n] || 0));
+        setStyle("invCap" + h.n + "Fill", "width", (prN * 100).toFixed(1) + "%");
+        const leftMs = Math.max(0, (1 - prN) * invCapSec() / (h.speed * invHoundSpeedMult()) * 1000);
+        const leftTxt = leftMs >= 10 ? (leftMs / 1000).toFixed(2) + " 秒" : leftMs.toFixed(1) + " 毫秒";
+        setText("invCap" + h.n + "Text", `${INV_HOUND_NAMES[h.n - 1]} ${Math.floor(prN * 100)}% · 还有 ${leftTxt} · 被捕获概率 ${(invCaptureChance(h.strength) * 100).toFixed(1)}% · 一口 ${formatNumber(h.damage)} 级`);
+      });
+      // V0.105：精英进度条（挑战后显示；写明档位 / 攻击计数 / 被捕获概率）
+      const elTrack = el("invTrackElite");
+      if (elTrack) {
+        const elv = invWorld.elite;
+        const showEl = !!(elv && elv.active);
+        setStyle("invTrackElite", "display", showEl ? "" : "none");
+        if (showEl) {
+          const pr = Math.max(0, Math.min(1, elv.progress || 0));
+          const tierName = GENE_TIERS[elv.tier] ? GENE_TIERS[elv.tier].name : "普通";
+          setStyle("invEliteFill", "width", (pr * 100).toFixed(1) + "%");
+          const leftSec = Math.max(0, Math.round(((elv.deadline || 0) - Date.now()) / 1000));
+          setText("invEliteText", `👑 精英·${tierName} Lv.${formatNumber(elv.level)} ${Math.floor(pr * 100)}% · 限时剩 ${formatDuration(leftSec)} · 被捕获概率 ${(invEliteChance() * 100).toFixed(1)}% · 已承受 ${formatNumber(elv.attacks)}/100`);
+        }
+      }
+      renderInvElitePane();
+      const track3 = el("invTrack3");
+      if (track3) {
+        const show3 = lv >= INV_HOUND3_UNLOCK_LEVEL;
+        setStyle("invTrack3", "display", show3 ? "" : "none");
+        if (show3) {
+          const pr3 = Math.max(0, Math.min(1, invWorld.progress3 || 0));
+          setStyle("invCap3Fill", "width", (pr3 * 100).toFixed(1) + "%");
+          setText("invCap3Text", `第三条猎犬 ${Math.floor(pr3 * 100)}% · 还有 ${Math.max(0, (1 - pr3) * invCapSec() / INV_HOUND3_SPEED_MULT).toFixed(2)} 秒 · 被捕获概率 ${(invCaptureChance(INV_HOUND3_STRENGTH) * 100).toFixed(1)}% · 一口 ${INV_HOUND3_DAMAGE} 级`);
+        }
+      }
+      const track2 = el("invTrack2");
+      if (track2) {
+        const show2 = lv >= INV_HOUND2_UNLOCK_LEVEL;
+        setStyle("invTrack2", "display", show2 ? "" : "none");
+        if (show2) {
+          const pr2 = Math.max(0, Math.min(1, invWorld.progress2 || 0));
+          setStyle("invCap2Fill", "width", (pr2 * 100).toFixed(1) + "%");
+          setText("invCap2Text", `第二条猎犬 ${Math.floor(pr2 * 100)}% · 还有 ${Math.max(0, (1 - pr2) * invCapSec() / INV_HOUND2_SPEED_MULT).toFixed(2)} 秒 · 被捕获概率 ${(invCaptureChance(INV_HOUND2_STRENGTH) * 100).toFixed(1)}%`);
+        }
+      }
       setText("invHarvestBtn", `深度凝析（+${formatNumber(invHarvestGain())}）`);
       const cost = invLevelCost();
       const can = bigCmp(invWorld.dust, bigOf(cost)) >= 0;
@@ -15002,18 +16465,259 @@
           ? `反转铸级 Lv.${formatNumber(lv)} → Lv.${formatNumber(lv + 1)}（花费 ${formatNumber(cost)}）`
           : `反转铸级（需要 ${formatNumber(cost)} 反转尘埃）`);
       }
-      const hb = el("invAutoHarvestBtn"), lb = el("invAutoLevelBtn");
-      if (hb) { hb.classList.toggle("on", !!invWorld.auto.harvest); setText("invAutoHarvestBtn", invWorld.auto.harvest ? "开" : "关"); }
-      if (lb) { lb.classList.toggle("on", !!invWorld.auto.level); setText("invAutoLevelBtn", invWorld.auto.level ? "开" : "关"); }
+      // V0.105：里程碑行（层数 / 下一层门槛 / 当前加成）
+      const mCount = invMilestoneCount();
+      setHTML("invMilestoneLine", `🏁 <b>反转里程碑</b>：已达 <b style="color: var(--gold);">${formatNumber(mCount)}</b> 层` +
+        `（本局最高 Lv.${formatNumber(invWorld.best)}，下一层 Lv.${formatNumber((mCount + 1) * INV_MILESTONE_STEP)}） · ` +
+        `大里程碑 <b>${formatNumber(invMilestoneBigCount())}</b> 座 · 超级 <b>${formatNumber(invMilestoneMegaCount())}</b> 座 · ` +
+        `加成：尘埃 <b>×${invMilestoneDustMult().toFixed(2)}</b> · 抵抗 <b>+${(invMilestoneResist() * 100).toFixed(0)}%</b> · 软上限 <b>×${invMilestoneCapMult().toFixed(3)}</b>`);
+      renderInvAutoPane();   // V0.104：自动化两行（解锁 / 开关 / 效率）
+      renderInvTechPane();   // V0.104：科技页的八格
+      renderInvLeapPane();   // V0.104：科技跃迁 · 科技爆炸
+      // V0.104：页签的隐藏与高亮 —— 科技页没拿到第一件前不显示；跃迁页到 20 级才现身；
+      //   首次出现时挂「新」高亮，看过一次即熄灭（会话级，不落盘）。
+      const bagTab = el("invTabBag");
+      if (bagTab) {
+        const unlocked = isInvBagUnlocked();   // V0.104：粘性解锁 —— 丢光也不黑回去
+        bagTab.style.display = unlocked ? "" : "none";
+        bagTab.classList.toggle("new-glow", unlocked && !invWorld.bagSeen);
+      }
+      const leapTab = el("invTabLeap");
+      if (leapTab) {
+        const on = isInvLeapUnlocked();
+        leapTab.style.display = on ? "" : "none";
+        leapTab.classList.toggle("new-glow", on && !invWorld.leapSeen);
+      }
+      // V0.105：精英页签（反转等级 500 解锁 + 「新」高亮）
+      const eliteTab = el("invTabElite");
+      if (eliteTab) {
+        const onE = isInvEliteUnlocked();
+        eliteTab.style.display = onE ? "" : "none";
+        eliteTab.classList.toggle("new-glow", onE && !invWorld.eliteSeen);
+      }
+      // V0.104：灵感子页签（任意进阶科技 5 级 → 出现 + 「新」高亮直到看过）
+      const insTab = el("invLeapSubTabInspire");
+      if (insTab) {
+        const on = isInvInspireUnlocked();
+        insTab.style.display = on ? "" : "none";
+        insTab.classList.toggle("new-glow", on && !invWorld.inspireSeen);
+      }
+      // V0.105：解析子页签（解锁第二条猎犬后出现 + 「新」高亮直到看过）
+      const parTab = el("invLeapSubTabParse");
+      if (parTab) {
+        const onP = isInvParseUnlocked();
+        parTab.style.display = onP ? "" : "none";
+        parTab.classList.toggle("new-glow", onP && !invWorld.parseSeen);
+      }
+      renderInvParsePane();
+      renderInvInspirePane();
+      // V0.105（作者要求）：反转世界右上角数值条（和主宇宙同款；没解锁的不显示）
+      setText("invHeadDust", formatNumber(invWorld.dust));
+      setText("invHeadLevel", "Lv." + formatNumber(lv));
+      setText("invHeadCaptures", formatNumber(invWorld.captures));
+      const eliteChip = el("invHeadEliteChip");
+      if (eliteChip) {
+        const showE = Math.max(0, Math.floor(invWorld.elitePts || 0)) > 0;
+        eliteChip.style.display = showE ? "" : "none";
+        if (showE) setText("invHeadElite", formatNumber(Math.floor(invWorld.elitePts || 0)));
+      }
+      const parseChip = el("invHeadParseChip");
+      if (parseChip) {
+        const showP = isInvParseUnlocked();
+        parseChip.style.display = showP ? "" : "none";
+        if (showP) setText("invHeadParse", formatNumber(Math.floor(invParseState().pts)));
+      }
+      // 主界面侧栏：灵感倍率（生效时显示）
+      const insRow = el("invInspireRow");
+      if (insRow) {
+        const m = invInspireMult();
+        const active = m > 1.0001;
+        insRow.style.display = active ? "" : "none";
+        if (active) setText("invInspireVal", "×" + m.toFixed(2));
+      }
     }
-    on("invExit", () => exitInvWorld());
+    // V0.104：灵感子页 —— 献祭全部反转等级换尘埃倍率
+    function renderInvInspirePane() {
+      const box = el("invLeapSubInspire");
+      if (!box) return;
+      if (!isInvInspireUnlocked()) {
+        setHTML("invLeapSubInspire", `<p class="inv-note" style="margin-top: 8px; color: var(--muted);">任意一件进阶科技到 <b>5 级</b>后，这里会亮起。</p>`);
+        return;
+      }
+      const I = invInspireState();
+      const need = invInspireNeed();
+      const lv = invLevelNow();
+      const cur = invInspireMult();
+      const can = lv >= need;
+      const preview = 1 + INV_INSPIRE_PER_LEVEL * lv;
+      setHTML("invLeapSubInspire",
+        `<p class="inv-note" style="margin-top: 8px;">把<b>当前全部反转等级</b>一次献祭，换成<b>反转尘埃倍率</b>：` +
+        `每 1 级 = +${(INV_INSPIRE_PER_LEVEL * 100).toFixed(0)}%；倍率<b>持续整局有效</b>（不衰减），直到退出反转世界为止。` +
+        `献祭后等级清零；<b>下一次只需要超过「上次献祭的等级」</b>（比如上次献的是 Lv.50，下一次到 Lv.51 就能再献 —— 与历史最高等级无关）。</p>` +
+        `<div class="inspire-card">` +
+        `<div class="inspire-row"><span>当前倍率</span><b>${cur > 1.0001 ? "×" + cur.toFixed(2) + "（本局持续）" : "×1.00（未使用）"}</b></div>` +
+        `<div class="inspire-row"><span>上次献祭等级</span><b>${I.last > 0 ? "Lv." + formatNumber(I.last) : "还没献祭过"}</b></div>` +
+        `<div class="inspire-row"><span>下一次需要</span><b>Lv.${formatNumber(need)}（只要比上次献祭高 1 级）</b></div>` +
+        `<div class="inspire-row"><span>你当前反转等级</span><b>Lv.${formatNumber(lv)}${can ? " ✔" : `（还差 ${formatNumber(need - lv)} 级）`}</b></div>` +
+        `<div class="inspire-row"><span>本次可换倍率</span><b>×${preview.toFixed(2)}</b></div>` +
+        `<button class="primary-button" data-inspire-use="1" ${can ? "" : "disabled"}>` +
+        `${can ? `✨ 献祭全部 Lv.${formatNumber(lv)} → ×${preview.toFixed(2)}` : `还差 ${formatNumber(need - lv)} 级（需要 Lv.${formatNumber(need)}）`}</button>` +
+        `</div>`);
+    }
+    // V0.104：科技跃迁 · 科技爆炸面板（八行：基础科技 → 对应进阶科技）
+    function renderInvLeapPane() {
+      const list = el("invLeapList");
+      if (!list) return;
+      const L = invLeapState();
+      setHTML("invLeapList", INV_TECH_DEFS.map(d => {
+        const lv = invTechLv(d.id);
+        const advLv = invLeapLevel(d.id);
+        const prog = invLeapProgress(d.id);
+        const sel = L.sel === d.id;
+        const cost = invLeapCost(d.id);
+        // V0.104（作者要求）：进度条填充也向下取整（整百分比，不出现 86.4% 这种）
+        const pct = Math.floor(Math.max(0, Math.min(100, (prog / cost) * 100)));
+        const canFeed = sel && lv > 0;
+        return `<div class="inv-leap-row${sel ? " selected" : ""}">` +
+          `<div class="inv-leap-head"><span class="inv-tech-icon">${d.icon}</span><b>${d.name}</b>` +
+          `<span class="inv-tech-lv">Lv.${formatNumber(lv)}</span>` +
+          `<span class="inv-leap-arrow">➜</span>` +
+          `<b style="color: var(--gold);">${d.adv}</b>` +
+          `<span class="inv-tech-lv">Lv.${formatNumber(advLv)}</span></div>` +
+          `<div class="inv-leap-bar"><i style="width:${pct.toFixed(1)}%"></i></div>` +
+          `<div class="inv-leap-meta"><span>进度 <b>${formatNumber(prog)}</b> / ${formatNumber(cost)}</span>` +
+          `<span>基础效果倍率 <b>×${(1 + INV_LEAP_BONUS_PER_LEVEL * advLv).toFixed(2)}</b></span>` +
+          `<span class="inv-leap-btns">` +
+          `<button class="secondary-button" data-leap-select="${d.id}">${sel ? "已选择" : "选择"}</button>` +
+          `<button class="primary-button" data-leap-feed="${d.id}" ${canFeed ? "" : "disabled"}>丢入 Lv.${formatNumber(lv)}</button>` +
+          `</span></div></div>`;
+      }).join(""));
+    }
+    // V0.105：精英页 —— 刷新倒计时 / 精英卡（档位 / 战力 / 属性）/ 挑战 / 激战状态 / 精英点数
+    function renderInvElitePane() {
+      const box = el("invEliteBody");
+      if (!box) return;
+      const pts = Math.max(0, Math.floor(invWorld.elitePts || 0));
+      const elv = invWorld.elite;
+      const head = `<p class="inventory-note">加强过的<b>精英猎犬</b>：等级围绕你的反转等级浮动、档位沿用「普通 → 超越」；<b>数值跟着你的成长走</b>（强度按你的总抵抗浮动，速度 / 伤害随等级放大），属性随机。挑战后它会加入主界面<b>最下面的一条进度条</b>，承受 <b>100</b> 次攻击即可击败、获得精英点数；<b>限时内打完立刻刷下一头，超时它会逃走。</b></p>`;
+      const ptsLine = `<p class="inventory-note">已积累精英点数：<b style="color: var(--gold);">${formatNumber(pts)}</b><span style="color: var(--muted);">（用途会在后续版本开放）</span></p>`;
+      if (!elv) {
+        const left = Math.max(0, (invWorld.eliteNextAt || 0) - Date.now());
+        setHTML("invEliteBody", head + `<p class="inventory-note">下一头精英：<b>${formatDuration(Math.round(left / 1000))}</b> 后刷新。</p>` + ptsLine);
+        return;
+      }
+      const leftSec2 = Math.max(0, Math.round(((elv.deadline || 0) - Date.now()) / 1000));
+      const timerLine = `<p class="inventory-note">⏳ 限时：<b style="color: var(--red);">${formatDuration(leftSec2)}</b>（从刷出来开始算，打完立刻刷下一头；超时逃走）。</p>`;
+      const tierName = (GENE_TIERS[elv.tier] || { name: "普通" }).name;
+      const specList = elv.specials.length
+        ? elv.specials.map(id => { const d = INV_ELITE_SPECIALS.filter(s => s.id === id)[0]; return `<b style="color: var(--red);">${d ? d.name : id}</b>（${d ? d.desc : ""}）`; }).join("、")
+        : "无（普通个体）";
+      const status = elv.active
+        ? timerLine + `<p class="inventory-note">状态：<b style="color: var(--gold);">激战中</b> —— 已承受 <b>${formatNumber(elv.attacks)}/100</b> 次攻击${elv.specials.indexOf("rage") >= 0 ? `（狂暴中：当前攻速 ×${elv.speedMult.toFixed(2)}）` : ""}。</p>`
+        : timerLine + `<button class="primary-button" data-elite-fight="1">⚔ 挑战它（加入进度条）</button>`;
+      setHTML("invEliteBody", head +
+        `<div class="inspire-card">` +
+        `<div class="inspire-row"><span>档位 · 等级</span><b>${tierName} · Lv.${formatNumber(elv.level)}</b></div>` +
+        `<div class="inspire-row"><span>预估战力</span><b style="color: var(--gold);">${formatNumber(invElitePower(elv))}</b></div>` +
+        `<div class="inspire-row"><span>捕获强度 · 攻速 · 伤害</span><b>${(elv.strength * 100).toFixed(0)}% · ×${elv.speedMult.toFixed(2)} · 一口 ${formatNumber(elv.damage)} 级</b></div>` +
+        `<div class="inspire-row" style="display: block;"><span>特殊属性</span><div style="margin-top: 4px;">${specList}</div></div>` +
+        `</div>` + status + ptsLine);
+    }
+    // V0.105：解析子页 —— 数据点商店
+    function renderInvParsePane() {
+      const box = el("invLeapSubParse");
+      if (!box) return;
+      if (!isInvParseUnlocked()) {
+        setHTML("invLeapSubParse", `<p class="inv-note" style="margin-top: 8px; color: var(--muted);">解锁第二条猎犬（反转等级到 50）后，这里会亮起。</p>`);
+        return;
+      }
+      const P = invParseState();
+      const rate = invParseRate();
+      const nH = invHoundCount();
+      setHTML("invLeapSubParse",
+        `<p class="inv-note" style="margin-top: 8px;">从第二条猎犬起，<b>每被追逐 1 秒</b>都积攒<b style="color: var(--cyan);">数据点</b> —— ` +
+        `当前 <b>${formatNumber(nH)}</b> 条猎犬 → <b>${formatNumber(rate)}</b> 点 / 秒（两条 1、三条 2、四条 4、五条 8…翻倍递增）。` +
+        `解锁后掉回 50 级以下也保留；数据点在本趟旅程里花，退出即清。</p>` +
+        `<div class="inspire-card"><div class="inspire-row"><span>当前数据点</span><b>${formatNumber(Math.floor(P.pts))}</b></div></div>` +
+        INV_PARSE_DEFS.map(def => {
+          const lv = invParseLv(def.id);
+          const cost = invParseCost(def);
+          const can = Math.floor(P.pts) >= cost;
+          return `<div class="inv-leap-row" style="margin-top: 8px;"><div class="inv-leap-head"><span class="inv-tech-icon">${def.icon}</span>` +
+            `<b>${def.name}</b><span class="inv-tech-lv">Lv.${formatNumber(lv)}</span></div>` +
+            `<div class="inv-tech-desc">${def.desc}</div>` +
+            `<div class="inv-leap-meta"><span>升级花费 <b>${formatNumber(cost)}</b> 数据点</span>` +
+            `<span class="inv-leap-btns"><button class="primary-button" data-inv-parse="${def.id}" ${can ? "" : "disabled"}>升级（${formatNumber(cost)}）</button></span></div></div>`;
+        }).join(""));
+    }
+    // V0.104：自动化页两行 —— 未解锁显示解锁按钮；解锁后显示「效率升级 + 开关」
+    function renderInvAutoPane() {
+      ["harvest", "level"].forEach(kind => {
+        const box = el(kind === "harvest" ? "invAutoRowHarvest" : "invAutoRowLevel");
+        if (!box) return;
+        const name = invAutoKindName(kind);
+        const sub = kind === "harvest" ? "自动做「深度凝析」" : "反转尘埃够就自动铸一级";
+        if (!invAutoUnlocked(kind)) {
+          setHTML(kind === "harvest" ? "invAutoRowHarvest" : "invAutoRowLevel",
+            `<div class="inv-auto-text"><b>${name}</b><small>${sub} · <b style="color: var(--muted);">未解锁</b></small></div>` +
+            `<span class="inv-auto-ctl"><button class="primary-button" data-inv-auto-unlock="${kind}">解锁（${formatNumber(INV_AUTO_UNLOCK_COST[kind])} 反转尘埃）</button></span>`);
+          return;
+        }
+        const lv = invAutoEffLv(kind);
+        const maxed = lv >= INV_AUTO_EFF_MAX;
+        setHTML(kind === "harvest" ? "invAutoRowHarvest" : "invAutoRowLevel",
+          `<div class="inv-auto-text"><b>${name}</b><small>${sub} · 当前 <b style="color: var(--cyan);">${invAutoRate(kind).toFixed(1)} 次/秒</b></small></div>` +
+          `<span class="inv-auto-ctl">` +
+          `<button class="secondary-button" data-inv-auto-up="${kind}" ${maxed ? "disabled" : ""}>` +
+          `${maxed ? "效率已满级（3 次/秒）" : `效率 Lv.${lv} → ${lv + 1}（${formatNumber(invAutoEffCost(kind))}）`}</button>` +
+          `<button class="switch ${invWorld.auto[kind] ? "on" : ""}" data-inv-auto-toggle="${kind}">${invWorld.auto[kind] ? "开" : "关"}</button>` +
+          `</span>`);
+      });
+    }
+    // V0.104：科技页（八项基础科技：持有等级 + 效果 + 掉落规则读数）
+    function renderInvTechPane() {
+      const grid = el("invTechGrid");
+      if (!grid) return;
+      setHTML("invTechGrid", INV_TECH_DEFS.map(d => {
+        const lv = invTechLv(d.id);
+        return `<div class="inv-tech-card${lv > 0 ? " owned" : ""}">` +
+          `<div class="inv-tech-head"><span class="inv-tech-icon">${d.icon}</span><b>${d.name}</b>` +
+          `<span class="inv-tech-lv">${lv > 0 ? "Lv." + formatNumber(lv) + (invTechEffLv(d.id) < lv * (1 + INV_LEAP_BONUS_PER_LEVEL * invLeapLevel(d.id)) - 0.01 ? `（有效 ${invTechEffLv(d.id).toFixed(1)}）` : "") : "未获得"}</span></div>` +
+          `<div class="inv-tech-desc">${d.desc}${invLeapLevel(d.id) > 0 ? ` · 进阶加成 <b style="color: var(--gold);">×${(1 + INV_LEAP_BONUS_PER_LEVEL * invLeapLevel(d.id)).toFixed(2)}</b>` : ""}</div></div>`;
+      }).join("") +
+        `<div class="inv-tech-note">「深度凝析」每次（手动与自动都算）有 <b>${(invTechDropChance() * 100).toFixed(1)}%</b> 概率爆出基础科技` +
+        `（基础 ${(INV_TECH_DROP_CHANCE * 100).toFixed(0)}%，采样增幅器 +0.2%/级）；掉落等级 = 当前反转等级；` +
+        `同种科技<b>高等级自动替换低等级</b>，被消耗的那份按「等级 × ${INV_TECH_REFUND_PER_LEVEL}」折算成反转尘埃。` +
+        `八项科技全部<b>持续生效</b>；有效等级有<b>软上限</b>（超过 ${INV_TECH_EFF_SOFT_CAP} 的部分只按平方根计入，越堆越钝但永不封死）。</div>`);
+    }
+    on("invExit", () => confirmExitInvWorld());
     on("invTabMain", () => switchInvPane("main"));
     on("invTabAuto", () => switchInvPane("auto"));
     on("invTabBag", () => switchInvPane("bag"));
+    on("invTabLeap", () => switchInvPane("leap"));
+    delegate("invGateTabs", "[data-inv-gate]", btn => switchInvGatePane(btn.dataset.invGate));
+    delegate("invGateEnterBody", "[data-inv-enter]", () => requestInvEntry());
+    delegate("invGateLabBody", "[data-inv-lab]", btn => invLabBuy(btn.dataset.invLab));
+    delegate("invLeapSubTabs", "[data-leap-sub]", btn => switchInvLeapSub(btn.dataset.leapSub));
+    delegate("invLeapSubInspire", "[data-inspire-use]", () => invInspireConfirm());
+    delegate("invLeapSubParse", "[data-inv-parse]", btn => invParseBuy(btn.dataset.invParse));
+    delegate("invEliteBody", "[data-elite-fight]", () => invEliteChallenge());
+    on("invTabElite", () => switchInvPane("elite"));
+    delegate("invLeapList", "[data-leap-select]", btn => invLeapSelect(btn.dataset.leapSelect));
+    delegate("invLeapList", "[data-leap-feed]", btn => invLeapFeed(btn.dataset.leapFeed));
     on("invHarvestBtn", () => invHarvest(false));
     on("invLevelBtn", () => invTryLevelUp(false));
-    on("invAutoHarvestBtn", () => { if (invWorld) { invWorld.auto.harvest = !invWorld.auto.harvest; renderInvWorld(); } });
-    on("invAutoLevelBtn", () => { if (invWorld) { invWorld.auto.level = !invWorld.auto.level; renderInvWorld(); } });
+    // V0.105：铸级批量（×1 / ×10 / ×100 / 一键最大）
+    delegate("invPaneMain", "[data-inv-lv-buy]", btn => {
+      const v = btn.dataset.invLvBuy;
+      invTryLevelUp(false, v === "max" ? Infinity : Number(v));
+    });
+    // V0.104：自动化两行的按钮（解锁 / 效率升级 / 开关）
+    ["invAutoRowHarvest", "invAutoRowLevel"].forEach(rowId => {
+      delegate(rowId, "[data-inv-auto-unlock]", btn => invAutoUnlock(btn.dataset.invAutoUnlock));
+      delegate(rowId, "[data-inv-auto-up]", btn => invAutoUpgrade(btn.dataset.invAutoUp));
+      delegate(rowId, "[data-inv-auto-toggle]", btn => invAutoToggle(btn.dataset.invAutoToggle));
+    });
 
     // ===================== 主循环：按真实流逝时间推进 =====================
     // 浏览器限流只拉长回调间隔，不影响 Date.now()，
@@ -15148,11 +16852,16 @@
         } catch (_) {}
       }, 600);
     }
+    // V0.104（作者要求）：关网页不算退出反转世界 —— 存档里有未结束的进度时，
+    //   主宇宙本就处于暂停，这段「离线」不该兑现收益：把 savedAt 顶到现在即可。
+    const resumeInv = !!(save.invSave && typeof save.invSave === "object");
+    if (resumeInv) save.savedAt = Date.now();
     // 离线结算必须在首次 render 之前跑完，这样面板一出现就是结算后的数字
     const offlineInfo = applyOfflineProgress();
     if (offlineInfo) saveGame(true);   // 立刻落盘，防止刷新一次重复结算同一段时间
     // V0.98.1：启动渲染也包防护网 —— 万一某个面板数据异常，也不至于开屏即白屏
     safeRun("启动渲染", render);
+    if (resumeInv) safeRun("恢复反转世界", () => enterInvWorld(true));   // 直接回到反转世界继续
     if (offlineInfo) showOfflineModal(offlineInfo);
   </script>
 </body>
