@@ -2547,6 +2547,89 @@
       .game-layout { grid-template-columns: 1fr; }
       .achievement-sidebar { position: static; order: 2; }
     }
+
+    /* ===== V0.98：自动化子页面 —— 收割时机滑动条 ===== */
+    .overflow-box {
+      border: 1px solid var(--line);
+      background: var(--panel-light);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+    .overflow-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .overflow-val { color: var(--cyan); font-weight: 800; font-size: 15px; }
+    .overflow-box input[type="range"] { width: 100%; accent-color: var(--cyan); cursor: pointer; }
+    .overflow-hint { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    /* ===== V0.98：反转世界 —— 主宇宙的完全倒影 ===== */
+    /* 进入后：背景由淡黑翻成淡白、左上角标题由白翻黑；主世界的页面与页签栏整体收起 */
+    #invScreen { display: none; }
+    #invScreen.active { display: block; }
+    /* 门页 ↔ 反转世界本体：不进反转世界时只看到「开发中」门页 */
+    body:not(.inv-mode) #invWorldWrap { display: none; }
+    body.inv-mode #invGate { display: none; }
+    /* 进场后：主世界所有页面与页签栏整体收起，只留反转世界 */
+    body.inv-mode .screen { display: none; }
+    body.inv-mode #invScreen { display: block; }
+    body.inv-mode .tabs { display: none; }
+    body.inv-mode {
+      --bg: #edefe9;
+      --panel: #ffffff;
+      --panel-light: #f6f8f4;
+      --line: #d6dbd2;
+      --text: #161b24;
+      --muted: #5c6676;
+      background:
+        radial-gradient(circle at 15% 0%, #e1e9ea 0, transparent 34rem),
+        radial-gradient(circle at 100% 100%, #f2e9ef 0, transparent 30rem),
+        var(--bg);
+    }
+    body.inv-mode .panel { background: rgba(255, 255, 255, 0.94); }
+    body.inv-mode h1 { color: #0d1117; }
+    .inv-frame { display: grid; gap: 10px; }
+    .inv-nav {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      border: 1px solid var(--line); background: var(--panel); border-radius: 9px;
+      padding: 8px 12px;
+    }
+    .inv-brand { font-weight: 800; letter-spacing: 1px; margin-right: 4px; }
+    .inv-tab {
+      border: 1px solid var(--line); background: var(--panel-light); color: var(--text);
+      border-radius: 7px; padding: 5px 12px; cursor: pointer; font-weight: 700;
+    }
+    .inv-tab.active { border-color: transparent; color: #071014; background: linear-gradient(100deg, var(--cyan), var(--green)); }
+    .inv-spacer { flex: 1 1 auto; }
+    .inv-exit {
+      border: 1px solid var(--line); background: var(--panel-light); color: var(--text);
+      border-radius: 7px; padding: 5px 12px; cursor: pointer; font-weight: 700;
+    }
+    .inv-exit:hover { border-color: var(--muted); }
+    .inv-pane { display: none; }
+    .inv-pane.active { display: block; }
+    .inv-hero { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-end; margin: 2px 0 12px; }
+    .inv-hero-main { min-width: 240px; }
+    .inv-label { color: var(--muted); font-size: 12px; }
+    .inv-dust { font-size: clamp(26px, 3.2vw, 36px); font-weight: 800; line-height: 1.1; letter-spacing: 0.5px; }
+    .inv-side { display: grid; gap: 3px; font-size: 13px; }
+    .inv-track {
+      position: relative; height: 16px; border-radius: 5px; overflow: hidden;
+      border: 1px solid #cdd5cc; background: #f0f2ee; margin: 4px 0 10px;
+    }
+    .inv-track > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, #e0554f, #f2a35c); transition: width 0.1s linear; }
+    .inv-track-cap {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; color: #39404d;
+    }
+    .inv-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .inv-note { color: var(--muted); font-size: 12px; line-height: 1.55; margin: 10px 0 0; }
+    .inv-auto-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      border: 1px solid var(--line); background: var(--panel-light); border-radius: 8px;
+      padding: 10px 12px; margin-bottom: 8px;
+    }
+    .inv-auto-text { display: grid; gap: 2px; }
+    .inv-auto-text small { color: var(--muted); }
+    @media (max-width: 720px) { .inv-actions { grid-template-columns: 1fr; } }
   </style>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -2562,7 +2645,7 @@
         <h1>时间猎犬增量</h1>
         <p class="subtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.96</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.98</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -2596,13 +2679,16 @@
 
     <nav class="tabs" aria-label="游戏导航">
       <button class="tab active" data-tab="game">主界面</button>
-      <button class="tab locked" id="autoBtn" style="display: none;" disabled>⚙ 自动化</button>
+      <button class="tab locked" id="autoBtn" data-tab="auto" style="display: none;" disabled>⚙ 自动化</button>
       <button class="tab locked" id="inventoryTab" data-tab="inventory" style="display: none;" disabled>永恒背包</button>
       <button class="tab locked" id="baitTab" data-tab="bait" style="display: none;" disabled>诱饵</button>
       <button class="tab locked" id="paradoxTab" data-tab="paradox" style="display: none;" disabled>悖论</button>
       <button class="tab locked" id="houndTab" data-tab="hound" style="display: none;" disabled>猎犬</button>
       <button class="tab locked" id="challengeTab" data-tab="challenge" style="display: none;" disabled>⚔ 挑战</button>
       <button class="tab locked" id="possibilityTab" data-tab="possibility" style="display: none;" disabled>🌌 可能性</button>
+      <!-- V0.98：反转世界。在「可能性」右边；达成 1E30080 + 苦痛全通后解锁。
+           ⚠️ 点击它不会直接 switchTab —— 由 tab 委托特判成「请求进入」（弹确认 → 进场）。 -->
+      <button class="tab locked" id="invTab" data-tab="inv" style="display: none;" disabled>◑ 反转世界</button>
       <!-- V0.92：排行榜入口。⚠️ 没有 data-tab —— 它是「开弹窗」的纯动作按钮，
            不能被 switchTab 认成页面切换（否则会把当前页关掉）。
            入口**常显**；后端没接上时面板会如实说明「还没开放」，不会装成能用。 -->
@@ -3394,6 +3480,100 @@
       </div>
     </section>
 
+    <!-- ===== V0.98：反转世界（主宇宙的完全倒影）=====
+         独立结算：里面的尘埃 / 等级 / 自动化全部只属于这一趟旅程，每次进入从零开始；
+         进入期间主宇宙的时间整体暂停（runLoop 改道到 invStep，见脚本里的「反转世界」段）。 -->
+    <section id="invScreen" class="screen">
+      <!-- V0.98：对外的「开发中」门页 —— 其他玩家点开只能看到这里；
+           只有内部测试入口能真正进场（enterInvWorld(true)）。 -->
+      <div class="panel inv-gate" id="invGate" style="text-align: center; padding: 38px 20px;">
+        <div class="big-icon" style="font-size: 46px; color: var(--purple);">◑</div>
+        <h2 style="margin: 10px 0 6px;">反转世界 · 开发中</h2>
+        <p class="inventory-note" style="max-width: 580px; margin: 0 auto 10px;">
+          主宇宙的完全倒影：外面的时间会静止，里面的一切从零开始 —— 在那里，「被捕获」不是恩赐，而是等级 −1。
+        </p>
+        <p class="inventory-note" style="max-width: 580px; margin: 0 auto 10px;">
+          <b style="color: var(--gold);">开放条件（暂定）</b>：历史最高尘埃达到 <b>1E30080</b>，
+          并且<b>苦痛挑战全部通关</b>。功能完成后会正式开放 —— 开发完成前，这里只对内部版本开放。
+        </p>
+        <p class="inventory-note" style="max-width: 580px; margin: 0 auto; color: var(--muted);">
+          反转尘埃上限 1EE10 · 反转主界面 / 自动化 / 永恒背包 三个子界面已在内部搭建中。
+        </p>
+      </div>
+      <div class="inv-frame" id="invWorldWrap">
+        <div class="inv-nav">
+          <span class="inv-brand">◑ 反转世界</span>
+          <button class="inv-tab active" id="invTabMain">反转主界面</button>
+          <button class="inv-tab" id="invTabAuto">自动化</button>
+          <button class="inv-tab" id="invTabBag">永恒背包</button>
+          <span class="inv-spacer"></span>
+          <button class="inv-exit" id="invExit" title="离开反转世界，主宇宙的时间会继续流动">↩ 退出反转世界</button>
+        </div>
+
+        <div class="inv-pane active" id="invPaneMain">
+          <div class="panel">
+            <div class="section-title">
+              <h2 style="margin: 0;">反转主界面</h2>
+              <small id="invStatusLine">—</small>
+            </div>
+            <div class="inv-hero">
+              <div class="inv-hero-main">
+                <div class="inv-label">反转尘埃</div>
+                <div class="inv-dust" id="invDustVal">0</div>
+                <div class="inv-label">上限 <b>1EE10</b>（远超主宇宙的 1E30080）</div>
+              </div>
+              <div class="inv-side">
+                <div>反转等级 <b id="invLevelVal">Lv.1</b></div>
+                <div>被捕获 <b id="invCapturesVal">0</b> 次</div>
+                <div>本局最高 <b id="invBestVal">Lv.1</b></div>
+                <div>被动凝析 <b id="invRateVal">+2 / 秒</b></div>
+              </div>
+            </div>
+            <div class="inv-track">
+              <i id="invCapFill"></i>
+              <span class="inv-track-cap" id="invCapText">捕获逼近 0%</span>
+            </div>
+            <div class="inv-actions">
+              <button class="secondary-button" id="invHarvestBtn">深度凝析（+6）</button>
+              <button class="primary-button" id="invLevelBtn">反转铸级（花费 12）</button>
+            </div>
+            <p class="inv-note">这是主宇宙的完全倒影：<b>被捕获不再是恩赐，而是等级 −1</b>。
+              反转猎犬每 10 秒逼近一次，被抓到就掉一级；用「反转铸级」把等级换回来 —— 等级越高，凝析越快。
+              反转尘埃的上限是 <b>1EE10</b>；这里的一切只属于这一趟旅程，退出后再进来就从零开始。</p>
+          </div>
+        </div>
+
+        <div class="inv-pane" id="invPaneAuto">
+          <div class="panel">
+            <div class="section-title">
+              <h2 style="margin: 0;">自动化</h2>
+              <small>反转世界有自己的节奏</small>
+            </div>
+            <div class="inv-auto-row">
+              <div class="inv-auto-text"><b>自动凝析</b><small>每秒自动做一次「深度凝析」</small></div>
+              <button class="switch" id="invAutoHarvestBtn">关</button>
+            </div>
+            <div class="inv-auto-row">
+              <div class="inv-auto-text"><b>自动铸级</b><small>反转尘埃够就立刻铸一级</small></div>
+              <button class="switch" id="invAutoLevelBtn">关</button>
+            </div>
+            <p class="inv-note">两件工具都是每秒巡检一次，和一墙之隔的主宇宙互不影响 —— 你在里面时，外面的一切都是静止的。</p>
+          </div>
+        </div>
+
+        <div class="inv-pane" id="invPaneBag">
+          <div class="panel">
+            <div class="section-title">
+              <h2 style="margin: 0;">永恒背包</h2>
+              <small>倒影里的战利品</small>
+            </div>
+            <div class="empty">反转世界的背包还空空如也。<br>
+              <span class="lb-sub">主宇宙的永恒部件在这里不生效 —— 反转部件、反转碎片这些只属于倒影的战利品，会在后续版本陆续觉醒。</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
 
   <div class="toast" id="toast"></div>
 
@@ -3565,16 +3745,28 @@
     </div>
   </div>
 
-  <div class="modal" id="autoModal">
-    <div class="modal-box wide">
-      <div class="big-icon" style="color: var(--cyan);">⚙</div>
-      <h2 id="autoTitle">自动化</h2>
-      <small id="autoCount" style="display: block; text-align: center; color: var(--muted); margin-bottom: 6px;">0 / 0</small>
-      <p class="inventory-note" id="autoNote" style="text-align: center;"></p>
-      <div id="autoList" style="margin-top: 12px; max-height: 58vh; overflow-y: auto;"></div>
-      <button class="primary-button" id="autoClose" style="margin-top: 16px;">返回</button>
-    </div>
-  </div>
+    <!-- V0.98：自动化从弹窗改成独立子页面（作者要求）——
+         「收割时机」改成 100~200% 的自由滑动条；滑动条放在静态区（不参与 setHTML 重建），
+         拖动过程不会被 100ms 一次的 render 打断。 -->
+    <section id="autoScreen" class="screen">
+      <div class="panel">
+        <div class="section-title">
+          <h2 id="autoTitle" style="margin: 0;">⚙ 自动化</h2>
+          <small id="autoCount">0 / 0</small>
+        </div>
+        <p class="inventory-note" id="autoNote" style="margin-bottom: 12px;"></p>
+        <div class="overflow-box">
+          <div class="overflow-head">
+            <b>收割时机</b>
+            <span class="overflow-val" id="overflowSliderVal">130%</span>
+          </div>
+          <input type="range" id="overflowSlider" min="100" max="200" step="5" value="130"
+            aria-label="自动收获的收割时机（100~200%）">
+          <p class="overflow-hint" id="overflowSliderHint">—</p>
+        </div>
+        <div id="autoList"></div>
+      </div>
+    </section>
 
   <div class="modal" id="baitModal">
     <div class="modal-box" style="border-color: var(--green); background: #101a15;">
@@ -3687,7 +3879,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.96";
+    const GAME_VERSION = "V0.98";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -3769,19 +3961,32 @@
     //   ⚠️ 这条倍率由 getStats() 统一乘（姿态/猎影/挑战环境都躲不掉）—— 见那里的注释。
     const OVERFLOW_RISK_COEF = 6;
     const PROGRESS_DISPLAY_MAX = 200;  // 进度条上限（含溢流段）
-    // 自动收割点（三挡）：让自动化玩家也能表达偏好，而不是被一个写死的策略替他们决定。
-    const OVERFLOW_AUTO_LEVELS = [
-      { at: 100, name: "稳健", hint: "满 100% 就收 —— 零溢流、暴露时间最短" },
-      { at: 130, name: "平衡", hint: "溢流 30% —— 期望收益最优点附近" },
-      { at: 180, name: "贪婪", hint: "溢流 80% —— 赌一把大的，风险也最大" }
-    ];
-    const OVERFLOW_AUTO_DEFAULT = 1;   // 默认「平衡」（130%）
-    // 当前生效的自动收割点（原样返回百分比）
+    // V0.98（作者要求）：自动收割点从「三挡预设」改成 100~200% 的自由滑动条 ——
+    //   玩家用滑动条自己选（步进 5%），不再被三个挡位替他们做决定。
+    //   老存档里的 0/1/2（旧挡位下标）在载入与读取两处都会迁移成 100/130/180。
+    const OVERFLOW_AUTO_MIN = 100;
+    const OVERFLOW_AUTO_MAX = 200;
+    const OVERFLOW_AUTO_STEP = 5;
+    const OVERFLOW_AUTO_DEFAULT = 130;   // 默认 130%（旧「平衡」挡）
+    function clampOverflowAuto(v) {
+      const n = Math.round(Number(v) / OVERFLOW_AUTO_STEP) * OVERFLOW_AUTO_STEP;
+      return Math.max(OVERFLOW_AUTO_MIN, Math.min(OVERFLOW_AUTO_MAX, isFinite(n) ? n : OVERFLOW_AUTO_DEFAULT));
+    }
+    // 当前生效的自动收割点（百分比）
     function getOverflowAutoAt() {
       if (!OVERFLOW_ENABLED) return 100;
-      const i = save && save.overflowAuto;
-      const idx = (Number.isInteger(i) && i >= 0 && i < OVERFLOW_AUTO_LEVELS.length) ? i : OVERFLOW_AUTO_DEFAULT;
-      return OVERFLOW_AUTO_LEVELS[idx].at;
+      const v = Number(save && save.overflowAuto);
+      if (!isFinite(v)) return OVERFLOW_AUTO_DEFAULT;
+      if (v <= 2) return [100, 130, 180][Math.max(0, Math.round(v))];   // 旧挡位下标（内存态老档兜底）
+      return clampOverflowAuto(v);
+    }
+    // 滑动条下方的实时提示（按区间给手感描述）
+    function overflowHintText(pct) {
+      const p = Math.round(pct);
+      if (p <= 100) return "满 100% 就收 —— 零溢流、暴露时间最短（最稳）";
+      if (p < 140) return p + "%：轻度溢流 —— 收益略增，风险略涨，适合大多数场合";
+      if (p < 180) return p + "%：中度溢流 —— 期望收益的甜点区附近（默认推荐）";
+      return p + "%：重度溢流 —— 赌一把大的，被捕获概率成倍上升";
     }
     // 进度条这一帧最多爬到哪（持续收割时停在收割点，否则一路到 200%）
     function getProgressCap() {
@@ -4104,6 +4309,11 @@
     const GOLDEN_ORIGIN_MULT = 3;       // 黄金线的本源收益倍率
     const GOLDEN_SHARD_BONUS = 1;       // 黄金线的额外碎片块数（再乘黄金强度）
     const SHARD_XP_BASE = 2;         // 从 Lv.L 升到 Lv.L+1 需要 SHARD_XP_BASE × L 点经验
+    // V0.98.1（崩溃修复）：碎片等级的「物理硬顶」—— 软上限（100~300 拐点）之外再加一道保险丝。
+    //   原因：等级被外部改档 / 极端数据推到 1e308 级别时，等级求和会溢出成 Infinity，
+    //   顺着读数与判据链传播（作者报告的「碎片数值过高崩溃 / 卡死」形态）。
+    //   正常玩法连 1e6 都摸不到（拐点之后收益是对数级的），1e12 硬顶完全无感。
+    const SHARD_LEVEL_HARD_CAP = 1e12;
     // V0.95（作者要求）：「势能核」（ramp）已整个删除 —— 它的 perLevel 恒为 1、
     //   「等级直接等于叠加上限层数」，是唯一一个不走常规百分比、也没法套软上限的碎片。
     //   连带删除：SHARD_RAMP_STEP 常量、getShardRampStacks()、战斗里 allyAttack 的叠加块、
@@ -4302,14 +4512,13 @@
     // 玩家自己猎犬的属性浮动（抽奖方差，保持原有的「同品质也有强弱」手感）
     const HOUND_ATTR_VARIANCE = 0.18;
     // ===== V0.96（作者要求）：品质 → 四维的「弧度」 =====
-    // 为什么加：V0.96 转盘重做之后，高阶品质比过去难抽得多 —— 阶位中心从几百档压回 20~80，
-    //   同一只「超越·30」现在要幸运得多才见得到。作为补偿，四维不再对品质倍率做**线性**映射，
-    //   而是叠一点曲率：四维倍率 = mult^(1 + HOUND_STAT_CURVE)。
-    //   低阶几乎无感（普通 ×1 不变），越高阶多拿的那一层越多（相对旧值：神话 ×1.43、
-    //   超越·10 ×1.74、超越·30 ×2.01）——「抽到高阶」这件事本身的回报更高了。
+    //   四维不再对品质倍率做**线性**映射，而是叠一点曲率：四维倍率 = mult^(1 + HOUND_STAT_CURVE)。
+    //   低阶几乎无感（普通 ×1 不变），越高阶多拿的那一层越多（相对旧线性值：神话 ×1.54、
+    //   超越·10 ×1.94、超越·30 ×2.30）——「抽到高阶」这件事本身的回报更高了。
+    //   V0.98：按作者要求再「稍微加一点」——系数 0.10 → 0.12。
     //   ⚠️ 只作用于「猎犬四维」；敌人四维（getEnemyBaseStats）刻意不动 —— 那是对局基准，
     //      保底线/推荐战力本来就按猎犬实际战力解算，会自动跟着新四维走。
-    const HOUND_STAT_CURVE = 0.1;
+    const HOUND_STAT_CURVE = 0.12;
     function houndStatMult(qualityEntry) {
       const m = qualityEntry && Number.isFinite(qualityEntry.mult) && qualityEntry.mult > 0
         ? qualityEntry.mult : 1;
@@ -4392,8 +4601,13 @@
     //   相关 CSS、HTML 面板、JS 逻辑与子页签也全部清掉，猎犬子页从五个变成四个）。
 
     // 猎犬寿命：普通猎犬基础 20 点，品质越高寿命越长，每场战斗消耗 1 点
+    // V0.98（作者要求）：寿命重定标 —— 每提高一个品质 +2（普通 20 → 优秀 22 → … → 神话 30），
+    //   进入超越段后每级再 +1（超越·1 = 31、超越·n = 30 + n）。
+    //   ⚠️ 对比旧曲线（20 × 1.6^t：神话 210、超越·n = 210 × (1 + 0.6n)）这是一次大幅下调 ——
+    //   猎犬换代更快、回归循环更活跃；补偿放在「战斗本源掉落」上（后期大幅增加，见 originTierMultOf）。
     const HOUND_BASE_LIFESPAN = 20;
-    const HOUND_LIFESPAN_STEP = 1.6;
+    const HOUND_LIFESPAN_PER_TIER = 2;       // 每提高一个品质：+2
+    const HOUND_LIFESPAN_PER_TRANS_TIER = 1; // 超越段每级：+1
     // 猎犬经验：狩猎掠夺的时间本源越多，经验越多；等级越高，升级越难
     // V0.41 削弱：基础经验 10 → 12，成长系数 1.32 → 1.38。
     // 原曲线下猎犬几场战斗就能连跳好几级，「养犬」几乎不需要等待；
@@ -5412,7 +5626,7 @@
     const AUTO_ROWS = [
       {
         key: "harvest", name: "自动收获",
-        desc: "时间进度走到你设定的「收割时机」（下方挡位，默认 130%）就替你结算一次，随后进度归零重新开始——和手动收获完全同一套规则，只是不用点按钮。结算收益可以在本源商店用「自动收获效率」逐级放大。开启后进度条会自己一圈圈走，不会再因为忘了点收获而空转。单圈耗时不足 1 秒时自动切换为「持续收割」：进度条停在满格不再归零，尘埃按当前速度连续入账，总收益不变。开启条件：达成成就「循环自动化」。"
+        desc: "时间进度走到你设定的「收割时机」（上方滑动条，默认 130%）就替你结算一次，随后进度归零重新开始——和手动收获完全同一套规则，只是不用点按钮。结算收益可以在本源商店用「自动收获效率」逐级放大。开启后进度条会自己一圈圈走，不会再因为忘了点收获而空转。单圈耗时不足 1 秒时自动切换为「持续收割」：进度条停在满格不再归零，尘埃按当前速度连续入账，总收益不变。开启条件：达成成就「循环自动化」。"
       },
       {
         key: "upgrade", name: "自动升级",
@@ -5427,6 +5641,10 @@
         desc: "每秒自动巡检四条时间线，挑出「时间本源产出最高、且推荐战力低于出战猎犬」的那一条派犬入侵——只打有把握的仗，绝不送死。四条时间线一条都打不过时不会干等，只要这只猎犬已达到回归门槛（10 级），它会直接自动回归、进入超越展示柜，把等级换成永久全局加成。出战猎犬战死后会自动换上仓库里最强的一只，从头到尾不用你动手。开启条件：达成成就「猎犬二十级」。"
       },
       {
+        key: "retire", name: "自动回归",
+        desc: "每秒看一眼出战猎犬：只要寿命只剩 <b>1 点</b>（下一场战斗就会寿终消散），立刻替它办理回归 —— 等级全额转成永久全局加成，不让它白死；随后自动从仓库换上最强的一只继续出战。回归门槛 10 级：没到 10 级的猎犬回归不产出加成，会跳过、让它自己打完最后一场。和自动狩猎的战败回归是两条独立的保险，建议一起开。开启条件：达成成就「猎犬二十级」。"
+      },
+      {
         key: "paradox", name: "自动悖论",
         desc: "每隔一段时间自动发动一次悖论：转盘照常转动、照常召唤一只猎犬，不用你动手。基础是每 30 秒一次，之后随「多元宇宙里程碑」一路加速——每多进一次宇宙就快 2.7 秒，最快到 3 秒一次。它不会打断你——触发时不弹窗、也不抢当前页签；尘埃不够 / 转盘中 / 被捕获时会顺延 5 秒再试。注意：悖论会清空尘埃与升级（达到「多元宇宙旅人」后，永恒部件与装备会保留；多元宇宙达到第 20 次后，尘埃与升级也不再被清空）。开启条件：达成成就「多元宇宙旅人」。"
       },
@@ -5436,12 +5654,14 @@
       },
       {
         key: "shop", name: "自动升级悖论商店",
-        desc: "第 5 次进入多元宇宙后，由「多元宇宙里程碑」解锁。每秒自动巡检一次本源商店：挑衅冷却、自动收获效率、猎影加速三件套，只要本源够就各买 1 级——买不起或已满级就跳过，不弹提示、不打扰。开启后攒下的本源会被持续投进商店，不再留着做别的事（比如手动冲「猎影加速」的某一个挡位）。开启条件：多元宇宙里程碑第 5 次。"
+        desc: "第 5 次进入多元宇宙后，由「多元宇宙里程碑」解锁。每秒自动巡检一次本源商店：挑衅冷却、自动收获效率、猎影加速三件套各买 1 级，剩下的本源再持续投进<b>「命运扭曲」</b>（一次买满当前买得起的级数）——买不起或已满级就跳过，不弹提示、不打扰。开启后攒下的本源会被持续投进商店，不再留着做别的事（比如手动冲「猎影加速」的某一个挡位）。开启条件：多元宇宙里程碑第 5 次。"
       }
     ];
 
     const AUTO_UNLOCK = {
       harvest: "auto_harvest", upgrade: "auto_upgrade", equip: "part_collector", hunt: "hound_lv20",
+      // V0.98：自动回归（寿命 1 点自动送展示柜）与自动狩猎共用「猎犬二十级」
+      retire: "hound_lv20",
       bait: "bait_collector",
       // V0.90：自动悖论也搬进「⚙ 自动化」，由成就「多元宇宙旅人」解锁（MULTIVERSE_ACHV_ID 声明在本文件更上方）
       paradox: MULTIVERSE_ACHV_ID
@@ -5643,10 +5863,10 @@
       lines: [],
       linesDirty: false,
       achievements: {},
-      auto: { harvest: false, upgrade: false, hunt: false, equip: false, bait: false, paradox: false, shop: false },
+      auto: { harvest: false, upgrade: false, hunt: false, retire: false, equip: false, bait: false, paradox: false, shop: false },
       bulkLevel: 1,
       luckBoost: 0,
-      // V0.93：自动收割点挡位（OVERFLOW_AUTO_LEVELS 的下标）—— 0 稳健 / 1 平衡 / 2 贪婪
+      // V0.98：自动收割点改成 100~200 的百分比（滑动条自选；老档的 0/1/2 在载入时迁移成 100/130/180）
       overflowAuto: OVERFLOW_AUTO_DEFAULT,
       transcendedHounds: [],
       inertiaUnlocked: false,
@@ -6110,8 +6330,12 @@
       for (const def of SHARD_DEFS) {
         const st = raw[def.id];
         if (!st || typeof st !== "object") continue;
-        const level = Math.max(1, Math.floor(st.level || 0) || 1);
-        out[def.id] = { level, xp: Math.max(0, Math.floor(st.xp || 0)) };
+        // V0.98.1（崩溃修复）：等级加硬顶 —— 外部改档/极端数据把等级推到天文数字时，
+        //   任何「等级求和」都会溢出成 Infinity 并顺着读数链传播。软上限之外本来就是对数量级，
+        //   1e12 的硬顶对正常玩法完全无感（正常拐点只有 100~300）。
+        const level = Math.min(SHARD_LEVEL_HARD_CAP, Math.max(1, Math.floor(Number(st.level) || 0) || 1));
+        const xp = Math.min(1e15, Math.max(0, Math.floor(Number(st.xp) || 0)));
+        out[def.id] = { level, xp };
       }
       return out;
     }
@@ -6422,9 +6646,14 @@
           auto: { ...DEFAULT_SAVE.auto, ...(parsed.auto || {}) },
           luckBoost: parsed.luckBoost || 0,
           // V0.93：自动收割点挡位（0 稳健 / 1 平衡 / 2 贪婪）。越界或非整数一律回默认「平衡」。
-          overflowAuto: (Number.isInteger(parsed.overflowAuto) &&
-            parsed.overflowAuto >= 0 && parsed.overflowAuto < OVERFLOW_AUTO_LEVELS.length)
-            ? parsed.overflowAuto : OVERFLOW_AUTO_DEFAULT,
+          // V0.98：自动收割点 = 100~200 的百分比。老档的 0/1/2（旧挡位下标）在这里迁移成
+          //   100/130/180；非法值一律回默认 130%。
+          overflowAuto: (() => {
+            const v = Number(parsed.overflowAuto);
+            if (!isFinite(v)) return OVERFLOW_AUTO_DEFAULT;
+            if (v <= 2) return [100, 130, 180][Math.max(0, Math.round(v))];
+            return clampOverflowAuto(v);
+          })(),
           // 大数迁移：老存档里这几个量是普通 Number，新存档里是 { m, e }。
           // bigOf 两种都认，这里统一提升一遍，后面所有逻辑就只跟 big* 系列打交道了。
           dust: bigOf(parsed.dust),
@@ -6691,9 +6920,32 @@
     const GENE_TIER_MULT_A = 1.5;          // 超越段的次指数底数（越大越陡）
     const GENE_TIER_MULT_B = 0.5;          // 次指数上的档位指数（0.5 = √n）
     const GENE_TAIL_WEIGHT = 1;            // 超越段的起始权重（= 神话的基础权重 1）
-    const GENE_TAIL_DECAY_BASE = 0.62;     // 超越段权重逐档衰减（基础值）
-    const GENE_TAIL_DECAY_MAX = 0.96;      // 衰减最缓也只能到这儿（再接近 1，尾巴会摊平、又会把面板撑爆）
-    const GENE_LUCK_DECAY_STEP = 0.012;    // 每级「基因幸运」让超越段的衰减变缓（越幸运越容易摸到高档）
+    // ===== V0.98（作者要求）：基因超越段概率对标转盘 —— 幸运乘法化 + 几何焦点 =====
+    //   基因幸运每买一级：幸运值 ×1.1（复利）；每隔一个「超越档位」所需幸运 ×1.21。
+    //   ⚠️ 1.21 = 1.1²，所以「两次幸运升级 = 一个基因超越等级」是精确成立的，不是近似。
+    //   抽法照搬转盘：先由幸运值算出「焦点档位」（可小数），再在焦点附近按钟形取样 ——
+    //   幸运每涨 2 级，整条分布稳定上移一档，永远不到顶（旧「衰减软化」在幸运 29 就撞死）。
+    //   旧规则：超越段权重 = 0.62^档位，被幸运按 +0.012/级 软化（上限 0.96）—— 已删除。
+    const GENE_TIER_LUCK_STEP = 1.21;    // 每个超越档位所需幸运 ×1.21（= 1.1²）
+    const GENE_LUCK_UPGRADE_STEP = 1.1;  // 每一级「基因幸运」：幸运值 ×1.1
+    const GENE_FOCUS_SIGMA_COEFF = 0.5;  // 焦点附近的散布（与转盘的 σ 同思路：随焦点缓慢变宽）
+    const GENE_FOCUS_SIGMA_MIN = 0.7;    // 散布下限（幸运 0 时也留一丝碰到超越·1 的可能）
+    // 幸运值（乘法复利 + 指数保险丝：1.1^7000 ≈ 6e289，仍在 double 范围内）
+    function geneLuckValue() {
+      const e = Math.min(7000, getGeneLuck());
+      return Math.pow(GENE_LUCK_UPGRADE_STEP, e);
+    }
+    // 超越段「焦点」：log_1.21(1.1^等级) = 等级 ÷ 2（可小数，和转盘的焦点同义）
+    function getGeneFocusTier() {
+      const v = geneLuckValue();
+      if (!(v > 1)) return 0;
+      const f = Math.log(v) / Math.log(GENE_TIER_LUCK_STEP);
+      // 上限 = 99（超越·99 的档位序号：tier 104 = 基础 6 档 + 超越 99 档）；f 本身可小数
+      return Math.max(0, Math.min(GENE_MAX_TIER - GENE_BASE_TIERS.length + 1, f));
+    }
+    function getGeneTailSigma(focus) {
+      return Math.max(GENE_FOCUS_SIGMA_MIN, GENE_FOCUS_SIGMA_COEFF * Math.sqrt(focus + 1));
+    }
     const GENE_TIERS = (function () {
       const out = GENE_BASE_TIERS.map(t => ({ id: t.id, name: t.name, color: t.color, weight: t.weight, mult: t.mult }));
       const myth = GENE_BASE_TIERS[GENE_BASE_TIERS.length - 1];
@@ -6759,21 +7011,19 @@
     }
     function getGeneLuck() { return Math.max(0, Math.floor(getMerchant().luck || 0)); }
     // 超越段的权重衰减系数：被「基因幸运」软化 —— 幸运越高，衰减越缓，越容易摸到高档
-    function getGeneTailDecay() {
-      const luck = getGeneLuck();
-      return Math.max(GENE_TAIL_DECAY_BASE,
-        Math.min(GENE_TAIL_DECAY_MAX, GENE_TAIL_DECAY_BASE + luck * GENE_LUCK_DECAY_STEP));
-    }
-    // 抽基因用的权重：基础六档保持固定；超越段（tier ≥ 6）用「衰减软化」——
-    //   幸运越高、衰减越缓，尾巴越厚、越高档越摸得到。
-    //   ⚠️ 这里刻意**不给基础六档加线性幸运倾斜**：那样「神话」会随幸运越滚越重，
-    //     反而把整条超越段压到 0.5% 以下（实测幸运 25 时超越段一档都显示不出来），
-    //     与「幸运 = 更容易摸到高档」的直觉相反。
+    // 抽基因用的权重：基础六档保持固定；超越段（tier ≥ 6）以「焦点」为中心按钟形取样 ——
+    //   焦点 = 幸运等级 ÷ 2（见 getGeneFocusTier），越靠近焦点概率越高、远离快速衰减。
+    //   ⚠️ 基础六档刻意**不吃幸运倾斜**（保持固定权重）：那会让「神话」随幸运越滚越重，
+    //     反而把整条超越段压到不可见，与「幸运 = 越高档越容易摸到」的直觉相反。
     function getGeneTierWeights() {
-      const d = getGeneTailDecay();
+      const focus = getGeneFocusTier();
+      const sigma = getGeneTailSigma(focus);
+      const twoSigma2 = 2 * sigma * sigma;
       return GENE_TIERS.map((t, i) => {
         if (i < GENE_BASE_TIERS.length) return t.weight;
-        return t.weight * Math.pow(d, i - GENE_BASE_TIERS.length + 1);
+        const n = i - GENE_BASE_TIERS.length + 1;   // 超越·n
+        const d = n - focus;
+        return GENE_TAIL_WEIGHT * Math.exp(-(d * d) / twoSigma2);
       });
     }
     // 实验室的「品质」单独一个入口：只滚**基础六档**。
@@ -6819,6 +7069,8 @@
       });
       const probText = shown.map(x =>
         `<span class="gm-prob"><b style="color:${x.t.color}">${x.t.name}</b> ${(x.p * 100).toFixed(1)}%</span>`).join("");
+      const focus = getGeneFocusTier();
+      const luckVal = geneLuckValue();
       setHTML("geneMerchant", `
         <div class="panel" style="margin-top: 14px;">
           <div class="section-title">
@@ -6827,11 +7079,13 @@
           </div>
           <p class="possibility-note" style="margin-top: 0;">
             植入基因时按稀有度抽档：<b>普通 → 神话</b>，再往上还有 <b style="color: var(--q-myth);">超越·1 ~ 超越·99</b>。
-            <b style="color: var(--cyan);">基因幸运</b>可以让「超越段」的权重衰减变缓（幸运越高，越摸得到高档）——
+            抽法对标转盘：<b style="color: var(--cyan);">基因幸运</b>每升一级，幸运值 <b>×1.1</b>（当前
+            ${luckVal >= 1e6 ? formatNumber(luckVal) : luckVal.toFixed(2)}）；每上一个「超越等级」所需的幸运是 <b>×1.21</b>
+            —— 正好 1.1²，所以<b>每买 2 级基因幸运，抽到的基因档位整体上移一档</b>。
             它由「🧪 基因实验室」偶尔上架出售（永久属性、可叠加）。
           </p>
           <div class="gm-prob-row">
-            <span class="mv-cost">当前抽到各档的概率：</span>${probText}
+            <span class="mv-cost">当前抽到各档的概率（超越焦点 ·${focus.toFixed(1)}）：</span>${probText}
           </div>
           <div class="gm-prob-row">
             <span class="gm-high">高级（稀有及以上）合计 <b>${(high * 100).toFixed(1)}%</b>${luck > 0 ? ` · 幸运 Lv.${luck} 已生效` : " · 还没买过基因幸运"}</span>
@@ -7075,7 +7329,6 @@
       houndGridSig = "";
       el("invadeModal").classList.remove("show");
       el("achievementModal").classList.remove("show");
-      el("autoModal").classList.remove("show");
       el("baitModal").classList.remove("show");
       ensureLines();
     }
@@ -7651,7 +7904,7 @@
       styleCache.clear();
       numberMode = save.numberMode === "sci" ? "sci" : "kmbt";
       renderNumberModeChoice();
-      ["invadeModal", "achievementModal", "autoModal", "baitModal",
+      ["invadeModal", "achievementModal", "baitModal",
         "transcendModal", "challengeStartModal", "settingsModal", "saveModal",
         "confirmModal"].forEach(id => {
           const node = el(id);
@@ -7666,6 +7919,8 @@
       const info = applyOfflineProgress();
       setSettledMark(Date.now());
       saveGame(true);
+      // V0.98.1：导入前先退出反转世界（否则会留在淡白主题里，像卡死了一样）
+      exitInvWorld();
       ensureLines();
       render();
       logEvent("💾", "导入了外部存档", "cyan");
@@ -7679,6 +7934,8 @@
     }
 
     function resetSave() {
+      // V0.98.1：清档前先退出反转世界（否则会留在淡白主题里，像卡死了一样）
+      exitInvWorld();
       // V0.96：删档前先原样留一份「误删备份」（只留最近一份），给手滑一个后悔的机会
       try {
         const raw = localStorage.getItem(SAVE_KEY);
@@ -7696,7 +7953,6 @@
       pendingInvadeLineId = null;
       el("invadeModal").classList.remove("show");
       el("achievementModal").classList.remove("show");
-      el("autoModal").classList.remove("show");
       el("baitModal").classList.remove("show");
       el("settingsModal").classList.remove("show");
       baitSpinning = false;
@@ -8151,18 +8407,20 @@
     }
     function getShardLevel(id) {
       const st = getShardState(id);
-      return st ? Math.max(0, st.level || 0) : 0;
+      if (!st) return 0;
+      const lv = Number(st.level);
+      if (!(lv > 0)) return 0;
+      // V0.98.1：统一在读数口夹一道硬顶 —— 所有生效/展示链都从这里取等级，改这一处就够
+      return Math.min(SHARD_LEVEL_HARD_CAP, lv);
     }
     function getOwnedShardCount() {
       return SHARD_DEFS.filter(d => !!getShardState(d.id)).length;
     }
     // 所有碎片等级之和（挑战「碎片共鸣」的进度读数用）
+    // V0.98.1：逐项走 getShardLevel（含硬顶）—— 否则极端等级一求和就溢出成 Infinity
     function getShardTotalLevel() {
       let total = 0;
-      for (const def of SHARD_DEFS) {
-        const st = getShardState(def.id);
-        if (st && st.level > 0) total += st.level;
-      }
+      for (const def of SHARD_DEFS) total += getShardLevel(def.id);
       return total;
     }
     function getShardXpToNext(level) {
@@ -8330,16 +8588,32 @@
     }
     // 「双生隙」提供的额外掉落次数：perLevel 累加后可以超过 1（100%）。
     // 1.5 → 必定多掉 1 块 + 50% 概率再掉 1 块。
+    // V0.98（玩家反馈）：加一道软上限 —— 它和虚空饵同属「掉得多 → 碎片等级高 → 掉更多」的
+    //   正反馈源头，旧版无上限时后期一场能叠出上百块。拐点 8 块：之上按对数继续涨、永不归零。
+    const SHARD_EXTRA_DROP_KNEE = 8;
     function getShardExtraDropTimes() {
-      return Math.max(0, getShardBonus("shardDouble"));
+      const raw = Math.max(0, getShardBonus("shardDouble"));
+      return softCapValue(raw, SHARD_EXTRA_DROP_KNEE, SHARD_SOFT_DECAY_K);
+    }
+    // V0.98.1（玩家反馈）：单场掉落**总块数**改成「拐点 + 对数递减」的软上限 ——
+    //   前 SHARD_DROP_SOFT_KNEE 块满效率（前期一分不动），超过之后每一块都要付出指数级更多的掉率，
+    //   也就是「慢慢失效」：会继续涨，但涨得极其吃力；不会锁死在拐点上，也不再像旧版那样
+    //   被海量掉率顶着恒满 64 块。外侧的 SHARD_DROP_COUNT_CAP 仍保留，只当极端数据的性能保险丝。
+    //   k 越大衰减越慢（0.1 = 衰减较快；想更宽松就往上调，例如 0.2/0.3）。
+    const SHARD_DROP_SOFT_KNEE = 12;
+    const SHARD_DROP_SOFT_K = 0.1;
+    function softCapDropCount(n) {
+      if (!(n > 0)) return 0;
+      return Math.floor(softCapValue(n, SHARD_DROP_SOFT_KNEE, SHARD_DROP_SOFT_K));
     }
     // 一场战斗的完整掉落 =（基础掉落概率折出来的块数）+（双生隙的额外次数）+（黄金时间线的额外块数）。
-    // 三段都走「整数必掉 + 小数掷一次」，最后过一道纯性能保险丝（单场最多 SHARD_DROP_COUNT_CAP 块）。
+    // 三段都走「整数必掉 + 小数掷一次」，再过「拐点 + 对数递减」软上限，最后压 SHARD_DROP_COUNT_CAP 硬顶。
     function rollShardDrops(line, won) {
       const out = [];
       let times = rollDropCount(getShardTotalDropRate(line, won));
       times += rollDropCount(getShardExtraDropTimes());
       times += rollDropCount(getGoldenShardDrop(line));
+      times = softCapDropCount(times);
       times = Math.min(times, SHARD_DROP_COUNT_CAP);
       for (let i = 0; i < times; i++) {
         const def = rollShardRarity(line);
@@ -8357,13 +8631,16 @@
       const gained = Math.max(1, Math.round(rarity.xpGain * getShardXpMult() * getChallengeShardXpMult()));
       st.xp += gained;
       let levelUps = 0, guard = 0;
-      while (guard++ < 10000) {
+      while (guard++ < 10000 && st.level < SHARD_LEVEL_HARD_CAP) {
         const need = getShardXpToNext(st.level);
         if (st.xp < need) break;
         st.xp -= need;
         st.level += 1;
         levelUps++;
       }
+      // V0.98.1（崩溃修复）：落盘值也夹硬顶 —— 与 sanitizeShards / getShardLevel 同一口径
+      if (!(st.level < SHARD_LEVEL_HARD_CAP)) st.level = SHARD_LEVEL_HARD_CAP;
+      if (!(st.xp < 1e15)) st.xp = 1e15;
       return { isNew: false, gained, levelUps, level: st.level, xp: st.xp, need: getShardXpToNext(st.level) };
     }
     function formatShardEffect(def, level) {
@@ -8540,14 +8817,26 @@
         (1 + getLabBonus("houndExp"));
     }
 
-    // 寿命：普通（tier 0）基础 20 点，品质越高越长
+    // 寿命：普通（tier 0）基础 20 点；每提高一个品质 +2（→ 神话 30），超越段每级再 +1
     function getMaxLifespan(tier) {
       const t = Math.max(0, tier || 0);
+      const topBase = HOUND_BASE_LIFESPAN + (HOUND_QUALITIES.length - 1) * HOUND_LIFESPAN_PER_TIER; // 30
       if (t < HOUND_QUALITIES.length) {
-        return Math.round(HOUND_BASE_LIFESPAN * Math.pow(HOUND_LIFESPAN_STEP, t));
+        return HOUND_BASE_LIFESPAN + t * HOUND_LIFESPAN_PER_TIER;   // 20 / 22 / 24 / 26 / 28 / 30
       }
-      const topBase = HOUND_BASE_LIFESPAN * Math.pow(HOUND_LIFESPAN_STEP, HOUND_QUALITIES.length - 1);
-      return Math.round(topBase * (1 + (t - HOUND_QUALITIES.length + 1) * 0.6));
+      return topBase + (t - HOUND_QUALITIES.length + 1) * HOUND_LIFESPAN_PER_TRANS_TIER;  // 超越·n = 30 + n
+    }
+    // V0.98（作者要求）：寿命重定标后的补偿 —— 战斗掉落的本源按「出战猎犬品质档位」放大：
+    //   普通 ~ 史诗 ×1（前期/中期一分不变）；传说 ×3、神话 ×5、超越·n ×(5 + 2n)……
+    //   品质越高掉得越多，把高寿命档位被砍掉的续航补回来。（引用方：generateLines 的 originYield）
+    function originTierMultOf(tier) {
+      const t = Math.max(0, Math.round(tier || 0));
+      if (t <= 3) return 1;                 // 前期：原样
+      return Math.min(1e6, 1 + 2 * (t - 3)); // 传说 3、神话 5、超越·n = 5 + 2n
+    }
+    function getOriginTierMult() {
+      const ref = getLineReferenceHound();
+      return ref ? originTierMultOf(ref.qualityTier) : 1;
     }
 
     // 升级所需经验：等级越高，需求增长越快
@@ -9245,6 +9534,8 @@
       const refPower = houndPower(refHound);
       const targetPower = Math.max(1, Math.min(Number.isFinite(refPower) ? refPower : ENEMY_STAT_MAX,
         ENEMY_STAT_MAX) * LINE_GUARANTEE_POWER_RATIO);
+      // V0.98：本源补偿倍率（同 generateLines，按参考猎犬品质档位放大）
+      const originTierMult = refHound ? originTierMultOf(refHound.qualityTier) : 1;
       const id = `line${stamp}g${(houndSeq++).toString(36)}`;
       const name = pick(LINE_NAMES);
       const make = (difficulty, scale) => {
@@ -9258,7 +9549,7 @@
           // V0.95（方案 B5）：保底线常驻之后，它的收益要按比例打折 ——
           //   否则「必赢 + 高收益」会变成唯一解，随机那几条就没人打了。
           //   折扣只作用于本源收益，不影响掉落判定（碎片/黄金仍按常规走）。
-          originYield: Math.max(1, Math.round((2 + reward * 4) * spread * LINE_GUARANTEE_REWARD_RATIO)),
+          originYield: Math.max(1, Math.round((2 + reward * 4) * spread * originTierMult * LINE_GUARANTEE_REWARD_RATIO)),
           guaranteed: true,
           cleared: false,
           // 记下这条保底是按哪只猎犬解算的：换犬时 renderLineGrid 会据此重织，
@@ -9295,6 +9586,8 @@
       const invPart = Math.min(LINE_INVASION_SCALE_CAP, inv * LINE_INVASION_SCALE);
       const growthPart = Math.min(LINE_DIFFICULTY_GROWTH_CAP, refLevel <= 10 ? 0 : (refLevel - 10) * 0.15);
       const difficultyGrowth = growthPart;
+      // V0.98：寿命重定标后的本源补偿 —— 按出战猎犬的品质档位放大（前期 ×1，超高阶可到 ×200+）
+      const originTierMult = refHound ? originTierMultOf(refHound.qualityTier) : 1;
       const spread = Math.min(LINE_SPREAD_CAP, 1 + invPart + growthPart);
       const stamp = Date.now().toString(36);
 
@@ -9314,7 +9607,7 @@
           difficulty,
           reward,
           enemyScale: Number(((0.5 + difficulty * 0.28) * spread).toFixed(2)),
-          originYield: Math.max(1, Math.round((2 + reward * 4) * spread)),
+          originYield: Math.max(1, Math.round((2 + reward * 4) * spread * originTierMult)),
           cleared: false
         });
       }
@@ -9328,7 +9621,7 @@
           difficulty,
           reward,
           enemyScale: Number(((0.5 + difficulty * 0.28) * spread).toFixed(2)),
-          originYield: Math.max(1, Math.round((2 + reward * 4) * spread)),
+          originYield: Math.max(1, Math.round((2 + reward * 4) * spread * originTierMult)),
           cleared: false
         });
       }
@@ -10111,6 +10404,10 @@
     }
 
     function render() {
+      // V0.98.1：在反转世界里只刷反转世界自己 ——
+      //   主宇宙整体静止、页面也全被 CSS 收起，不必每帧重画（省性能），
+      //   顺带把「主宇宙某一处渲染出问题」与反转世界彻底隔离开（防一处小错冻住全场）。
+      if (invActive) { renderInvTab(); renderInvWorld(); saveGame(); return; }
       checkAchievements();
       renderHeader();
       renderMain();
@@ -10134,6 +10431,10 @@
       renderInertia();
       renderPossibility();
       renderPlayTime();
+      // V0.98：反转世界 —— 页签解锁状态常刷；在场内时把它的读数/按钮一起刷掉
+      renderInvTab();
+      renderAuto();
+      if (invActive) renderInvWorld();
       // V0.92：排行榜入口的显隐（未接入后端时不出现 —— 所以这一版可以安全发布）
       renderLeaderboardButton();
       // V0.76：老存档第一次进来时把「此刻已解锁的页签」记为已看（顺序必须在这里 ——
@@ -11010,6 +11311,7 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.98", "反转世界上线（首发框架版）。① 解锁：历史最高尘埃达到 1E30080、并且苦痛挑战全部通关之后，导航栏「可能性」的右边会出现「◑ 反转世界」。② 它是一趟完全独立的旅程：走进去，主宇宙的一切都会静止（时间暂停），而反转世界每次进入都从 Lv.1 从头开始 —— 随时可以退出，出去后主宇宙原样继续。③ 它是主宇宙的倒影：在这里「被捕获」不再是恩赐，而是等级 −1 —— 反转猎犬每 10 秒逼近一次，被抓到就掉一级；用「反转铸级」花反转尘埃把等级换回来，等级越高凝析越快。④ 反转尘埃的上限是 1EE10（10^(1E10)），远超主宇宙的 1E30080。⑤ 首发先开放三个子界面：反转主界面 / 自动化（自动凝析、自动铸级）/ 永恒背包（反转部件等战利品会在后续版本陆续觉醒）。⑥ 走进反转世界时，整个界面会翻成淡白的倒影配色，连左上角的「时间猎犬增量」标题都会由白变黑。⑦ 崩溃防护网上线：主循环、自动巡检、启动渲染整体加了异常兜底 —— 以前任何一帧里出现一次报错，整个游戏就会永久卡死（点哪都没反应、也没有任何提示）；现在只会「跳过这一帧继续跑」，并把出错原因写进事件日志、弹一条提示（8 秒节流），截图就能排查。浏览器控制台里的其他报错也会被一并接住上报。⑧ 数值保险丝与防刷屏：碎片等级加了一道 1e12 的硬顶（软上限之外本就是对数量级收益，正常玩法连 1e6 都摸不到），等级求和不会再溢出成天文数字；反转世界切后台回来的补帧，一口气的多次捕获会合并成一条汇总提示，不再一次刷出几百条；清档 / 导入存档时会自动退出反转世界，不会卡在倒影配色里。⑨ 基因高等级概率对标转盘：基因幸运每级幸运值 ×1.1（复利），每上一个「超越档位」所需幸运 ×1.21 —— 正好是 1.1²，所以<b>每买 2 级基因幸运、抽到的基因档位整体上移一档</b>；旧规则在幸运 29 就顶死，现在永不到顶。⑩ 猎犬寿命重定标：每提高一个品质 +2（普通 20 → 神话 30）、超越段每级 +1（超越·n = 30+n）；作为补偿，战斗掉落的本源按出战猎犬品质放大 —— 前期（普通~史诗）一分不变，传说 ×3、神话 ×5、超越·n ×(5+2n)，越往后越夸张；高品质猎犬的四维「弧度」也再上调一点（系数 0.10 → 0.12）。⑪ 自动化从弹窗改成独立子页面（页签直接打开），「收割时机」从三个挡位改成 <b>100%~200% 自由滑动条</b>，拖到哪就从哪收；另新增「自动回归」：出战猎犬寿命只剩 1 点就自动送进展示柜换成永久加成，绝不白死，随后自动换最强的一只接着打。⑫ 反转世界对外挂上「开发中」牌：所有人都能看到页签与门页（写明未来的解锁条件），但目前只有内部版本能真正进入 —— 功能完成、去掉开发锁之后，会把解锁条件接回页签正式开放。⑬ 修「苦痛之路退不出来」：踏入苦痛之后如果把基因移掉（或基因数掉回 10 条以下），旧版会把「苦痛之路」子页签连同里面的「中止苦痛」按钮一起藏掉，人被困在苦痛里。现在只要【曾经踏入过 / 苦痛进行中 / 有预约】三者占其一，入口就永久保留。⑭ 碎片掉落数量加软上限：单场掉落总块数过了 <b>12 块</b>之后按对数递减 —— 掉率再怎么堆，多出来的部分也是「慢慢失效」：不会锁死在 12，也不会再像以前那样恒满 64 块；「碎片单场掉落块数」这条加成同样加了拐点（8 块）。面板会同时显示「单场实际结算约几块」（以前写着「必掉 45 亿块」）。前期（少加成）完全不受影响。⑮ 自动升级悖论商店现在也会升级<b>「命运扭曲」</b>：三件套先各买 1 级保底，剩下的本源持续投进命运扭曲（一次买满买得起的级数）——以前开了自动商店，命运扭曲永远停在原地。"],
       ["V0.96", "十五条体验与平衡修正。① 所有读数统一走计数法：回归加成、碎片效果、诱饵加成这些「百分比」以前会直接印出 +1084500.00% 之类的裸长数字，现在超过 10 万% 一律自动转计数法（跟随你的字母 / 科学偏好）。② 主线挑战里的「悖论重置」门槛锁死 100 万尘埃——以前它会跟着命运扭曲等级一起涨，等于把关卡难度偷偷加上去了。③ 「猎影加速」放开到 40 级（×11，原来 20 级 ×6），自动狩猎的巡检间隔下限同步放到 50ms，买的等级真的兑现成狩猎频率。④ 转盘幸运逻辑重做：撤掉「每次升级最多 +1 档」的硬规则，改成超越段以下每点运气 +0.78 档、从「超越」起每上一档所需运气再贵 1.3 倍的几何曲线——越往后每级越难，但永远戳不穿；作为补偿，「回旋针」碎片重新参与运气（每级 ×1.05 复利，原来是 ×1.1），它终于再次影响你能抽到的品质，收紧盘面散布的老本行也还在。⑤ 基因修饰点数加强前期：第一次达到多元宇宙时总点数 ×3.5，之后每进一次宇宙衰减一档，第 5 次起恢复原样——前期终于升得动级了，后期一分不变。⑥ 苦痛挑战说好的「每完成一个 → 基因点数 ×1.5」以前只写了规则、从没接进发放口（打完一分不多），现在正式生效，与苦痛之路、里程碑串联结算。⑦ 多元宇宙里程碑第 5 次解锁「自动升级悖论商店」：挂在「自动化」页签，每秒巡检一次，挑衅冷却 / 自动收获效率 / 猎影加速三件套，只要本源够就各买 1 级。⑧ 基因实验室可以重复购买同一条升级了：买下的每一份都单独算加成、购买没有总量上限；实验台一共十个货物栏——基础 5 件、「货物扩容」最多再 +4 条、外加偶尔上架的「基因幸运」；代价是同一种升级每多买一份，价格 ×1.5。⑨ 战斗文案同步 V0.94 起的新规则：战斗进行中无法更换出战猎犬（这一场已经拿着它的四维开打了），战斗结束后随时可以换；战败只会让它重伤（等级腰斩、经验清零），休整后照样能再战——只有寿命耗尽才会真正消散。⑩ 本源商店三件套（挑衅冷却 / 自动收获 / 猎影加速）全部支持「×1 / ×10 / ×100」批量购买，逐级按真实造价扣本源，买不起自动少买；命运扭曲的「一键最大」恢复成一次买到买不动为止。⑪ 修「清空存档没有确认框」：这个按钮以前点一下就立刻删档（回调里误吃了点击事件、把「跳过确认」当成了 true）。现在会正常弹确认，并且删档前自动留一份「误删备份」，设置面板里可以一键恢复一次。同源的另外两处（退出挑战、确认超越）一并修好。⑫ 盘面散布的下限改成跟着碎片走：新曲线下阶位中心比过去低，「收紧散布」不再被 σ 下限整段吃掉——回旋针拉满时盘面真的会收窄。⑬ 排行榜改成纯手动上传：以前成功上传一次后，游戏会每 5 分钟在后台自动上报一遍（后端按调用次数计费，长期挂机的代价不小），现在只在点「上传成绩」时发送一次，后台不再有任何自动请求；旧存档里的「自动上传」开关一并移除。⑭ 高阶猎犬的四维加了一点「弧度」：转盘重做之后高阶品质难抽多了，作为补偿，四维不再对品质倍率做线性映射，而是叠了一层轻微曲率——低阶几乎无感（普通不变），神话约补 43%、超越·30 约补 100%，抽到高阶这件事本身的回报更高了。⑮ 基因「部件软上限」重做：去掉等级上限（不再有「满级」把强化卡死），代价是成长比例巨幅削弱——每级只吃原来品质增量的十分之一、单级最多 +5%（普通 ×1.002/级、神话 ×1.028/级、超越段 ×1.05/级）。以前它要么几步撞上限、要么把部件软上限乘到 1e9 直接超模，现在两头都收住了。"],
       ["V0.95", "修复了海量 BUG。战斗、时间进度条、时间碎片、转盘与多元宇宙重置的显示与结算问题一起清了一遍：战败不再让猎犬永久消失（改成重伤），僵持不再白打，出战猎犬不再被锁死；进度条溢流段的风险与收益重新对齐；转盘最多只显示和抽到 7 个品质，能抽到的最高品质从此完全由「命运扭曲」等级决定；多元宇宙重置的折算改用软上限生效后的数值，不会再换出天文数字的点数；折算相关的大数字也会跟随你的计数法偏好显示。另外删除了「势能核」碎片，并给全部时间碎片统一加上软上限。"],
       ["V0.94", "时间进度条重做：满了之后不再只能收，而是可以继续「溢流」到 200%。溢流段按固定速率推进，越往后收益越高（200% 时是满圈的 2.5 倍），但被捕获概率会大幅上升（200% 时是满圈的 7 倍）——所以「收还是贪」第一次成了真正的判断：一圈内越危险就越该早点收。自动收获的收割时机也交给你选（稳健 100% / 平衡 130% / 贪婪 180%，在「自动化」里设置）。猎犬战斗改动：取消出战猎犬的锁定，随时可以自由更换；战斗失败不再让猎犬永久消失，而是改成「重伤」（等级腰斩、经验清零，休整后照样能再战），只有寿命耗尽才会真正消散；打不穿的僵持局也不再白打，现在会给 30% 经验且不消耗寿命。猎犬合成的功能整个移除（子页从五个变四个）。时间碎片调整：移除了「悖论锁」与「凝滞」两块降低被捕获概率的碎片；「虚空饵」加上软上限，避免后期掉率滚雪球；「回旋针」不再抬高能抽到的最高品质（天花板从此完全由「命运扭曲」等级决定，回旋针改为收紧盘面散布、让高档位更好抽）；转盘最多只显示和抽到 7 个品质。悖论造价不再用写死的数字，而是跟着「命运扭曲」等级走。多元宇宙里程碑新增两件事：第 20 次之后发动悖论不再清空尘埃与升级；「超越悖论」的进度折算改用软上限生效后的部件与回归等级，避免后期换算出的点数失控。"],
@@ -11399,7 +11701,7 @@
         statsRow(geneLabel(k), statsMult(geneMap[k]), "同属性多条基因按乘法叠加"))
         .concat([
           statsRow("已植入基因", `${(p.genes || []).length} / ${GENE_MAX} 条`),
-          statsRow("基因幸运", `Lv.${getGeneLuck()}`, "软化「超越段」权重衰减：幸运越高越容易抽到高品基因")
+          statsRow("基因幸运", `Lv.${getGeneLuck()}`, "幸运值每级 ×1.1、超越等级每档 ×1.21：每买 2 级，抽到的基因档位整体上移一档")
         ]);
 
       // ⑩ 宇宙 / 里程碑
@@ -11481,6 +11783,7 @@
       setHTML("autoBtn", `⚙ 自动化 <b>${formatNumber(unlockedCount)} / ${AUTO_ROWS.length}</b>`);
       setHTML("autoNote",
         "开启后时间循环会自己运转，你只需要偶尔回来看看——但每一项自动化都有代价，它们不是纯粹的增益。" +
+        "<br><span style=\"color: var(--muted);\">收割时机越晚收益越高：溢流段额外收益倍率为 1 + 1.5×√溢流比例，但暴露时间越长、被捕获风险越大 —— 用上面的滑动条自己权衡。</span>" +
         (unlockedCount < AUTO_ROWS.length
           ? `<br><span style="color: var(--muted);">未解锁的项达成对应成就后会直接出现。` +
             `自动收获：累计被捕获 10 次 · 自动升级：任一升级达到 Lv.${AUTO_UPGRADE_UNLOCK_LEVEL} · ` +
@@ -11503,21 +11806,15 @@
         if (r.key !== "harvest") return row;
         // 挡位的 active 状态直接编进这段 HTML：renderAuto() 每次 render 都会重算，
         //   所以切换挡位后按钮高亮会立刻跟上（setHTML 自带去重，没变就不刷）。
-        const picks = OVERFLOW_AUTO_LEVELS.map((o, i) =>
-          `<button class="ov-opt ${i === save.overflowAuto ? "active" : ""}" data-ov-opt="${i}"` +
-          ` title="${o.name}：${o.hint}">${o.name} ${o.at}%</button>`
-        ).join("");
-        return row + `
-          <div class="auto-row auto-sub" data-locked="0">
-            <div class="auto-info">
-              <h4>收割时机</h4>
-              <p>自动收获在哪个进度点结算。越晚收收益越高（溢流段额外收益倍率为 1 + 1.5×√溢流比例），` +
-          `但暴露时间越长、被捕获风险越大 —— 一圈内被捕获概率高的时候就该选「稳健」。</p>
-            </div>
-            <span class="overflow-picks">${picks}</span>
-          </div>`;
+        return row;   // V0.98：「收割时机」滑条已挪到页面顶部静态区，不再随行重建
       }).join("");
       setHTML("autoList", autoRowsHtml);
+      // V0.98：同步顶部滑条（拖动中不回写 value，避免打断拖拽）
+      const at = getOverflowAutoAt();
+      const slider = el("overflowSlider");
+      if (slider && (typeof document === "undefined" || document.activeElement !== slider)) slider.value = String(at);
+      setText("overflowSliderVal", at + "%");
+      setText("overflowSliderHint", overflowHintText(at));
     }
 
     // ===================== 挑战页 =====================
@@ -12426,7 +12723,7 @@
                 <div><h3>基因幸运</h3><small>永久属性 · 当前 Lv.${getGeneLuck()}</small></div>
                 <span class="lab-cost">${LAB_LUCK_COST} 基因点</span>
               </div>
-              <p class="lab-desc">提高抽到高级基因的概率（每级把高稀有度的权重往上抬）。</p>
+              <p class="lab-desc">幸运值每级 ×1.1（复利）；每 2 级让抽到的基因档位整体上移一档（超越等级间距 ×1.21）。</p>
               <button class="primary-button" data-lab-buy="${idx}" ${afford ? "" : "disabled"}>
                 ${afford ? "买下（永久）" : "基因点数不足"}
               </button>
@@ -12471,7 +12768,7 @@
           用「🧬 基因改造」那边攒下的<b style="color: var(--cyan);">基因点数</b>购买，买下后
           <b>永久生效</b>——清空整个轮回也不会掉。<br>
           <span style="color: var(--muted);">每条升级都带<b>品质</b>（沿用转盘那一套六档：普通 → 神话），品质越高<b>效果越强、也越贵</b>；
-          偶尔还会上架一件「<b style="color: var(--cyan);">基因幸运</b>」（永久提高抽到高级基因的概率）。</span><br>
+          偶尔还会上架一件「<b style="color: var(--cyan);">基因幸运</b>」（永久属性：每级幸运值 ×1.1，每 2 级让抽到的基因档位整体上移一档）。</span><br>
           <span style="color: var(--muted);">V0.96：同一条升级可以<b>反复购买</b>——刷新清单有机会再刷到它，买下的<b>每一份都单独算加成</b>，购买<b>没有总量上限</b>；
           唯一的代价是同一种升级每多买一份，价格 <b>×${LAB_REPEAT_STEP}</b>。实验台一共 <b>${LAB_SHELF_MAX}</b> 个货物栏：基础 ${LAB_OFFER_COUNT} 件、「货物扩容」最多再 +${LAB_CARGO_MAX} 条、外加偶尔上架的「基因幸运」。</span><br>
           <span style="color: var(--muted);">也可以花基因点当场刷新清单：第一次 ${LAB_REROLL_COST_BASE} 点，往后每刷一次翻一倍。
@@ -12494,7 +12791,13 @@
       // V0.87：可能性页的四个子页签也走同一套「解锁即显形 + 新功能高亮」——
       // 之前只有实验室接了，其余三个一直亮着、玩家不知道该先点哪个。
       const pSub = getPossibility();
-      const painReady = (pSub.genes || []).length >= PAIN_REQUIRED_GENES;
+      // V0.98（玩家反馈）：苦痛之路的子页签**不能只看当下基因数** ——
+      //   玩家踏入苦痛之后若把基因移掉（或数量掉回 10 条以下），旧逻辑会把子页签连入口一起藏掉，
+      //   结果「中止苦痛」的按钮再也找不到，人被困在苦痛里退不出来。
+      //   现在只要【曾经踏入过 / 苦痛进行中 / 有预约】，入口就永久保留（与苦痛挑战的 everUnlocked 行为一致）。
+      const painPending = !!(pSub.pain && Array.isArray(pSub.pain.pending) && pSub.pain.pending.length > 0);
+      const painEver = isPainEverUnlocked() || !!(pSub.pain && (pSub.pain.active || painPending));
+      const painReady = (pSub.genes || []).length >= PAIN_REQUIRED_GENES || painEver;
       setTabLocked("subTabMultiverse", false, "🌌 多元宇宙");
       setTabLocked("subTabGene", false, "🧬 基因改造");
       setTabLocked("subTabLab", !isLabUnlocked(), "🧪 基因实验室");
@@ -12765,12 +13068,19 @@
       for (const ln of save.lines) bestDiff = Math.max(bestDiff, ln.difficulty || 1);
       const bestLine = save.lines.find(ln => (ln.difficulty || 1) === bestDiff);
       const bestRate = bestLine ? getShardTotalDropRate(bestLine, true) : 0;
-      // 概率没有上限，超过 100% 时把「必掉几块」也写出来，不然 150% 看不懂
-      const bestWhole = Math.floor(bestRate);
-      const bestFrac = Math.round((bestRate - bestWhole) * 100);
-      const bestRateText = bestWhole > 0
-        ? `${(bestRate * 100).toFixed(1)}%（必掉 ${bestWhole} 块${bestFrac > 0 ? ` + ${bestFrac}% 再 1 块` : ""}）`
-        : `${(bestRate * 100).toFixed(1)}%`;
+      // V0.98（玩家反馈）：这里展示「经软上限后实际结算」的块数 ——
+      //   掉率本身没有上限（它同时决定各稀有度的权重），但真正掉几块是收敛的：
+      //   三段相加 → 渐近软上限 → 硬顶保险丝。旧文案直接写「必掉 4504171927 块」，
+      //   看着像要掉四十亿块，实际结算端根本不是这个数。
+      const rawTimes = bestLine
+        ? Math.floor(bestRate) + Math.floor(getShardExtraDropTimes()) + Math.floor(getGoldenShardDrop(bestLine))
+        : 0;
+      const effDrops = bestLine ? softCapDropCount(rawTimes) : 0;
+      const bestRateText = !bestLine
+        ? "—"
+        : (bestRate >= 1
+            ? `${formatNumber(bigOf(bestRate * 100))}% · 单场实际结算约 <b>${formatNumber(effDrops)}</b> 块（软上限 ${SHARD_DROP_SOFT_KNEE} 块 · 超出部分递减）`
+            : `${(bestRate * 100).toFixed(1)}%`);
 
       let summaryHTML = `<div class="shard-sum-head">碎片加成总览</div>`;
       summaryHTML += `<div class="shard-sum-meta">已掉落 <b>${formatNumber(save.shardsDropped || 0)}</b> 块 · ` +
@@ -12942,7 +13252,8 @@
       setHTML("oddsBody", body + foot);
     }
 
-    function boostLuck(times) {
+    // V0.98：silent = 自动商店专用 —— 不弹提示、不整页 render（常规刷新会跟上），只回报买了几级。
+    function boostLuck(times, silent) {
       const free = isFreeParadoxUpgrade();
       let totalCost = 0, boosted = 0, budget = bigOf(save.origin);
       for (let i = 0; i < times; i++) {
@@ -12954,12 +13265,13 @@
         boosted++;
       }
       if (boosted <= 0) {
-        showToast(save.luckBoost >= BOOST_MAX_LEVEL ? "命运扭曲已达上限。" : "时间本源不足。");
-        return;
+        if (!silent) showToast(save.luckBoost >= BOOST_MAX_LEVEL ? "命运扭曲已达上限。" : "时间本源不足。");
+        return 0;
       }
       if (!free) save.origin = bigSub(save.origin, totalCost);
       save.luckBoost += boosted;
       saveGame(true);
+      if (silent) return boosted;
       const win = getTierWindow();
       showToast(
         `命运扭曲 +${boosted} 级，当前中心阶位 <b>${tierInfo(Math.round(win.focus)).name}</b>` +
@@ -12968,6 +13280,7 @@
           : `（消耗 ${formatNumber(totalCost)} 时间本源）`)
       );
       render();
+      return boosted;
     }
 
     function openParadoxConfirm() {
@@ -13220,14 +13533,17 @@
 
     // V0.93：收割时机挡位（0 稳健 100% / 1 平衡 130% / 2 贪婪 180%）。
     //   影响的是**自动收获**在哪个进度点结算；手动收获不受影响（想收随时收）。
-    function setOverflowAuto(i) {
-      const idx = Number(i);
-      if (!Number.isInteger(idx) || idx < 0 || idx >= OVERFLOW_AUTO_LEVELS.length) return;
-      if (save.overflowAuto === idx) return;
-      save.overflowAuto = idx;
+    // V0.98：收割时机 = 100~200% 百分比（滑动条拖动时逐帧调用）。
+    //   ⚠️ 刻意不整页 render()：setHTML 重建会把玩家正在拖的滑块换掉、拖拽直接断掉 ——
+    //      只更新读数与提示，其余部分等下一次常规 render 跟上。
+    function setOverflowAuto(pct) {
+      const v = clampOverflowAuto(pct);
+      if (save.overflowAuto === v) return;
+      save.overflowAuto = v;
       saveGame(true);
-      render();
-      showToast(`收割时机：<b>${OVERFLOW_AUTO_LEVELS[idx].name} ${OVERFLOW_AUTO_LEVELS[idx].at}%</b>`);
+      const sv = el("overflowSliderVal"); if (sv) setText("overflowSliderVal", v + "%");
+      const sh = el("overflowSliderHint"); if (sh) setText("overflowSliderHint", overflowHintText(v));
+      const sl = el("overflowSlider"); if (sl) sl.value = String(v);
     }
 
     function equipPart(key) {
@@ -13692,6 +14008,8 @@
       el("paradoxScreen").classList.toggle("active", name === "paradox");
       el("challengeScreen").classList.toggle("active", name === "challenge");
       el("possibilityScreen").classList.toggle("active", name === "possibility");
+      el("invScreen").classList.toggle("active", name === "inv");
+      el("autoScreen").classList.toggle("active", name === "auto");
       if (name === "paradox") renderParadox();
       if (name === "bait") renderBait();
       if (name === "challenge") renderChallenge();
@@ -13757,13 +14075,14 @@
 
     document.querySelectorAll(".tab").forEach(btn => {
       btn.addEventListener("click", () => {
-        if (!btn.disabled) switchTab(btn.dataset.tab);
+        if (btn.disabled) return;
+        // V0.98：反转世界已改成普通页签（打开是「开发中」门页）—— 特判取消，统一走 switchTab
+        switchTab(btn.dataset.tab);
       });
     });
 
     delegate("bulkBar", "[data-bulk]", btn => setBulkLevel(btn.dataset.bulk));
     // V0.93：收割时机挡位（必须走 delegate —— 它监听的是 pointerdown/pointerup，不是 click）
-    delegate("autoList", "[data-ov-opt]", btn => setOverflowAuto(btn.dataset.ovOpt));
     delegate("upgradeGrid", "[data-upgrade]", btn => buyUpgrade(btn.dataset.upgrade, btn.dataset.mode));
     delegate("partGrid", "[data-equip]", btn => equipPart(btn.dataset.equip));
     delegate("autoList", "[data-auto]", btn => {
@@ -13914,12 +14233,13 @@
     on("achievementClose", () => el("achievementModal").classList.remove("show"));
 
     // ===== 自动化弹窗 =====
-    on("autoBtn", () => {
-      markTabSeen("autoBtn");   // V0.76：点过就不再高亮
-      renderAuto();
-      el("autoModal").classList.add("show");
-    });
-    on("autoClose", () => el("autoModal").classList.remove("show"));
+    // V0.98：自动化改成独立子页面 —— 页签切换交给通用委托，渲染交给 render()，无需单独接线。
+    // V0.98：收割时机滑动条（100~200%）—— input 事件连续触发，只更新状态与读数，不整页重建
+    (function bindOverflowSlider() {
+      const slider = el("overflowSlider");
+      if (!slider) return;
+      slider.addEventListener("input", () => setOverflowAuto(Number(slider.value)));
+    })();
 
     // ===== 挑衅 / 猎影 =====
     on("huntButton", startHunt);
@@ -14085,8 +14405,42 @@
     // 挂在主循环里按时间累积触发，而不是固定在 autoStep —— 这样加速后
     // 战斗一结束就能马上派出下一场，几千点寿命不用挂着等。
     let autoHuntNextAt = 0;
+    // V0.98（作者要求）：自动回归 —— 出战猎犬寿命只剩 1 点时，替它办回归，绝不让它寿终消散。
+    //   与自动狩猎的「打不过就回归」「战败但够门槛就回归」是三条互补的保险。
+    function autoRetireStep() {
+      if (activeBattle) return;                       // 战斗中不动（这一场已经打响了）
+      const hound = getSelectedHound();
+      if (!hound || hound.lifespan > 1) return;
+      if (hound.level < TRANSCEND_MIN_LEVEL) return;  // 不够回归门槛：让它自己打完最后一场
+      const transcended = transcendHound(hound);
+      const qMult = getTranscendQualityMult(transcended.qualityTier);
+      const bonus = transcended.returnLevel * TRANSCEND_BASE_BONUS_PER_LEVEL * qMult;
+      showToast(
+        `<b style="color:${transcended.qualityColor}">${transcended.name}</b> 寿命将尽，已自动回归：` +
+        `全局 <b style="color: var(--gold);">+${formatPercent(bonus)}</b>（回归 Lv.${formatNumber(transcended.returnLevel)}）`
+      );
+      // 换上仓库里最强的一只，狩猎不中断
+      const next = save.hounds.filter(h => h.lifespan > 0).reduce((best, h) => {
+        if (!best) return h;
+        const bp = houndPowerKey(best), hp = houndPowerKey(h);
+        if (hp > bp) return h;
+        return (hp === bp && h.level > best.level) ? h : best;
+      }, null);
+      if (next) save.activeHoundId = next.id;
+      saveGame(true);
+      render();
+    }
+
     function autoHuntPump() {
       if (!isAutoUnlocked("hunt") || !save.auto.hunt) return;
+      // V0.98：自动回归开着时，寿命只剩 1 点的猎犬先办回归，绝不带着它开下一场
+      if (isAutoUnlocked("retire") && save.auto.retire) {
+        const doomed = getSelectedHound();
+        if (doomed && doomed.lifespan <= 1 && doomed.level >= TRANSCEND_MIN_LEVEL && !activeBattle) {
+          autoRetireStep();
+          return;
+        }
+      }
       if (isCaptured || wheelSpinning) return;
       const now = Date.now();
       if (now < autoHuntNextAt) return;
@@ -14131,16 +14485,26 @@
     // 每秒巡检一次：三件套按固定顺序各尝试买 1 级（买得起才买、满级跳过）。
     // 刻意走 silent 通道：不弹 toast、不主动 render —— 主循环每 100ms 自己会重画商店，
     // 否则每秒最多三条提示足以把界面刷爆。
+    // V0.98（玩家反馈）：自动商店还要升级「命运扭曲」——
+    //   顺序：三件套各买 1 级（便宜、优先保底）→ 剩下的本源持续投进命运扭曲（一次最多 1000 级）。
+    //   命运扭曲是唯一「越买越贵」的坑（每级 ×1.62），批量静默购买、买不动自然就停。
     function autoShopStep() {
       let bought = 0;
       if (buyOriginShop("huntCd", 1, true)) bought++;
       if (buyOriginShop("harvestSpeed", 1, true)) bought++;
       if (buyOriginShop("huntSpeed", 1, true)) bought++;
+      bought += boostLuck(1000, true);
       return bought;
     }
 
     function autoStep() {
-      checkChallenges();
+      // V0.98.1：同样包防护网（自动巡检出错也不许冻结游戏）
+      safeRun("自动巡检", () => {
+        // V0.98.1b：内存看门狗先行（反转世界内外都看）—— 接近浏览器崩溃线就提前存档提醒
+        memoryWatchdog();
+        // V0.98：反转世界模式下，主宇宙的自动步骤整段跳过（时间暂停），改跑反转世界自己的巡检
+        if (invActive) { invAutoStep(); return; }
+        checkChallenges();
       // V0.90：自动悖论搬进「自动化」面板 —— 解锁后还要把那个开关打开才会跑
       if (isAutoUnlocked("paradox") && save.auto.paradox) autoParadoxStep();
       // V0.96：自动升级悖论商店（里程碑第 5 次解锁）—— 买本源商店的级，与捕获/转盘无关
@@ -14154,13 +14518,307 @@
       if (isAutoUnlocked("equip") && save.auto.equip) {
         autoEquipStep();
       }
-      if (isAutoUnlocked("bait") && save.auto.bait) {
-        autoBaitStep();
-      }
-      // 自动狩猎不在这里跑：它有自己的巡检节奏（见 autoHuntPump）
+        if (isAutoUnlocked("bait") && save.auto.bait) {
+          autoBaitStep();
+        }
+        // V0.98：自动回归（寿命 1 点自动送展示柜）
+        if (isAutoUnlocked("retire") && save.auto.retire) {
+          autoRetireStep();
+        }
+        // 自动狩猎不在这里跑：它有自己的巡检节奏（见 autoHuntPump）
+      });
     }
 
 
+
+    // ===================== V0.98.1 崩溃防护网 =====================
+    // 背景：单文件游戏没有服务端兜底 —— 主循环里任何「某一帧抛了个异常」都会让
+    //   整个 setInterval 回调永久哑火：画面停在最后一帧、点哪都没反应，
+    //   玩家能描述出来的只有「游戏崩溃了」，拿不到任何可排查的信息（作者本轮反馈的形态）。
+    // 三层保护：
+    //   ① runLoop / autoStep 整体 try/catch：单帧出错 → 跳过这一帧继续跑，不再冻结；
+    //   ② window error / unhandledrejection：按钮回调、定时器等其他路径的错误一并兜住；
+    //   ③ 所有报错上屏（事件日志 + 轻提示，节流 8 秒），玩家截个图就能把出错原因交回来。
+    //   ⚠️ 防护网只负责「不让一处小错毁掉整局游戏」，不掩盖问题：控制台照常打印原始错误。
+    let crashReportAt = 0;
+    let crashReportCount = 0;
+    // V0.98.1b：崩溃日志独立落盘（localStorage）—— 不随存档走，刷新页面、甚至清档都带不走。
+    //   为什么需要它：「白屏 + F12 打开是空白的」这类事故属于**浏览器渲染进程被杀**（多半是内存），
+    //   控制台里的报错会随进程一起消失。有了这份日志，任何被捕获的异常都留有现场可查。
+    const CRASH_LOG_KEY = "time-hound-crash-log";
+    const CRASH_LOG_MAX = 20;
+    function pushCrashLog(where, msg, stack) {
+      try {
+        const arr = JSON.parse(localStorage.getItem(CRASH_LOG_KEY) || "[]");
+        arr.unshift({
+          at: new Date().toISOString().replace("T", " ").slice(0, 19),
+          where: String(where || ""),
+          msg: String(msg || "").slice(0, 200),
+          stack: String(stack || "").slice(0, 600)
+        });
+        localStorage.setItem(CRASH_LOG_KEY, JSON.stringify(arr.slice(0, CRASH_LOG_MAX)));
+      } catch (_) { }
+    }
+    function readCrashLog() {
+      try {
+        const a = JSON.parse(localStorage.getItem(CRASH_LOG_KEY) || "[]");
+        return Array.isArray(a) ? a : [];
+      } catch (_) { return []; }
+    }
+    function reportCrash(where, e) {
+      const msg = String((e && e.message !== undefined ? e.message : e) || "未知错误").slice(0, 160);
+      const stack = (e && (e.stack || (e.error && e.error.stack))) || "";
+      pushCrashLog(where, msg, stack);
+      const now = Date.now();
+      // ⚠️ console.error 也放进节流里：早期版本每次异常都打一行 console，
+      //   一旦有「每帧都抛」的错误，长挂机下控制台缓冲区会持续吃内存（自己变成崩溃源）。
+      if (now - crashReportAt < 8000) return;
+      crashReportAt = now;
+      crashReportCount += 1;
+      try { console.error("[时间猎犬增量][" + where + "]", e); } catch (_) { }
+      try {
+        logEvent("⚠️", `捕获到一次异常（${where}）：<b>${msg}</b> —— 已自动跳过继续运行，存档不受影响。请把这条截图给作者。`, "red");
+      } catch (_) { }
+      try {
+        showToast(`⚠️ 出现一次异常（${where}）：${msg}<br>游戏已自动跳过并继续 —— 如果反复出现，请截图这句话。`);
+      } catch (_) { }
+    }
+    function safeRun(where, fn) {
+      try { fn(); return true; } catch (e) { reportCrash(where, e); return false; }
+    }
+    // V0.98.1b：内存看门狗（Chrome 专属）——「突然白屏 + 控制台空白」的典型成因是
+    //   浏览器把渲染进程杀了（内存），这里在接近阈值时提前存档并提醒刷新，别等它硬崩。
+    let memWarnedAt = 0;
+    function memoryWatchdog() {
+      try {
+        const mem = (typeof performance !== "undefined") && performance.memory;
+        if (!mem || !mem.usedJSHeapSize || !mem.jsHeapSizeLimit) return;
+        const usedMB = mem.usedJSHeapSize / 1048576;
+        const limitMB = mem.jsHeapSizeLimit / 1048576;
+        if (usedMB < 1200 && usedMB < limitMB * 0.72) return;
+        if (Date.now() - memWarnedAt < 120000) return;
+        memWarnedAt = Date.now();
+        pushCrashLog("内存看门狗", `堆内存 ${usedMB.toFixed(0)}MB / 上限 ${limitMB.toFixed(0)}MB（接近崩溃线，建议刷新）`, "");
+        saveGame(true);
+        showToast(`⚠️ 页面内存已达 <b>${usedMB.toFixed(0)}MB</b>（上限 ${limitMB.toFixed(0)}MB），快摸到浏览器崩溃线了。<br>存档已保存 —— 建议刷新一次页面清空内存。`);
+      } catch (_) { }
+    }
+    window.addEventListener("error", e => {
+      // 资源类错误（img 等）没有 message，不打扰玩家；脚本错误才上报
+      if (!e || !e.message) return;
+      reportCrash("界面", e);
+    });
+    window.addEventListener("unhandledrejection", e => reportCrash("异步任务", e && e.reason));
+
+    // ===================== 反转世界（V0.98）=====================
+    // 设计口径（本版与作者对齐的规则）：
+    //   · 解锁：历史最高尘埃 ≥ 1E30080，且苦痛挑战全部通关；
+    //   · 完全独立：反转世界有自己的尘埃 / 等级 / 自动化 —— 主宇宙的加成、部件、猎犬在这里**一概不生效**；
+    //   · 主宇宙暂停：进场后 runLoop 改道到 invStep，主宇宙的时间（收益 / 进度 / 捕获 / 自动巡检）整体静止；
+    //   · 每次从头：状态只活在内存里，进场时整个重建 —— 退出再进就是新的一局；
+    //   · 倒影逻辑：主宇宙「被捕获 = 赐予部件成长」，反转世界「被捕获 = 等级 −1」（反转猎犬每 10 秒逼近一次）；
+    //   · 上限 1EE10（10^(1E10)）：尘埃钳在 log10 = 1e10，显示自带 EE 记法（formatScientific 输出 1EE10）。
+    //   ⚠️ 状态故意不进存档：①「每次重来」是规则本身；② 省掉一整套存档迁移 / 离线结算的坑。
+    const INV_UNLOCK_E = 30080;        // 解锁门槛：历史最高尘埃 1E30080
+    const INV_CAP_LOG10 = 1e10;        // 反转尘埃上限：10^(1E10) = 显示「1EE10」
+    const INV_CAPTURE_SEC = 10;        // 反转猎犬逼近周期：每 10 秒捕获一次（与界面说明文案同步）
+    const INV_START_LEVEL = 1;
+    const INV_HARVEST_BASE = 3;        // 深度凝析基础收益
+    const INV_HARVEST_PER_LEVEL = 3;   // 每级再 +3
+    const INV_LEVEL_COST_BASE = 12;    // 反转铸级：基础 12 反转尘埃
+    const INV_LEVEL_COST_GROWTH = 1.4; // 每级造价 ×1.4
+
+    let invActive = false;             // 会话级开关（不落盘）：在不在反转世界里
+    let invWorld = null;               // 反转世界的全部状态（进场重建）
+    let invPane = "main";              // main | auto | bag
+    function invCapBig() { return bigFromLog10(INV_CAP_LOG10); }
+    // 解锁判定：尘埃到顶 + 苦痛挑战全通（PAIN_CHALLENGES，共 10 条），两个条件缺一不可
+    function isInvUnlocked() {
+      if (bigLog10(save.bestDust) < INV_UNLOCK_E - 0.001) return false;
+      return painClearedCount() >= PAIN_CHALLENGES.length;
+    }
+    function freshInvState() {
+      return {
+        dust: BIG_ZERO,
+        level: INV_START_LEVEL,
+        best: INV_START_LEVEL,
+        captures: 0,
+        progress: 0,
+        auto: { harvest: false, level: false }
+      };
+    }
+    function invLevelNow() { return Math.max(0, Math.floor((invWorld && invWorld.level) || 0)); }
+    function invHarvestGain() { return INV_HARVEST_BASE + INV_HARVEST_PER_LEVEL * invLevelNow(); }
+    function invLevelCost() {
+      const lv = invLevelNow();
+      const c = INV_LEVEL_COST_BASE * Math.pow(INV_LEVEL_COST_GROWTH, Math.max(0, lv - 1));
+      return isFinite(c) ? Math.ceil(c) : Number.MAX_VALUE;   // 保险丝：越高越贵，永远算不出 Infinity
+    }
+    // 正式开放后的公开入口（自绘确认框 → 进场）。⚠️ 目前只有开发者面板能进，
+    //   这条通道先留着 —— 等反转世界做完、去掉开发锁之后，把它接回页签即可。
+    function requestInvEntry() {
+      if (invActive) return;
+      if (!isInvUnlocked()) {
+        showToast("反转世界尚未解锁：需要<b>历史最高尘埃 ≥ 1E30080</b>，并且<b>苦痛挑战全部通关</b>。");
+        return;
+      }
+      if (activeBattle || isHunting() || wheelSpinning) {
+        showToast("战斗 / 猎影进行中：等这一轮结束再进入反转世界。");
+        return;
+      }
+      showConfirm({
+        icon: "◑", title: "进入反转世界",
+        text: `反转世界是主宇宙的完全倒影：进去之后<b>外面的一切都会静止</b>（时间暂停），` +
+              `里面的一切<b>从零开始</b> —— 每次进入都会重来，随时可以退出。<br>` +
+              `<span style="color: var(--muted);">在那里，「被捕获」不是恩赐，而是<b>等级 −1</b>。确定现在进去吗？</span>`,
+        ok: "进入"
+      }, () => enterInvWorld());
+    }
+    function enterInvWorld(force) {
+      if (invActive) return;
+      if (!force && !isInvUnlocked()) return;   // force = 开发者通道（跳过解锁条件）
+      if (activeBattle || isHunting() || wheelSpinning) {
+        showToast("战斗 / 猎影进行中：等这一轮结束再进入反转世界。");
+        return;
+      }
+      invWorld = freshInvState();      // 「下次进入从头开始」：每次进场整个重建
+      invActive = true;
+      document.body.classList.add("inv-mode");
+      switchTab("inv");
+      switchInvPane("main");
+      showToast(`◑ 已进入反转世界：外面的时间静止了，这里从 Lv.${INV_START_LEVEL} 开始。`);
+    }
+    function exitInvWorld() {
+      if (!invActive) return;
+      invActive = false;
+      document.body.classList.remove("inv-mode");
+      switchTab("game");
+      render();
+      showToast("已退出反转世界 —— 主宇宙的时间继续流动。");
+    }
+    function switchInvPane(name) {
+      if (name !== "main" && name !== "auto" && name !== "bag") name = "main";
+      invPane = name;
+      el("invPaneMain").classList.toggle("active", name === "main");
+      el("invPaneAuto").classList.toggle("active", name === "auto");
+      el("invPaneBag").classList.toggle("active", name === "bag");
+      el("invTabMain").classList.toggle("active", name === "main");
+      el("invTabAuto").classList.toggle("active", name === "auto");
+      el("invTabBag").classList.toggle("active", name === "bag");
+      renderInvWorld();
+    }
+    // 深度凝析：手动 / 自动共用
+    function invHarvest(silent) {
+      if (!invActive || !invWorld) return;
+      const gain = bigOf(invHarvestGain());
+      invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, gain));
+      if (!silent) {
+        showToast(`深度凝析：<b>+${formatNumber(gain)}</b> 反转尘埃。`);
+        renderInvWorld();
+      }
+    }
+    // 反转铸级：花反转尘埃换等级（等级越高凝析越快），被捕获时掉的也是它
+    function invTryLevelUp(silent) {
+      if (!invActive || !invWorld) return false;
+      const cost = invLevelCost();
+      if (bigCmp(invWorld.dust, bigOf(cost)) < 0) {
+        if (!silent) showToast(`反转尘埃不足：铸级需要 <b>${formatNumber(cost)}</b>。`);
+        return false;
+      }
+      invWorld.dust = bigSub(invWorld.dust, bigOf(cost));
+      invWorld.level = invLevelNow() + 1;
+      if (invWorld.level > invWorld.best) invWorld.best = invWorld.level;
+      if (!silent) {
+        showToast(`反转铸级：<b>Lv.${formatNumber(invWorld.level)}</b>（花费 ${formatNumber(cost)} 反转尘埃）。`);
+        renderInvWorld();
+      }
+      return true;
+    }
+    // 被捕获：倒影规则 —— 等级 −1（主宇宙里这一步是赐予部件成长）
+    //   quiet=true 时静默结算（补帧批处理用，避免一帧几百条提示把页面顶住）
+    //   ⚠️ 进度由调用方扣减（批处理要一次扣一档），这里不碰 progress
+    function invCapture(quiet) {
+      if (!invWorld) return;
+      invWorld.captures += 1;
+      const before = invLevelNow();
+      invWorld.level = Math.max(0, before - 1);
+      if (quiet) return;
+      if (before > 0) {
+        showToast(`◑ 被反转猎犬捕获：<b>等级 −1 → Lv.${formatNumber(invWorld.level)}</b>（本局第 ${formatNumber(invWorld.captures)} 次）。`);
+      } else {
+        showToast(`◑ 被反转猎犬捕获：等级已经归零，没有等级可掉了（本局第 ${formatNumber(invWorld.captures)} 次）。`);
+      }
+    }
+    // 独立结算：只在反转世界模式下由 runLoop 调用 —— 主宇宙的 gameStep 整段跳过
+    function invStep(dt) {
+      if (!invWorld) return;
+      const lv = invLevelNow();
+      // 被动凝析：每秒 +（1 + 等级）
+      invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, bigMul(bigOf(1 + lv), dt)));
+      // 捕获逼近：反转猎犬每 INV_CAPTURE_SEC 秒到访一次
+      invWorld.progress += dt / INV_CAPTURE_SEC;
+      if (invWorld.progress >= 1) {
+        // V0.98.1：切后台回来的补帧可能一口气跨过好几次捕获 —— 逐次结算（等级照扣），
+        //   但只出「一条汇总提示」；再配一道每次最多 200 次的保险丝，极端 dt 也顶得住。
+        let n = 0;
+        while (invWorld.progress >= 1 && n < 200) {
+          invWorld.progress -= 1;
+          invCapture(n > 0);      // 第一次照常提示，后续静默
+          n++;
+        }
+        if (invWorld.progress >= 1) invWorld.progress = 0;   // 兜底：不给残留
+        if (n > 1) {
+          showToast(`◑ 补帧结算：一口气被反转猎犬捕获了 <b>${formatNumber(n)}</b> 次，当前 Lv.${formatNumber(invLevelNow())}。`);
+        }
+      }
+    }
+    // 反转世界的自动化：随 autoStep 的秒级节拍跑（主宇宙的自动步骤整段跳过）
+    function invAutoStep() {
+      if (!invWorld) return;
+      if (invWorld.auto.harvest) invHarvest(true);
+      if (invWorld.auto.level) invTryLevelUp(true);
+    }
+    // V0.98：反转世界改成「常显页签 + 开发中门页」—— 所有人能看到入口；
+    //   真正进场只留给开发者面板（enterInvWorld(true)），解锁条件留作正式开放时的门槛。
+    function renderInvTab() {
+      setTabLocked("invTab", false, "◑ 反转世界");
+    }
+    function renderInvWorld() {
+      if (!invActive || !invWorld) return;
+      const lv = invLevelNow();
+      setText("invStatusLine", `反转等级 Lv.${formatNumber(lv)} · 被捕获 ${formatNumber(invWorld.captures)} 次 · 本局最高 Lv.${formatNumber(invWorld.best)}`);
+      setText("invDustVal", formatNumber(invWorld.dust));
+      setText("invLevelVal", "Lv." + formatNumber(lv));
+      setText("invCapturesVal", formatNumber(invWorld.captures));
+      setText("invBestVal", "Lv." + formatNumber(invWorld.best));
+      setText("invRateVal", "+" + formatNumber(1 + lv) + " / 秒");
+      const pct = Math.max(0, Math.min(1, invWorld.progress)) * 100;
+      setStyle("invCapFill", "width", pct.toFixed(1) + "%");
+      setText("invCapText", invWorld.progress >= 1
+        ? "捕获逼近 100%"
+        : `捕获逼近 ${pct.toFixed(0)}% · 还有 ${Math.max(0, (1 - invWorld.progress) * INV_CAPTURE_SEC).toFixed(1)} 秒`);
+      setText("invHarvestBtn", `深度凝析（+${formatNumber(invHarvestGain())}）`);
+      const cost = invLevelCost();
+      const can = bigCmp(invWorld.dust, bigOf(cost)) >= 0;
+      const lvBtn = el("invLevelBtn");
+      if (lvBtn) {
+        lvBtn.disabled = !can;
+        setText("invLevelBtn", can
+          ? `反转铸级 Lv.${formatNumber(lv)} → Lv.${formatNumber(lv + 1)}（花费 ${formatNumber(cost)}）`
+          : `反转铸级（需要 ${formatNumber(cost)} 反转尘埃）`);
+      }
+      const hb = el("invAutoHarvestBtn"), lb = el("invAutoLevelBtn");
+      if (hb) { hb.classList.toggle("on", !!invWorld.auto.harvest); setText("invAutoHarvestBtn", invWorld.auto.harvest ? "开" : "关"); }
+      if (lb) { lb.classList.toggle("on", !!invWorld.auto.level); setText("invAutoLevelBtn", invWorld.auto.level ? "开" : "关"); }
+    }
+    on("invExit", () => exitInvWorld());
+    on("invTabMain", () => switchInvPane("main"));
+    on("invTabAuto", () => switchInvPane("auto"));
+    on("invTabBag", () => switchInvPane("bag"));
+    on("invHarvestBtn", () => invHarvest(false));
+    on("invLevelBtn", () => invTryLevelUp(false));
+    on("invAutoHarvestBtn", () => { if (invWorld) { invWorld.auto.harvest = !invWorld.auto.harvest; renderInvWorld(); } });
+    on("invAutoLevelBtn", () => { if (invWorld) { invWorld.auto.level = !invWorld.auto.level; renderInvWorld(); } });
 
     // ===================== 主循环：按真实流逝时间推进 =====================
     // 浏览器限流只拉长回调间隔，不影响 Date.now()，
@@ -14242,21 +14900,26 @@
 
     let lastTickAt = Date.now();
     function runLoop() {
-      const now = Date.now();
-      let dtMs = now - lastTickAt;
-      lastTickAt = now;
-      if (!isFinite(dtMs) || dtMs < 0) dtMs = TICK_MS;
-      dtMs = Math.min(dtMs, MAX_CATCHUP_MS);
-      // 子步长度：正常情况就是 TICK_MS；只有被长时间冻结时才放粗，避免上万次迭代卡顿
-      const steps = Math.max(1, Math.min(MAX_STEPS_PER_FRAME, Math.ceil(dtMs / TICK_MS)));
-      const stepMs = dtMs / steps;
-      const dt = stepMs / 1000;
-      for (let i = 0; i < steps; i++) {
-        if (isCaptured) break;
-        if (!gameStep(dt)) break;
-      }
-      autoHuntPump();
-      render();
+      // V0.98.1：整段包在防护网里 —— 单帧出错只跳过这一帧，不再让主循环永久哑火
+      safeRun("主循环", () => {
+        const now = Date.now();
+        let dtMs = now - lastTickAt;
+        lastTickAt = now;
+        if (!isFinite(dtMs) || dtMs < 0) dtMs = TICK_MS;
+        dtMs = Math.min(dtMs, MAX_CATCHUP_MS);
+        // 子步长度：正常情况就是 TICK_MS；只有被长时间冻结时才放粗，避免上万次迭代卡顿
+        const steps = Math.max(1, Math.min(MAX_STEPS_PER_FRAME, Math.ceil(dtMs / TICK_MS)));
+        const stepMs = dtMs / steps;
+        const dt = stepMs / 1000;
+        for (let i = 0; i < steps; i++) {
+          // V0.98：在反转世界里 → 主宇宙整段静止，只推进反转世界自己的结算
+          if (invActive) { invStep(dt); continue; }
+          if (isCaptured) break;
+          if (!gameStep(dt)) break;
+        }
+        if (!invActive) autoHuntPump();
+        render();
+      });
     }
 
     setInterval(runLoop, TICK_MS);
@@ -14293,7 +14956,8 @@
     // 离线结算必须在首次 render 之前跑完，这样面板一出现就是结算后的数字
     const offlineInfo = applyOfflineProgress();
     if (offlineInfo) saveGame(true);   // 立刻落盘，防止刷新一次重复结算同一段时间
-    render();
+    // V0.98.1：启动渲染也包防护网 —— 万一某个面板数据异常，也不至于开屏即白屏
+    safeRun("启动渲染", render);
     if (offlineInfo) showOfflineModal(offlineInfo);
   </script>
 </body>
