@@ -2645,7 +2645,7 @@
         <h1>时间猎犬增量</h1>
         <p class="subtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.102</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.103</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -3879,7 +3879,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.102";
+    const GAME_VERSION = "V0.103";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -11335,6 +11335,7 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.103", "排行榜暂时下线。入口按钮已移除，游戏不再上传或拉取任何排行榜数据（此前已部署的服务端也加了总开关，默认一律拒收，不接收任何数据）。之前上传过的排名保留在服务端 —— 身份、4 小时冷却、版本门这些代码全部原地保留，之后想重新开放只需翻两个开关就能原样复活。"],
       ["V0.102", "两条修正。① 排行榜身份与 4 小时冷却改「设备级」保存：以前它们只存在存档里 —— 清空存档（或导入一份老档）就能把上传冷却和「我是谁」一起重置，服务端还会把你当成新玩家、在榜上多出一条记录。现在清档不再影响身份与冷却（时间戳取「设备与存档的较大值」，导入老档也倒不回冷却）。② 服务端加「一个昵称只占一行」：自定义昵称按名字去重，同名旧行会被清掉、只留最新的一条（换设备 / 清档 / 旧数据留下的副本一并清理）；默认名「无名猎手」不参与去重，仍是一人一条。匹配这份更新，服务端已同步升级 —— 部署一次即可全部生效。"],
       ["V0.101", "四条修正。① 修「自动战斗卡死」：自动狩猎遇到「四条时间线一条都打不过」时会静默空转（以前只会悄悄等着）。现在三层兜底 —— 先换仓库里打得过的更强猎犬、够门槛就回归、谁都不够就打不过时自动重织时间线（20 秒节流），保证永远转得下去。② 修超越展示柜排版错乱：软上限警告与「只列 20 只」说明以前被拼进了卡片网格里、占了第一行两个格子，把第一张卡挤到旁边；现在统一收进顶部汇总框。③ 修「先挑衅猎犬、8 秒内开挑战或发动超越悖论会继承保险箱」：重置现在会连同保险箱一起清零、并打断进行中的猎影。④ 修苦痛挑战「累计本源」进度把 log10 直接拼成「1E0.06」的怪文案，改为正常数值；排行榜全链路收紧（只收最新版成绩、每 4 小时一次、在线时长有物理上限）。"],
       ["V0.100", "三条修正。① 排行榜版本门补全：老版本现在连「发送」这一步都不会走 —— 客户端从榜单响应里读到「当前收件版本」，发现自己过期就直接拒发、并提示刷新更新（以前只是打到服务端被拒收，白占一次调用）；服务端那道拦截仍然保留作双保险。② 修「先挑衅猎犬、8 秒内再开挑战 / 发动超越悖论会继承保险箱」：重置现在会连同保险箱一起清零、并打断进行中的猎影 —— 以前旧循环保险箱里存下的尘埃，会在新循环的下一次捕获时结算进来，等于绕过「全清」。③ 修「主线挑战中门槛已锁定」那行文案把尖括号标签原样印出来（改为正常渲染）。"],
@@ -11395,6 +11396,11 @@
     //     ⚠️ 服务端**不回传 pid**（防采集）；「哪一行是我」用 `me` 查询参数比出来的 self 标记。
     //     ⚠️ 尘埃显示一律由客户端用 bigFromLog10() 现算，**不信服务端给的字符串**。
     const LEADERBOARD_API = "https://shijianliequan-d0gg4kdtf6d987183-150674349.ap-shanghai.app.tcloudbase.com/leaderboard";
+    // V0.103（作者要求：排行榜暂时下线）——**总开关**。
+    //   false = 入口按钮隐藏、面板打不开、上传 / 拉榜一律不发任何网络请求；
+    //   身份（设备级 pid）、4 小时冷却、版本门、服务端校验这些代码全部保留，
+    //   以后想重新开放：把这里改回 true（必要时换成新接口地址）即可原样复活。
+    const LEADERBOARD_ENABLED = false;
     const LB_TIMEOUT_MS = 8000;        // 单次请求超时（绝不拖住主循环）
     // V0.99（作者要求）：同一玩家两次上传至少间隔 4 小时 —— 后端按调用次数计费，压住上传频率。
     //   客户端先拦一道（冷却期内连请求都不发，白发的调用也要花钱），服务端再拦一道（真正的保险）。
@@ -11413,7 +11419,8 @@
     // 生产环境下永远是 false（唯一的赋值点包在 DEV 标记里，发布版会被剥掉）。
     let lbPreview = false;
 
-    function isLeaderboardOn() { return !!LEADERBOARD_API || lbPreview; }
+    // V0.103：总开关关着 → 一律视为「未开放」（预览模式是 DEV 工具，不受影响）。
+    function isLeaderboardOn() { return lbPreview || (LEADERBOARD_ENABLED && !!LEADERBOARD_API); }
     // 服务端只收最新版（LATEST_VERSION）。旧客户端自己先拒发 —— 老版本不再占服务端调用。
     //   ⚠️ 服务端那道 400 old_version 仍然保留（双保险：没更新过检查逻辑的旧版会撞上它）。
     function lbIsOutdated() {
@@ -11607,7 +11614,8 @@
     function lbLoad(sort) {
       lbSort = sort === "time" ? "time" : "dust";
       // 预览模式（DEV 假数据）不联网；没接后端时也只是重绘一下
-      if (lbPreview || !LEADERBOARD_API) { renderLeaderboard(); return; }
+      // V0.103：下线期（总开关关着）连「读取中」都不显示，更不发任何请求
+      if (lbPreview || !isLeaderboardOn()) { renderLeaderboard(); return; }
       lbNote = "读取中…";
       renderLeaderboard();
       // 带上自己的 pid：服务端据此给「我这一行」打 self 标记（榜单本身不回传 pid）
@@ -11628,10 +11636,9 @@
     function renderLeaderboardButton() {
       // V0.92（作者要求）：入口**常显**，像「成就」一样固定在导航栏右侧。
       //   后端还没接上时面板会如实说明「还没开放」，不装成能用 —— 所以不是"死按钮"。
-      //   ⚠️ 如果哪天想恢复「没配地址就不显示」，把下面一行换成
-      //      btn.style.display = isLeaderboardOn() ? "" : "none";
+      //   ⚠️ V0.103（作者要求）：排行榜暂时下线 —— 入口直接隐藏（预览模式除外）。
       const btn = el("leaderboardBtn");
-      if (btn) btn.style.display = "";
+      if (btn) btn.style.display = (LEADERBOARD_ENABLED || lbPreview) ? "" : "none";
     }
     function renderLeaderboard() {
       if (!el("lbBody")) return;
@@ -11639,7 +11646,7 @@
       // 状态行
       setText("lbStatus", on
         ? (lbNote || "上传你的在线时长与历史最高尘埃，和所有猎手比一比。")
-        : "排行榜还没开放 —— 后端正在接入中，开放后这里就能上传成绩、看全服排名。");
+        : "排行榜暂时下线（维护中）—— 之后准备好了会重新开放。");
       // 自己的成绩（昵称输入框不重绘 —— 否则会把玩家正在输入的框冲掉）
       setText("lbSelfScore", "你的成绩：" + formatNumber(save.bestDust) + " 尘埃 · ⏱ " + formatPlayTime(save.playMs || 0));
       // 工具条（V0.96：自动上传开关已移除 —— 上传是纯手动，点一次发一次）
@@ -11663,8 +11670,8 @@
         })() : ""));
       // 榜单
       if (!on) {
-        setHTML("lbBody", `<div class="lb-empty">排行榜还没开放。<br>` +
-          `<span class="lb-sub">开放后这里会显示全服排名，你也能把自己的成绩传上去。</span></div>`);
+        setHTML("lbBody", `<div class="lb-empty">排行榜暂时下线（维护中）。<br>` +
+          `<span class="lb-sub">重新开放后，这里会显示全服排名，你也能把自己的成绩传上去。</span></div>`);
         return;
       }
       if (!lbRows.length) {
@@ -11686,6 +11693,8 @@
       }).join(""));
     }
     function openLeaderboardModal() {
+      // V0.103：下线期间入口不可达 —— 就算被别的路径调用也拒绝打开
+      if (!LEADERBOARD_ENABLED && !lbPreview) return;
       const input = el("lbNameInput");
       if (input) input.value = typeof save.lbName === "string" ? save.lbName : "";
       renderLeaderboard();
