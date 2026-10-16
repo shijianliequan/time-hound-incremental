@@ -1415,6 +1415,111 @@
     .stats-n { grid-column: 1 / -1; color: var(--muted); font-size: 11px; line-height: 1.55; }
     .stats-sum { color: var(--cyan) !important; }
 
+    /* V0.109：赛博赌场 */
+    .vw-g-open { font-size: 11px; color: var(--green); border: 1px solid var(--green); border-radius: 999px; padding: 0 6px; }
+    .inv-cs-lobby { margin-top: 10px; border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; }
+    .cs-lobby-title { font-weight: 700; margin-bottom: 8px; }
+    .cs-lobby-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .cs-lobby-row .secondary-button { flex: 0 0 auto; width: auto; }
+    .cs-lobby-note { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+    .inv-cs-head { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; border: 1px solid var(--line);
+      border-radius: 10px; padding: 10px 12px; background: var(--panel-light); }
+    .inv-cs-head .secondary-button { flex: 0 0 auto; width: auto; margin-left: auto; }
+    .cs-stats { font-size: 12px; color: var(--muted); margin: 8px 0; }
+    .cs-bet-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    .cs-bet-row .cs-bet-label { font-size: 12px; color: var(--muted); }
+    .cs-bet-row .secondary-button { flex: 0 0 auto; width: auto; padding: 4px 10px; }
+    .cs-pk-sub { font-size: 11px; color: var(--muted); font-weight: 400; }
+    .cs-pk-blind-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 12px; margin-bottom: 6px; }
+    .cs-pk-blind-row .secondary-button { flex: 0 0 auto; width: auto; padding: 3px 9px; font-size: 12px; }
+    .cs-pk-blind.active { border-color: var(--gold); color: var(--gold); font-weight: 700; }
+    .cs-pk-blind-hint { font-size: 11px; color: var(--muted); }
+    .cs-pk-blind-input { font-size: 12px; padding: 3px 8px; }
+    .cs-pk-stats { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .cs-pk-type { font-size: 12px; color: var(--gold); }
+    .cs-pk-meta { display: flex; gap: 16px; font-size: 12px; color: var(--muted); }
+    .cs-pk-msg { margin: 6px 0 4px; }
+    .cs-pk-result { font-size: 13px; margin-bottom: 8px; }
+    .cs-clear-row { font-size: 12px; color: var(--gold); margin-bottom: 6px; }
+    .cs-bet-pct { font-size: 12px; color: var(--muted); flex: 0 0 auto; }
+    .cs-bet-row input[type=range] { accent-color: var(--purple, #7c5cff); }
+    .cs-spent { font-size: 12px; color: var(--muted); margin-left: auto; }
+    .inv-empty-slot { border: 1px dashed var(--line); border-radius: 10px; padding: 28px 16px; text-align: center; margin-top: 10px; }
+    .inv-empty-big { font-size: 22px; font-weight: 700; color: var(--muted); }
+    .inv-empty-hint { font-size: 12.5px; color: var(--muted); margin-top: 8px; line-height: 1.7; }
+
+    .inv-achv-btn { position: absolute; right: 16px; top: 14px; z-index: 30; flex: 0 0 auto; width: auto;
+      padding: 5px 12px; font-size: 12.5px; }
+    .inv-achv-btn b { color: var(--gold); font-weight: 700; }
+    .inv-achv-sum { font-size: 12.5px; color: var(--gold); margin-bottom: 8px; }
+    .inv-achv-list { display: flex; flex-direction: column; gap: 8px; }
+    .inv-achv-card { display: flex; align-items: center; gap: 12px; border: 1px dashed var(--line); border-radius: 10px;
+      padding: 10px 12px; opacity: .68; }
+    .inv-achv-card.on { border-style: solid; border-color: var(--gold); opacity: 1; }
+    .inv-achv-card .achv-ico { font-size: 22px; }
+    .inv-achv-card .achv-mid { flex: 1; }
+    .inv-achv-card .achv-name { font-weight: 700; }
+    .inv-achv-card .achv-got { font-size: 11px; color: var(--gold); font-weight: 400; }
+    .inv-achv-card .achv-cond { font-size: 12px; color: var(--muted); }
+    .inv-achv-card .achv-reward { font-size: 12px; color: var(--gold); }
+    .inv-achv-card .achv-flag { font-size: 18px; color: var(--muted); }
+    .inv-achv-card.on .achv-flag { color: var(--green); }
+
+    .cs-chal-banner { border: 1px solid var(--purple); border-radius: 10px; padding: 8px 12px; margin-bottom: 8px;
+      font-size: 12.5px; line-height: 1.6; }
+    .inv-chal-card { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-top: 12px;
+      background: var(--panel-light); }
+    .inv-chal-card .chal-head { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; }
+    .inv-chal-card .chal-icon { font-size: 20px; }
+    .inv-chal-card .chal-state { margin-left: auto; font-size: 12px; font-weight: 400; color: var(--gold); }
+    .inv-chal-card .chal-desc { font-size: 12.5px; color: var(--muted); line-height: 1.7; margin: 8px 0; }
+    .inv-chal-card .chal-reward { font-size: 12.5px; line-height: 1.7; border-left: 3px solid var(--gold); padding-left: 8px; }
+    .inv-chal-card .chal-stat { font-size: 12px; color: var(--muted); margin: 8px 0; }
+
+    .cs-cash-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .cs-cash-hint { font-size: 12px; color: var(--muted); }
+
+    .cs-broke-note { border: 1px dashed var(--red); border-radius: 10px; padding: 8px 12px; margin-top: 10px;
+      font-size: 12.5px; color: var(--red); line-height: 1.6; }
+
+    .cs-rescue { border: 1px solid var(--red); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; background: rgba(224,85,79,.06); }
+    .cs-rescue-title { font-weight: 700; color: var(--red); margin-bottom: 6px; }
+    .cs-rescue-hint { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.6; }
+    .cs-msg { min-height: 20px; font-size: 13px; font-weight: 700; margin: 6px 0 10px; }
+    .cs-table { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; }
+    .cs-table-name { font-weight: 700; margin-bottom: 6px; }
+    .cs-line { font-size: 13px; margin-bottom: 6px; }
+    .cs-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .cs-btn-row .primary-button, .cs-btn-row .secondary-button { flex: 0 0 auto; width: auto; min-width: 84px; }
+
+    /* V0.109：虚拟世界（小游戏卡 + 加点行） */
+    .inv-vw-games { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+    .inv-vw-game { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--panel-light);
+      display: flex; flex-direction: column; gap: 6px; }
+    .inv-vw-game.todo { border-style: dashed; }
+    .inv-vw-game .vw-g-icon { font-size: 20px; }
+    .inv-vw-game .vw-g-name { font-weight: 700; }
+    .inv-vw-game .vw-g-desc { font-size: 12px; color: var(--muted); flex: 1; }
+    .inv-vw-game .vw-g-btn { align-self: flex-start; }
+    .inv-vw-ups { display: flex; flex-direction: column; gap: 8px; }
+    .inv-vw-up { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: var(--panel-light); }
+    .inv-vw-up .vw-u-head { display: flex; justify-content: space-between; font-weight: 700; }
+    .inv-vw-up .vw-u-lv { color: var(--muted); font-weight: 400; font-size: 12px; }
+    .inv-vw-up .vw-u-desc { font-size: 12px; color: var(--muted); margin: 2px 0 6px; }
+    .inv-vw-up .vw-u-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .inv-vw-up .vw-u-cost { font-size: 12px; color: var(--gold); white-space: nowrap; flex: 0 0 auto; }
+    /* 加点按钮不要被基样式撑满整行 */
+    .inv-vw-up .vw-u-foot .secondary-button { flex: 0 0 auto; width: auto; min-width: 78px; padding: 6px 14px; }
+
+    /* V0.109：设置里的「提示框开关」清单 */
+    .toast-mute-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .toast-mute-row { display: grid; grid-template-columns: auto 116px 1fr; align-items: center; gap: 8px;
+      font-size: 12.5px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; }
+    .toast-mute-row input { margin: 0; }
+    .toast-mute-row .tm-name { font-weight: 700; }
+    .toast-mute-row .tm-hint { color: var(--muted); }
+    .toast-mute-row.locked { opacity: .62; }
+
     .settings-option {
       display: flex;
       align-items: center;
@@ -2746,7 +2851,10 @@
       position: relative; height: 16px; border-radius: 5px; overflow: hidden;
       border: 1px solid #cdd5cc; background: #f0f2ee; margin: 4px 0 10px;
     }
-    .inv-track > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, #e0554f, #f2a35c); transition: width 0.1s linear; }
+    /* V0.109：过渡时长刻意比主循环节拍（100ms）长 —— 只要有一拍被浏览器拖后，
+   0.1s 的过渡就会先跑完、然后进度条「停一下再跳」，看起来就是一跳一跳的。
+   0.3 秒能吸收这种抖动（代价只是视觉上落后约 0.2 秒，读数文字仍是实时的）。 */
+    .inv-track > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, #e0554f, #f2a35c); transition: width 0.3s linear; }
     /* V0.105：第三条猎犬的进度条 —— 最深最凶 */
     #invTrack3 > i { background: linear-gradient(90deg, #5e0a18, #a11d2e); }
     #invTrack3 { border-color: #5e0a18; }
@@ -2799,7 +2907,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.108</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.110</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -2836,6 +2944,8 @@
         </div>
       </div>
       <!-- V0.105（作者要求）：反转世界的右上角数值条（和主宇宙同款；进反转世界时显示，没解锁的不显示） -->
+      <!-- V0.110（作者要求）：成就在右上角（和主宇宙排布一致） -->
+      <button class="secondary-button inv-achv-btn" id="invAchvBtn" style="display: none;">🏆 成就 <b id="invAchvBadge">0/0</b></button>
       <div class="header-stats" id="invHeaderStats">
         <div class="stat-chip" title="反转世界的尘埃 —— 只在这趟旅程里有效">
           <span>反转尘埃</span>
@@ -3452,14 +3562,15 @@
                 <span class="shop-icon">🏹</span>
                 <div class="shop-title">
                   <h4>猎影加速</h4>
-                  <span class="shop-sub">每级 +25%，最高 40 级（×11）· 仅自动狩猎</span>
+                  <span class="shop-sub">每级 +25%，最高 40 级 · 最快 0.08 秒/场 · 仅自动狩猎</span>
                 </div>
                 <span class="shop-level">Lv.<b id="shopHuntSpeedLevel">0</b><em id="shopHuntSpeedMax"></em></span>
               </div>
               <p class="shop-desc">
-                加快<b>自动狩猎</b>的节奏。倍率同时作用于战斗内的出手速度、战后结果在面板上的停留时间、
-                以及两次狩猎之间的间隔——自动狩猎会一场接一场地迅速打完，几千点寿命不用再挂着等半天。
-                <b style="color: var(--gold);">手动发起的战斗不受影响</b>。当前狩猎节奏
+                加快<b>自动狩猎</b>的节奏：整场战斗的<b>总周期</b>（战斗本身 + 战报停留 + 两场之间的间隔）
+                一起被压缩 —— 等级越高，自动狩猎就一场接一场地打得越快，几千点寿命不用再挂着等半天。
+                <b style="color: var(--gold);">最快 0.08 秒一场</b>（含战斗间隔），
+                <b style="color: var(--gold);">手动发起的战斗完全不受影响</b>。当前节奏
                 <b style="color: var(--cyan);" id="shopHuntSpeedValue">×1.00</b>。
               </p>
               <div class="shop-meter"><i id="shopHuntSpeedMeter"></i></div>
@@ -3699,6 +3810,10 @@
           <span class="inv-brand">◑ 反转世界</span>
           <button class="inv-tab active" id="invTabMain">反转主界面</button>
           <button class="inv-tab" id="invTabAuto">自动化</button>
+          <!-- V0.109：能源（进入反转世界即解锁，排在自动化右边；唯一跨局保留的东西） -->
+          <button class="inv-tab" id="invTabEnergy" style="display: none;">⚡ 能源</button>
+          <!-- V0.110（作者要求）：开启挑战后，在能源右边挂一个挑战页签 -->
+          <button class="inv-tab" id="invTabChal" style="display: none;">🎰 赌神</button>
           <button class="inv-tab" id="invTabBag" style="display: none;">科技</button>
           <button class="inv-tab" id="invTabLeap" style="display: none;">科技跃迁</button>
           <button class="inv-tab" id="invTabElite" style="display: none;">精英</button>
@@ -3789,6 +3904,244 @@
             <p class="inv-note">两件工具都要先用<b>反转尘埃解锁</b>，解锁后还能继续花尘把效率往 <b>3 次/秒</b> 堆；
               和一墙之隔的主宇宙互不影响 —— 你在里面时，外面的一切都是静止的。</p>
           </div>
+        </div>
+
+        <!-- V0.109：能源页 —— 资源 + 进度 + 说明（消费内容留待下一版） -->
+        <div class="inv-pane" id="invPaneEnergy">
+          <!-- V0.109：能源页分两个子页 —— 能源本体 / 虚拟世界 -->
+          <div class="sub-tab-bar" id="invEnergySubTabs" style="margin-bottom: 10px;">
+            <button class="sub-tab active" data-inv-energy-sub="energy" id="invEnergySubTabEnergy">⚡ 能源</button>
+            <button class="sub-tab" data-inv-energy-sub="vworld" id="invEnergySubTabVworld">🕹 虚拟世界</button>
+            <button class="sub-tab" data-inv-energy-sub="vup" id="invEnergySubTabVup">⬆ 虚拟升级</button>
+          </div>
+
+          <div id="invEnergySubEnergy">
+          <div class="panel">
+            <div class="section-title">
+              <h2 style="margin: 0;">⚡ 能源</h2>
+              <small>反转世界唯一带得走的东西</small>
+            </div>
+            <div class="inv-stat-row">
+              <div class="inv-stat"><div class="inv-label">能源总量</div><div class="inv-big" id="invEnergyVal">0</div></div>
+              <div class="inv-stat"><div class="inv-label">本局进度</div><div class="inv-big" id="invEnergyRunVal">0</div></div>
+              <div class="inv-stat"><div class="inv-label">速率</div><div class="inv-big" id="invEnergyRateVal">+1 / 秒</div></div>
+            </div>
+            <div class="inv-track" id="invEnergyTrack"><i id="invEnergyFill"></i><span class="inv-track-cap" id="invEnergyText">0%</span></div>
+            <p class="inv-note">
+              只要待在反转世界里，<b>能源</b>每秒 +1 —— <b>不吃任何加成</b>（等级、科技、里程碑、解析统统不影响它），
+              <b>唯一的例外是「反转世界成就」</b>（比如「赌神」会给 ×1.5）。<br>
+              <b style="color: var(--gold);">它是唯一不会被清空的东西</b>：退出反转世界、甚至进宇宙重置，能源都原样留着
+              （主界面的一切照旧归零）。<br>
+              能源能用来做什么？<b>作者还没定</b> —— 这一版先把资源和进度摆出来，消费内容留到下个版本。
+            </p>
+          </div>
+          </div><!-- /invEnergySubEnergy -->
+
+          <!-- V0.109：虚拟世界 —— 界面先行版（小游戏玩法待定，先用来看版式） -->
+          <div id="invEnergySubVworld" style="display: none;">
+            <div class="panel">
+              <div class="section-title">
+                <h2 style="margin: 0;">🕹 虚拟世界</h2>
+                <small>玩小游戏换虚拟点数 · 永久加点</small>
+              </div>
+              <div class="inv-stat-row">
+                <div class="inv-stat"><div class="inv-label">虚拟点数</div><div class="inv-big" id="invVpVal">0</div></div>
+                <div class="inv-stat"><div class="inv-label">永久加点</div><div class="inv-big" id="invVpBonusVal">—</div></div>
+                <div class="inv-stat"><div class="inv-label">状态</div><div class="inv-big" id="invVpState">筹备中</div></div>
+              </div>
+              <p class="inv-note" style="margin-top: 6px;">
+                虚拟点数与加点<b>都是永久的</b>：它和能源一样记在主存档上，退出反转世界、进宇宙重置都不会清掉。<br>
+                <b style="color: var(--gold);">小游戏的玩法还没定</b> —— 这一版先把版式搭出来给你看：
+                下面是游戏位与加点位，玩法确定后直接往这两个列表里塞就行。
+              </p>
+            </div>
+
+            <div class="panel" style="margin-top: 12px;">
+              <div class="section-title" id="invVwGamesTitle">
+                <h2 style="margin: 0; font-size: 15px;">🕹 小游戏</h2>
+                <small>玩法待定 · 位子先占好</small>
+              </div>
+              <div class="inv-vw-games" id="invVwGames"></div>
+            <div id="invCasinoLobby" style="display: none;">
+              <div class="inv-cs-lobby">
+                <div class="cs-lobby-title">🎰 赛博赌场 · 先缴能源买时间（每秒 <b>2</b> 点）</div>
+                <div class="cs-lobby-row" id="invCsSlots">
+                  <button class="secondary-button" id="invCsSlot0" data-inv-casino-slot="0">1 分钟 · 120 能源</button>
+                  <button class="secondary-button" id="invCsSlot1" data-inv-casino-slot="1">5 分钟 · 600 能源</button>
+                  <button class="secondary-button" id="invCsSlot2" data-inv-casino-slot="2">15 分钟 · 1800 能源</button>
+                </div>
+                <div class="cs-lobby-note">时间到会自动离开，<b>筹码与进度都保留</b>，下次进来接着玩；
+                  只有<b>破产</b>（筹码归 0）才会在下次进场时重新发 100 筹码、从头再来。当前能源：<b id="invCsLobbyEnergy">0</b></div>
+                <div class="cs-lobby-note" id="invCsLobbyState"></div>
+              </div>
+            </div>
+            <div id="invCasinoView" style="display: none;">
+              <div class="inv-cs-head">
+                <div class="inv-stat"><div class="inv-label">筹码</div><div class="inv-big" id="invCsChips">0</div></div>
+                <div class="inv-stat"><div class="inv-label">剩余时间</div><div class="inv-big" id="invCsTime">0 秒</div></div>
+                <div class="inv-stat"><div class="inv-label">能源</div><div class="inv-big" id="invCsEnergy">0</div></div>
+                <button class="secondary-button" id="invCsLeave" style="flex: 0 0 auto; width: auto;">离开赌场</button>
+              </div>
+              <div class="cs-chal-banner" id="invCsChalBanner" style="display: none;">
+                🎰 <b>赌神挑战进行中</b>　·　免费 · 不能用氪金 · <b>无时间限制</b> · 筹码归零自动退出　·　
+                通关线 <b id="invCsChalTarget">37.0M</b>
+              </div>
+              <div class="cs-stats" id="invCsStats"></div>
+              <div class="cs-rescue" id="invCsRescue" style="display: none;">
+                <div class="cs-rescue-title">💥 破产了 —— 选一条路续命</div>
+                <div class="cs-rescue-hint" id="invCsRescueHint"></div>
+                <div class="cs-btn-row">
+                  <button class="primary-button" id="invCsRescueTime">扣 1 分钟剩余时间 → +100 筹码</button>
+                  <button class="secondary-button" data-inv-cs-topup="100">氪金 100 能源 → +100 筹码</button>
+                  <button class="secondary-button" data-inv-cs-topup="500">氪金 500 能源 → +500 筹码</button>
+                  <button class="secondary-button" data-inv-cs-topup="all">氪金全部能源 → 等额筹码</button>
+                </div>
+              </div>
+              <div class="cs-clear-row" id="invCsClear"></div>
+              <div class="cs-cash-row">
+                <button class="primary-button" id="invCsCashOut" style="flex: 0 0 auto; width: auto;">💠 兑现筹码 → 虚拟点数</button>
+                <span class="cs-cash-hint" id="invCsCashHint"></span>
+              </div>
+              <div class="cs-bet-row" id="invCsBetRow">
+                <span class="cs-bet-label">本把押注</span>
+                <b id="invCsBet">10</b>
+                <span class="cs-bet-pct" id="invCsBetPct">10%</span>
+                <input type="range" id="invCsBetSlider" min="1" max="100" value="10" style="flex: 1 1 160px; min-width: 120px;">
+                <button class="secondary-button" data-inv-cs-pct="1">1%</button>
+                <button class="secondary-button" data-inv-cs-pct="25">25%</button>
+                <button class="secondary-button" data-inv-cs-pct="50">50%</button>
+                <button class="secondary-button" data-inv-cs-pct="100">全押</button>
+              </div>
+              <div class="cs-bet-row" id="invCsTopUpRow">
+                <span class="cs-bet-label">💎 氪金（能源 1:1 换筹码）</span>
+                <button class="secondary-button" data-inv-cs-topup="100">100</button>
+                <button class="secondary-button" data-inv-cs-topup="500">500</button>
+                <button class="secondary-button" data-inv-cs-topup="1000">1000</button>
+                <button class="secondary-button" data-inv-cs-topup="all">全部能源</button>
+                <span class="cs-spent">已氪 <b id="invCsSpent">0</b> 能源</span>
+              </div>
+              <div class="cs-msg" id="invCsMsg"></div>
+              <div id="invCsTables">
+              <div class="cs-table">
+                <div class="cs-table-name">🃏 21 点</div>
+                <div class="cs-line">我方：<span id="invCsBjPlayer">— 还没开局 —</span></div>
+                <div class="cs-line">庄家：<span id="invCsBjDealer"></span></div>
+                <div class="cs-btn-row">
+                  <button class="primary-button" id="invCsBjStart">开一局</button>
+                  <button class="secondary-button" id="invCsBjHit">要牌</button>
+                  <button class="secondary-button" id="invCsBjStand">停牌</button>
+                </div>
+              </div>
+              <div class="cs-table">
+                <div class="cs-table-name">🎲 猜大小</div>
+                <div class="cs-line" id="invCsDice">三个骰子，小 3~10 / 大 11~18</div>
+                <div class="cs-btn-row">
+                  <button class="primary-button" id="invCsDiceSmall">押小</button>
+                  <button class="primary-button" id="invCsDiceBig">押大</button>
+                </div>
+              </div>
+              <div class="cs-table">
+                <div class="cs-table-name">🂡 抽牌比大小</div>
+                <div class="cs-line" id="invCsDraw">抽一张比大小，同点算平局</div>
+                <div class="cs-btn-row"><button class="primary-button" id="invCsDrawGo">抽一张</button></div>
+              </div>
+              <!-- V0.109：德州扑克（单挑） -->
+              <div class="cs-table" id="invPokerBox">
+                <div class="cs-table-name">♠ 德州扑克 <span class="cs-pk-sub" id="invPkBlindLabel">单挑 · 盲注 10 / 20</span></div>
+                <div class="cs-pk-blind-row">
+                  <span class="cs-bet-label">盲注</span>
+                  <span id="invPkBlindBtns"></span>
+                  <input type="text" id="invPkBlindInput" class="cs-pk-blind-input" autocomplete="off"
+                    placeholder="自选小盲，可填 1e6" style="flex: 0 0 auto; width: 132px;">
+                  <button class="secondary-button" id="invPkBlindSet" style="flex: 0 0 auto; width: auto;">设定</button>
+                  <span class="cs-pk-blind-hint">（大盲 = 2×小盲，不能超过手上的筹码；自选支持 1e6 这种写法）</span>
+                </div>
+                <div class="cs-pk-stats" id="invPkStats"></div>
+                <div class="cs-line">我的手牌：<span id="invPkMe">—</span>　<span class="cs-pk-type" id="invPkType"></span></div>
+                <div class="cs-line">公共牌：<span id="invPkBoard">— 还没发公共牌 —</span></div>
+                <div class="cs-line">庄家：<span id="invPkFoe">—</span></div>
+                <div class="cs-line cs-pk-meta">
+                  <span>阶段：<b id="invPkStage">还没开局</b></span>
+                  <span>底池：<b id="invPkPot">0</b></span>
+                  <span>需跟注：<b id="invPkNeed">0</b></span>
+                </div>
+                <div class="cs-msg cs-pk-msg" id="invPkMsg"></div>
+                <div class="cs-pk-result" id="invPkResult"></div>
+                <div class="cs-btn-row">
+                  <button class="primary-button" id="invPkStart">开一手</button>
+                  <button class="secondary-button" id="invPkCall">过牌</button>
+                  <button class="secondary-button" id="invPkRaise">加注</button>
+                  <button class="secondary-button" id="invPkAllin">全下</button>
+                  <button class="secondary-button" id="invPkFold">弃牌</button>
+                </div>
+              </div>
+              </div><!-- /invCsTables -->
+              <!-- V0.109（作者要求）：破产提示放在牌桌**下面**（牌桌保持可见，先看结果） -->
+              <div class="cs-broke-note" id="invCsBrokeNote" style="display: none;">
+                💥 <b>已破产</b> —— 筹码归零了。用上面的抢救面板续命：<b>扣 1 分钟剩余时间换 100 筹码</b>，
+                或者<b>氪金</b>（能源 1:1 换筹码）。两条都走不通就先回反转世界攒能源（每秒 +1）。
+              </div>
+            </div>
+            </div>
+
+            <!-- V0.110（作者要求）：虚拟挑战并入「虚拟世界」页（左右点击太麻烦） -->
+            <div class="panel" style="margin-top: 12px;">
+              <div class="section-title">
+                <h2 style="margin: 0; font-size: 15px;">🎯 虚拟挑战</h2>
+                <small>不花能源 · 纯靠本事</small>
+              </div>
+              <p class="inv-note" style="margin-top: 0;">
+                和赌场不一样：挑战<b>不消耗任何东西就能进</b>，但规则也更狠 ——
+                <b>不能用氪金</b>、<b>没有时间限制</b>（想待多久待多久），
+                <b>筹码归零就自动退出</b>。通关给的奖励是永久的。
+              </p>
+              <div class="inv-chal-card" id="invChalGamblerCard">
+                <div class="chal-head">
+                  <span class="chal-icon">🎰</span>
+                  <span class="chal-name">赌神</span>
+                  <span class="chal-state" id="invChalGamblerState">未通关</span>
+                </div>
+                <div class="chal-desc">
+                  进场发 <b>20</b> 筹码，<b>不能用氪金</b>、<b>无时间限制</b>；<b>筹码归零自动退出</b>（不扣任何东西，随时可以再进）。<br>
+                  <b>通关条件</b>：赢到 <b id="invChalGamblerTarget">37.0M</b> 及以上。
+                </div>
+                <div class="chal-reward">
+                  <b>通关奖励：赌术高手</b>（永久）—— 虚拟世界里所有<b>概率 / 赌博类</b>判定的
+                  <b>获胜概率 ×1.05</b>（目前覆盖：21 点 / 猜大小 / 抽牌比大小 / 德州扑克的胜负判定）。
+                </div>
+                <div class="chal-stat" id="invChalGamblerStat"></div>
+                <div class="cs-btn-row">
+                  <button class="primary-button" id="invChalGamblerGo" style="flex: 0 0 auto; width: auto;">进入挑战（免费）</button>
+                </div>
+              </div>
+            </div>
+          </div><!-- /invEnergySubVworld -->
+
+          <!-- V0.110（作者要求）：反转世界成就改成右上角入口 + 弹窗（和主宇宙排布一致） -->
+          <div id="invEnergySubAchv" style="display: none;"></div>
+
+          <!-- V0.109（作者要求）：虚拟升级单独立页 —— 永久加点都搬到这里 -->
+          <div id="invEnergySubVup" style="display: none;">
+            <div class="panel">
+              <div class="section-title">
+                <h2 style="margin: 0;">⬆ 虚拟升级</h2>
+                <small>花虚拟点数买 · 永久生效（跨局保留）</small>
+              </div>
+              <!-- V0.110（作者要求）：加点内容先全部撤掉，只留一个「暂无」占位。
+                   下面这几个容器**留在 DOM 里但默认隐藏** —— 渲染代码与 id 都原样保留着，
+                   等内容定下来，把它们显示出来 + 往 INV_VWORLD_UPS 填一条就恢复。 -->
+              <div id="invVwUps" class="inv-vw-ups" style="display: none;"></div>
+              <div style="display: none;">
+                <span id="invVpVal2">0</span><span id="invVpBonusVal2">—</span><span id="invVpSpent2">0</span>
+              </div>
+              <div class="inv-empty-slot">
+                <div class="inv-empty-big">暂无</div>
+                <div class="inv-empty-hint">这一页的永久加点还没设计 —— 内容定下来之后我会接在这里。<br>
+                  现在你手上的<b>虚拟点数</b>会照常累积（赛博赌场通关 / 筹码兑现都会给），
+                  等加点开放了直接用。</div>
+              </div>
+            </div>
+          </div><!-- /invEnergySubVup -->
         </div>
 
         <div class="inv-pane" id="invPaneBag">
@@ -4005,6 +4358,18 @@
     </div>
   </div>
 
+  <!-- V0.110（作者要求）：反转世界专属成就 —— 右上角按钮打开，排布跟主宇宙一致 -->
+  <div class="modal" id="invAchvModal">
+    <div class="modal-box achievement">
+      <div class="big-icon">🏆</div>
+      <h2>成就</h2>
+      <p class="inventory-note">只记<b>反转世界</b>里的事（主宇宙那套成就完全独立）。成就永久保留 —— 退出反转世界、进宇宙重置都不清。</p>
+      <div class="inv-achv-sum" id="invAchvSum"></div>
+      <div class="inv-achv-list" id="invAchvList"></div>
+      <button class="primary-button" id="invAchvClose" style="margin-top: 10px;">返回</button>
+    </div>
+  </div>
+
   <div class="modal" id="achievementModal">
     <div class="modal-box wide">
       <div class="big-icon" style="color: var(--cyan);">🏆</div>
@@ -4091,6 +4456,15 @@
         </div>
       </div>
 
+      <div class="settings-option" style="flex-direction: column; align-items: stretch;">
+        <div>
+          <div class="so-title">提示框（右下角弹条）</div>
+          <div class="so-hint">嫌吵就按类别关掉 —— 勾掉哪一类，那一类的提示就完全不弹（连 DOM 都不碰）。
+            「系统与存档」固定开启：存档导入失败、异常这类消息漏掉会出大事。</div>
+        </div>
+        <div class="toast-mute-list" id="toastMuteList"></div>
+      </div>
+
       <div class="settings-option">
         <div>
           <div class="so-title">本存档时长</div>
@@ -4106,6 +4480,14 @@
           <button id="saveExportBtn">导出</button>
           <button id="saveImportBtn">导入</button>
         </div>
+      </div>
+
+      <div class="settings-option">
+        <div>
+          <div class="so-title">性能</div>
+          <div class="so-hint" id="perfHint">—</div>
+        </div>
+        <button class="secondary-button" id="cacheCleanBtn" style="flex: 0 0 auto; width: auto;">清理缓存 · 释放内存</button>
       </div>
 
       <div class="settings-option" id="settingsRestoreRow" style="display: none;">
@@ -4150,7 +4532,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.108";
+    const GAME_VERSION = "V0.110";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -4473,13 +4855,31 @@
     // 战后结果在战斗面板上停留多久（毫秒）。手动战斗固定这么久，方便你看战报；
     // 自动狩猎的战斗按猎影加速倍率缩短（下限 AUTO_HUNT_HOLD_MIN_MS），好让下一场尽快开打。
     const BATTLE_RESULT_HOLD_MS = 2600;
-    const AUTO_HUNT_HOLD_MIN_MS = 150;
-    // 自动狩猎的巡检基准间隔（毫秒）：Lv.0 时等于原来的 1 秒，随猎影加速倍率缩短。
+    // V0.108（作者要求：有玩家反馈后期战斗太慢）：战报停留的下限从 150ms 收到 24ms ——
+    //   它现在跟「每场总周期」挂钩（见 getAutoHuntCycleMs），不能再单独卡住节奏。
+    const AUTO_HUNT_HOLD_MIN_MS = 24;
     const AUTO_HUNT_STEP_MS = 1000;
-    // V0.96：上限抬到 40 级后倍率能到 ×11，原来的 100ms 下限会在 Lv.36 左右就把巡检间隔顶住，
-    //   等于「买了等级却不再变快」。这里把下限同步放到 50ms（最快 20 次/秒的巡检），
-    //   让新加的等级真的兑现成狩猎频率。
     const AUTO_HUNT_STEP_MIN_MS = 50;
+    // ===== V0.108（作者指定）：猎影加速 = 「整场战斗的总周期」加速，最快 0.08 秒一场 =====
+    //   一场战斗的**总周期** = 战斗本身 + 战后停留 + 两场之间的巡检间隔，三个部分一起被压缩，
+    //   并且在快的那一头给出**硬下限 0.08 秒/场**（作者原话：最快 0.08 秒一次战斗，包括战斗间隔）。
+    //   曲线：Lv.0 = 1000ms/场 → 每升一级 ×(0.08^(1/40)) ≈ ×0.939（复利）→ Lv.40（满级）= 80ms/场，
+    //   每一级都实打实地更快一点，不会出现「买了等级却不变快」的挡位。
+    //   ⚠️ 只作用在**自动狩猎**上：手动战斗的节奏与战报停留一律不变（BATTLE_RESULT_HOLD_MS）。
+    const AUTO_HUNT_CYCLE_BASE_MS = 1000;
+    const AUTO_HUNT_CYCLE_MIN_MS = 80;
+    function getAutoHuntCycleMs() {
+      const lv = Math.min(HUNT_SPEED_MAX_LEVEL, Math.max(0, getOriginShop().huntSpeed || 0));
+      const decay = Math.pow(AUTO_HUNT_CYCLE_MIN_MS / AUTO_HUNT_CYCLE_BASE_MS, 1 / HUNT_SPEED_MAX_LEVEL);
+      return Math.max(AUTO_HUNT_CYCLE_MIN_MS, AUTO_HUNT_CYCLE_BASE_MS * Math.pow(decay, lv));
+    }
+    // 读数用：把「每场周期（毫秒）」写成秒（≥1 秒保留两位小数，最快时写成「最快 0.08 秒/场」）
+    function formatCycleSeconds(ms) {
+      const sec = ms / 1000;
+      if (sec >= 1) return `${sec.toFixed(2)} 秒/场`;
+      if (ms <= AUTO_HUNT_CYCLE_MIN_MS + 0.5) return `最快 ${(AUTO_HUNT_CYCLE_MIN_MS / 1000).toFixed(2)} 秒/场`;
+      return `${sec.toFixed(3)} 秒/场`;
+    }
     // 单圈耗时低于这个秒数时，「满格→归零→立刻又满格」会让进度条每帧闪一下。
     // 此时自动收获切换为【持续收割】：进度条停在满格不再归零，尘埃按当前速度连续入账，
     // 平均收益与归零循环完全一致（都是「满档收益 ÷ 单圈耗时」），只是画面不再抖。
@@ -6285,6 +6685,21 @@
       // V0.104（作者要求）：反转世界的持久化 —— 主动退出后清空、关网页保留；
       //   科技点数是「主动退出」时按最高等级增量结算的主宇宙货币；尖端实验室花它买永久加成。
       invSave: null,
+      // V0.109：虚拟世界（虚拟点数 + 永久加点，跨局保留）
+      invVirtualPoints: 0,
+      // V0.110：虚拟挑战（进度与奖励，跨局保留）+ 挑战里那一局的运行态
+      invChal: { gamblerCleared: false, gamblerClears: 0, gamblerBest: 0 },
+      invAchv: {},
+      invChalRun: { chips: 0, plays: 0, wins: 0, best: 0, running: false },
+      // V0.109：赛博赌场（筹码 / 已缴的剩余时间 / 战绩；跨局保留）
+      invCasino: { chips: 100, prepaidMs: 0, broke: false, plays: 0, wins: 0, best: 0, clears: 0, spent: 0,
+        pokerPlays: 0, pokerWins: 0, pokerBest: 0, cashedOut: 0, ended: false, seen: false },
+      invVWorld: { ups: {} },
+      // V0.109：能源（跨局保留 —— 退出反转世界、进宇宙都不清）
+      invEnergy: 0,
+      invEnergyUnlocked: false,
+      // V0.109：提示框开关（按类别静音；见 TOAST_KINDS）
+      toastMute: {},
       invBestEver: 0,           // V0.105：历史最高反转等级（大里程碑开局福利的记账）
       invTechPoints: 0,
       invTechBase: 0,
@@ -6345,6 +6760,32 @@
       // 只在内容真的变了时才做数字格式化（省性能：事件日志 / 猎犬网格是常刷的大块）
       node.innerHTML = fmtDisplayNumbersInHtml(html);
     }
+    // ===== V0.109：反转世界进度条的写入助手 =====
+    //   为什么需要它：进度条每 100ms 才更新一次（主循环节拍），靠 CSS 过渡把它连成平滑移动。
+    //   过渡一旦短于节拍（或某一拍被浏览器拖后），就会「走一步、停一下」—— 玩家看到的就是
+    //   一跳一跳；刷新后计时器重新起跑，又变回平滑。
+    //   这里做两件事：
+    //     ① 过渡放宽到 0.3 秒（见 .inv-track 的 CSS），足以吸收偶发的延迟帧；
+    //     ② 但**回退**（被捕获把进度清零）与**大跳跃**（补帧 / 长时间卡顿）必须「啪」地贴上去 ——
+    //        否则 0.3 秒的过渡会从 100% 慢慢往回滑，看着像倒放。检测到这两种情况就临时关掉过渡。
+    const invTrackPrevPct = {};
+    function setInvTrackWidth(id, pct) {
+      const node = el(id);
+      if (!node) return;
+      const v = Math.max(0, Math.min(100, pct));
+      const prev = invTrackPrevPct[id];
+      const snap = prev !== undefined && (v < prev - 0.5 || v - prev > 6);
+      if (snap) {
+        node.style.transition = "none";
+        node.style.width = v.toFixed(1) + "%";
+        void node.offsetWidth;          // 强制回流：让「关过渡」这一步立刻生效
+        node.style.transition = "";     // 恢复成 CSS 里的 0.3 秒
+      } else {
+        node.style.width = v.toFixed(1) + "%";
+      }
+      invTrackPrevPct[id] = v;
+    }
+
     function setText(id, text) {
       const node = el(id);
       if (!node || node._lastText === text) return;
@@ -6745,7 +7186,59 @@
     function structuredCloneSafe(obj) {
       return JSON.parse(JSON.stringify(obj));
     }
-    function showToast(message) {
+    // ===== V0.109（作者要求）：提示条可以**按类别静音**（设置里勾）=====
+    //   分类规则：调用方可以显式给 kind；没给就按关键词自动归类（顺序即优先级）。
+    //   ⚠️ sys（系统与存档）**不可关闭** —— 「存档导入失败」「异常」这类漏掉会要命。
+    const TOAST_KINDS = [
+      { id: "battle", name: "战斗与狩猎", hint: "战果、寿命、僵持、自动狩猎汇总", re: /战|猎影|狩猎|掠夺|僵持|寿命|回归|捕获|本源/ },
+      { id: "drop",   name: "碎片与掉落", hint: "掉落时间碎片、诱饵相关", re: /碎片|掉落|诱饵/ },
+      { id: "tech",   name: "反转世界与科技", hint: "爆科技 / 解析 / 精英 / 能源", re: /科技|反转|解析|精英|灵感|能源|尘埃/ },
+      { id: "gene",   name: "基因与可能性", hint: "基因、实验室、宇宙、命运扭曲", re: /基因|实验室|可能性|宇宙|扭曲/ },
+      { id: "achv",   name: "成就与里程碑", hint: "成就、主线挑战、里程碑", re: /成就|挑战|里程碑/ },
+      { id: "auto",   name: "自动化", hint: "自动狩猎 / 自动铸级等开关与巡检", re: /自动/ },
+      { id: "sys",    name: "系统与存档", hint: "档案导入导出、异常、版本（不可关闭）", re: /存档|导入|导出|备份|版本|异常|错误|失败|刷新|崩溃|内存/, locked: true },
+      { id: "other",  name: "其它", hint: "没归到上面几类的零碎提示", re: null }
+    ];
+    function toastKindOf(message, kind) {
+      if (kind) {
+        const hit = TOAST_KINDS.filter(k => k.id === kind)[0];
+        if (hit) return hit;
+      }
+      const text = String(message || "");
+      for (const k of TOAST_KINDS) {
+        if (k.re && k.re.test(text)) return k;
+      }
+      return TOAST_KINDS[TOAST_KINDS.length - 1];
+    }
+    function isToastKindOn(id) {
+      const k = TOAST_KINDS.filter(x => x.id === id)[0];
+      if (!k || k.locked) return true;
+      return !(save && save.toastMute && save.toastMute[id] === true);
+    }
+    function setToastMute(id, muted) {
+      if (!save) return;
+      if (!save.toastMute || typeof save.toastMute !== "object") save.toastMute = {};
+      const k = TOAST_KINDS.filter(x => x.id === id)[0];
+      if (!k || k.locked) return;                     // 系统类不给关
+      if (muted) save.toastMute[id] = true; else delete save.toastMute[id];
+      saveGame(true);
+      renderToastMuteList();
+    }
+    function renderToastMuteList() {
+      const box = el("toastMuteList");
+      if (!box) return;
+      setHTML("toastMuteList", TOAST_KINDS.map(k => {
+        const on = isToastKindOn(k.id);
+        return '<label class="toast-mute-row' + (k.locked ? " locked" : "") + '">' +
+          '<input type="checkbox" data-toast-mute="' + k.id + '"' + (on ? " checked" : "") + (k.locked ? " disabled" : "") + '>' +
+          '<span class="tm-name">' + k.name + '</span>' +
+          '<span class="tm-hint">' + k.hint + (k.locked ? "　（固定开启）" : "") + '</span>' +
+          '</label>';
+      }).join(""));
+    }
+    function showToast(message, kind) {
+      const k = toastKindOf(message, kind);
+      if (!isToastKindOn(k.id)) return;      // 这一类被玩家关掉了 → 连 DOM 都不碰（省性能）
       const toast = el("toast");
       toast.innerHTML = fmtDisplayNumbersInHtml(message);   // V0.108：提示里的数字同样走显示层规则
       toast.classList.add("show");
@@ -7226,6 +7719,63 @@
         good.invTechBase = Math.floor(good.invTechBase);
         good.invLab = sanitizeInvLabRaw(good.invLab);
         if (!(good.invSave && typeof good.invSave === "object")) good.invSave = null;
+        // V0.109：能源（浮点数，跨局保留）+ 解锁标记 + 提示框静音表
+        if (!(typeof good.invEnergy === "number" && isFinite(good.invEnergy) && good.invEnergy >= 0)) good.invEnergy = 0;
+        good.invEnergyUnlocked = !!good.invEnergyUnlocked;
+        // V0.109：虚拟点数与加点
+        if (!(typeof good.invVirtualPoints === "number" && isFinite(good.invVirtualPoints) && good.invVirtualPoints >= 0)) good.invVirtualPoints = 0;
+        if (!good.invVWorld || typeof good.invVWorld !== "object" || Array.isArray(good.invVWorld)) good.invVWorld = { ups: {} };
+        if (!good.invVWorld.ups || typeof good.invVWorld.ups !== "object") good.invVWorld.ups = {};
+        // ⚠️ loadSave 在启动期就会执行，而 INV_VWORLD_UPS 声明在后面 —— 这里用内联表，
+        //    避免 TDZ（"Cannot access before initialization"）。
+        // V0.110：反转世界成就（id → true）
+        if (!good.invAchv || typeof good.invAchv !== "object" || Array.isArray(good.invAchv)) good.invAchv = {};
+        Object.keys(good.invAchv).forEach(k => { if (good.invAchv[k] !== true) delete good.invAchv[k]; });
+        // V0.110：虚拟挑战（进度 / 奖励 / 运行态）
+        if (!good.invChal || typeof good.invChal !== "object" || Array.isArray(good.invChal)) {
+          good.invChal = { gamblerCleared: false, gamblerClears: 0, gamblerBest: 0 };
+        }
+        {
+          const ch = good.invChal;
+          ch.gamblerCleared = !!ch.gamblerCleared;
+          ["gamblerClears", "gamblerBest"].forEach(k => {
+            if (!(typeof ch[k] === "number" && isFinite(ch[k]) && ch[k] >= 0)) ch[k] = 0;
+            ch[k] = Math.floor(ch[k]);
+          });
+        }
+        if (!good.invChalRun || typeof good.invChalRun !== "object" || Array.isArray(good.invChalRun)) {
+          good.invChalRun = { chips: 0, plays: 0, wins: 0, best: 0, running: false };
+        }
+        {
+          const cr = good.invChalRun;
+          ["chips", "plays", "wins", "best"].forEach(k => {
+            if (!(typeof cr[k] === "number" && isFinite(cr[k]) && cr[k] >= 0)) cr[k] = 0;
+            cr[k] = Math.floor(cr[k]);
+          });
+          cr.running = !!cr.running;
+        }
+        // V0.109：赛博赌场的存档（筹码 / 剩余时间 / 战绩）
+        if (!good.invCasino || typeof good.invCasino !== "object" || Array.isArray(good.invCasino)) {
+          good.invCasino = { chips: 100, prepaidMs: 0, broke: false, plays: 0, wins: 0, best: 0, seen: false };
+        }
+        {
+          const cs = good.invCasino;
+          ["chips", "prepaidMs", "plays", "wins", "best", "clears", "spent", "pokerPlays", "pokerWins", "pokerBest", "cashedOut"].forEach(k => {
+            if (!(typeof cs[k] === "number" && isFinite(cs[k]) && cs[k] >= 0)) cs[k] = (k === "chips" ? 100 : 0);
+            cs[k] = Math.floor(cs[k]);
+          });
+          cs.broke = !!cs.broke;
+          cs.seen = !!cs.seen;
+        }
+        const VWORLD_UP_CAPS = { dust: 50, resist: 50, parse: 50, drop: 25, shop: 40, bonus: 30 };
+        Object.keys(good.invVWorld.ups).forEach(k => {
+          const cap = VWORLD_UP_CAPS[k];
+          const v = good.invVWorld.ups[k];
+          if (!(typeof cap === "number") || !(typeof v === "number" && isFinite(v) && v > 0)) { delete good.invVWorld.ups[k]; return; }
+          good.invVWorld.ups[k] = Math.min(cap, Math.floor(v));
+        });
+        if (!good.toastMute || typeof good.toastMute !== "object" || Array.isArray(good.toastMute)) good.toastMute = {};
+        Object.keys(good.toastMute).forEach(k => { if (good.toastMute[k] !== true) delete good.toastMute[k]; });
         // V0.96：自动上传已移除（后端按调用计费）—— 老存档里残留的 lbAuto 字段直接删掉，
         //   免得它在导出档里继续存在、让玩家以为还在自动上报。
         delete good.lbAuto;
@@ -7338,12 +7888,56 @@
     //   代价是高档位的复利更陡（超越·99 每级 ×1.149，Lv.70 左右就摸到 1e9 保险丝），
     //   这正是「档位越高越值得追」的设计意图。
     const GENE_GROWTH_HIGH_STEP = 0.001;
+    // ===== V0.109（作者要求）：超越基因**不再一律 ×1.05** =====
+    //   作者原话：「像尘埃收益这种最基础的起码要十几倍吧，碎片爆率 1.05 确实没毛病，
+    //   但你也不能都 1.05」—— 于是按「这条基因对经济的影响强度」分档：
+    //   **越基础 / 越好堆的给得越高，越强 / 越容易滚雪球的给得越低**（复利，每级乘一次）。
+    //     🌫 尘埃收益     ×1.22 / 级 —— 最基础的经济底座（Lv.15 ≈ ×19、Lv.20 ≈ ×53）
+    //     ⏩ 时间流速     ×1.16 / 级 —— 还是「进度快一点」，本质是收益的另一个乘数
+    //     ✨ 本源收益     ×1.13 / 级
+    //     🐕 猎犬经验     ×1.12 / 级
+    //     💎 时间碎片强度 ×1.08 / 级
+    //     🧬 部件软上限   ×1.07 / 级 —— 动的是「上限」，给低一档
+    //     🌊 洪流峰值     ×1.06 / 级 —— 只在开局那阵顺风里生效
+    //     🎲 碎片爆率     ×1.05 / 级 —— 概率类，最能滚雪球，保持原值（作者认可）
+    //   超越序号再往上叠一点点（+0.001 × n，超越·1 +0.001 … 超越·99 +0.099），
+    //   所以「档位越高越强」这条身份没变，变的是「每条基因有自己的成长曲线」。
+    // ===== V0.110（作者反馈：超越·99 的尘埃基因 10 级才 ×20，太低了）=====
+    //   原来那套（尘埃 0.22）在 10 级只有 ×16~×20，作者认为「基础资源给得太抠」。
+    //   现在按「资源越好拿、乘数越高；越难拿、乘数越低」重新排（差距也拉大）：
+    //     🌫 尘埃收益   ×1.55 / 级 —— 最基础的经济底座（Lv.10 ≈ ×79、Lv.20 ≈ ×6100）
+    //     ⏩ 时间流速   ×1.45 / 级 —— 进度快 = 收益多，但本质是同一个乘数
+    //     ✨ 本源收益   ×1.35 / 级 —— 本源只能靠战斗掠夺，比尘埃难拿
+    //     🐕 猎犬经验   ×1.30 / 级
+    //     💎 时间碎片强度 ×1.20 / 级 —— 碎片是掉落物，靠场次堆
+    //     🧬 部件软上限 ×1.15 / 级 —— 动的是「上限」
+    //     🌊 洪流峰值   ×1.10 / 级 —— 只在开局那阵顺风里生效
+    //     🎲 碎片爆率   ×1.05 / 级 —— 概率类，最能滚雪球（作者认可，保持）
+    const GENE_STRONG_STEP = {
+      dust: 0.55,      // 尘埃收益（最基础）→ ×1.55/级
+      speed: 0.45,     // 时间流速 → ×1.45/级
+      origin: 0.35,    // 本源收益 → ×1.35/级
+      houndExp: 0.30,  // 猎犬经验 → ×1.30/级
+      shard: 0.20,     // 时间碎片强度 → ×1.20/级
+      partCap: 0.15,   // 部件软上限 → ×1.15/级
+      rushPeak: 0.10,  // 洪流峰值 → ×1.10/级
+      shardDrop: 0.05  // 碎片爆率 → ×1.05/级（保持）
+    };
+    const GENE_STRONG_STEP_FALLBACK = 0.30;   // 兜底：以后新增的基因（保守给中间值）
+    function geneStrongStep(g) {
+      const k = g && g.k;
+      return (k && GENE_STRONG_STEP[k] !== undefined) ? GENE_STRONG_STEP[k] : GENE_STRONG_STEP_FALLBACK;
+    }
     function geneGrowthRatio(g) {
       const t = geneTierOf(g);
       const base = Math.min(PART_CAP_GENE_MAX_STEP, Math.max(0, t.mult - 1) * PART_CAP_GENE_STEP_RATIO);
-      if (t.id < GENE_BASE_TIERS.length) return 1 + base;            // 基础六档：普通 ×1.002 … 神话 ×1.028（现在只用于旧读数）
+      if (t.id < GENE_BASE_TIERS.length) return 1 + base;            // 基础六档：加法（V0.108 起，不受本次影响）
       const n = Math.max(1, t.id - GENE_BASE_TIERS.length + 1);      // 超越·n
-      return 1 + PART_CAP_GENE_MAX_STEP + GENE_GROWTH_HIGH_STEP * n;
+      // V0.110：档位加成改成**按比例**（基础步长 ×(1 + 1%×(n−1))）——
+      //   步长拉大之后，原来那种「+0.001×n」的固定尾巴相对值太小了，
+      //   改成比例之后：超越·1 = 基础值、超越·99 ≈ 基础的 1.98 倍（高档位照旧更值钱）。
+      const step = geneStrongStep(g) * (1 + GENE_GROWTH_HIGH_STEP * 10 * (n - 1));   // 每上一档 +1%（0.001×10）
+      return 1 + step;
     }
     // ===== V0.108（作者要求）「超越之前」的六档基因改成【加法】=====
     //   原来所有档位都走指数（成长比例 ^ 等级）：普通每级 ×1.002 —— Lv.1 只有 +0.2%，
@@ -7835,6 +8429,12 @@
       const keepAchievements = save.achievements || {};
       const keepAuto = save.auto || {};
       const keepNumberMode = save.numberMode;
+      // V0.110（作者反馈：每次换宇宙，收割时机与诱饵/姿态设置都被重置）：
+      //   下面这些都是**玩家的偏好设置**，跟轮回进度无关 —— 一律原样带走。
+      const keepCaptureStance = save.captureStance || "normal";
+      const keepOverflowAuto = (typeof save.overflowAuto === "number") ? save.overflowAuto : OVERFLOW_AUTO_DEFAULT;
+      const keepBulkLevel = save.bulkLevel;
+      const keepAutoHuntRetireAfter = (save.auto && typeof save.auto.retireAfter === "number") ? save.auto.retireAfter : 0;
       const keepPlayMs = save.playMs || 0;
       const keepOfflineMs = save.offlineMs || 0;
       // V0.92：排行榜相关的「本存档身份 + 历史最高尘埃」也跨宇宙保留。
@@ -7855,6 +8455,28 @@
       const keepBaitDrops = save.baitDrops || 0;
       const keepBaitSpins = save.baitSpins || 0;
       const keepBaitLastDrop = save.baitLastDrop || "";
+      // V0.108（作者要求：**反转世界比多元宇宙更高一层，进宇宙不该把它重置掉**）：
+      //   要带走的一整套反转世界状态 ——
+      //     · invSave       本局进度快照（反转等级 / 反转尘埃 / 已拿科技 / 精英进度…）
+      //     · invTechPoints / invTechBase   尖端实验室的科技点与累计基点
+      //     · invLab        尖端实验室已买的等级（花科技点买的那四档）
+      //     · invBestEver   历史最高反转等级（大里程碑福利按它算）
+      //   ⚠️ 「主动退出反转世界 = 本局作废」那条规则**没动**（仍见 exitInvWorld 里的 settleInvTechPoints + 清 invSave），
+      //      这里只保证**外面的轮回级重置**（进宇宙 / 苦痛之路）不会顺手把它抹掉。
+      // V0.109（作者要求）：**能源是唯一跨局保留的东西** —— 退出反转世界、进宇宙重置都要原样带走
+      const keepInvVirtualPoints = save.invVirtualPoints;
+      const keepInvCasino = save.invCasino;   // V0.109：赌场筹码/剩余时间/战绩
+      const keepInvChal = save.invChal;        // V0.110：虚拟挑战进度与奖励
+      const keepInvAchv = save.invAchv;        // V0.110：反转世界成就
+      const keepInvChalRun = save.invChalRun;
+      const keepInvVWorld = save.invVWorld;
+      const keepInvEnergy = save.invEnergy;
+      const keepInvEnergyUnlocked = save.invEnergyUnlocked;
+      const keepInvSave = save.invSave;
+      const keepInvTechPoints = save.invTechPoints;
+      const keepInvTechBase = save.invTechBase;
+      const keepInvLab = save.invLab;
+      const keepInvBestEver = save.invBestEver;
 
       save = normalizeBigFields(structuredCloneSafe(DEFAULT_SAVE));
       save.possibility = p;
@@ -7872,12 +8494,31 @@
       save.lbPid = typeof keepLbPid === "string" ? keepLbPid : "";
       save.lbLastUploadAt = Number(keepLbLastUploadAt) || 0;
       if (keepSeenTabs !== undefined) save.seenTabs = keepSeenTabs;
+      // V0.110：玩家偏好设置原样带回（收割时机 / 捕获姿态 / 批量档位 / 自动回归场次）
+      save.captureStance = keepCaptureStance;
+      save.overflowAuto = keepOverflowAuto;
+      if (typeof keepBulkLevel === "number") save.bulkLevel = keepBulkLevel;
+      if (save.auto && typeof save.auto === "object") save.auto.retireAfter = keepAutoHuntRetireAfter;
       // V0.90：把诱饵原样接回来（它是永久加成，不随轮回清空）
       if (keepBaits && typeof keepBaits === "object") save.baits = keepBaits;
       if (Array.isArray(keepBaitStock)) save.baitStock = keepBaitStock;
       save.baitDrops = keepBaitDrops;
       save.baitSpins = keepBaitSpins;
       save.baitLastDrop = keepBaitLastDrop;
+      // V0.108：反转世界的一整套状态原样接回（见上面 keepInv* 的注释）
+      if (keepInvSave && typeof keepInvSave === "object") save.invSave = keepInvSave;
+      save.invVirtualPoints = Math.max(0, Math.floor(Number(keepInvVirtualPoints) || 0));
+      if (keepInvCasino && typeof keepInvCasino === "object") save.invCasino = keepInvCasino;
+      if (keepInvChal && typeof keepInvChal === "object") save.invChal = keepInvChal;
+      if (keepInvAchv && typeof keepInvAchv === "object") save.invAchv = keepInvAchv;
+      if (keepInvChalRun && typeof keepInvChalRun === "object") save.invChalRun = keepInvChalRun;
+      if (keepInvVWorld && typeof keepInvVWorld === "object") save.invVWorld = keepInvVWorld;
+      save.invEnergy = Math.max(0, Number(keepInvEnergy) || 0);
+      save.invEnergyUnlocked = !!keepInvEnergyUnlocked;
+      save.invTechPoints = Math.max(0, Math.floor(Number(keepInvTechPoints) || 0));
+      save.invTechBase = Math.max(0, Math.floor(Number(keepInvTechBase) || 0));
+      if (keepInvLab && typeof keepInvLab === "object") save.invLab = sanitizeInvLabRaw(keepInvLab);
+      save.invBestEver = Math.max(0, Math.floor(Number(keepInvBestEver) || 0));
 
       // 运行时状态复位（仿 resetSave）
       numberMode = save.numberMode === "sci" ? "sci" : "kmbt";
@@ -7961,7 +8602,12 @@
     }
 
     // ---- 多元宇宙 / 基因 操作 ----
-    function canAffordMultiverse() { return bigCmp(save.dust, bigFromLog10(MULTIVERSE_COST_E)) >= 0; }
+    // V0.110（作者反馈：进宇宙时老是被捕 —— 尘埃一清零就进不去了，还得再攒一会儿）：
+    //   进场判定改成**按「历史最高尘埃」**（bestDust 只增不减，被捕获清零也算你挣到过）——
+    //   只要这辈子摸到过 1E1000 尘埃，之后随时都能撬门。
+    //   付款照旧从**当前**尘埃里扣，扣到 0 为止（不够也不拦，反正进去就要全清）。
+    function multiverseWallet() { return bigMax(bigOf(save.dust || 0), bigOf(save.bestDust || 0)); }
+    function canAffordMultiverse() { return bigCmp(multiverseWallet(), bigFromLog10(MULTIVERSE_COST_E)) >= 0; }
     // V0.91（作者要求）：进多元宇宙的**硬门槛** —— 必须先把当前的主线挑战全部通关。
     //   理由：进宇宙会清空挑战进度，如果没打完就能走，那"挑战"这一整套就白设计了。
     //   （里程碑每 2 次多元宇宙会永久通关一关，所以这个门槛会随进入次数自然变轻。）
@@ -7985,13 +8631,16 @@
       if (p.pending && p.pending.length) return;
       if (!hasClearedAllChallenges()) { multiverseGateToast(); return; }
       if (!canAffordMultiverse()) {
-        showToast(`进入多元宇宙需要 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃。`);
+        showToast(`进入多元宇宙需要 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃（<b>按历史最高尘埃判定</b>：` +
+          `目前最高 ${formatNumber(bigOf(save.bestDust || 0))}）。`);
         return;
       }
       // 解锁与每次进入同价：花 1E1000 尘埃、刷出 4 个候选宇宙。
       // ⚠️ 有候选在场时这个函数会被守卫挡住（按钮也不会渲染），
       //    所以「开启新的一批」只可能发生在上一批已消散（pending === null）之后。
-      save.dust = bigSub(save.dust, bigFromLog10(MULTIVERSE_COST_E));
+      // 付款：手上有多少扣多少（判定已按历史最高通过，这里不再拦）
+      const mvCost = bigFromLog10(MULTIVERSE_COST_E);
+      save.dust = bigCmp(save.dust, mvCost) >= 0 ? bigSub(save.dust, mvCost) : bigOf(0);
       p.multiverse = true;
       p.pending = rollMultiverseUniverses();
       saveGame(true);
@@ -8339,9 +8988,14 @@
       const head = SAVE_FILE_TAG + "-" + nonce + "-" +
         saveChecksum(bytes).toString(16).padStart(8, "0");
       const body = bytesToBase64(cipher).replace(/(.{96})/g, "$1\n").replace(/\n$/, "");
+      // V0.109（玩家事故：导出文本被复制工具截断）：加一行**长度自证** ——
+      //   复制少了一截时一眼能看出来，导入失败时也知道「原本该多长、丢了多少」。
+      //   "#" 开头的行在解析时会被自动忽略，所以老版本导入这份新存档照样能读。
+      const bodyFlat = body.replace(/\n/g, "");
       return [
         "# 时间猎犬增量 · 加密存档 —— 请勿修改任何一个字符，改动会导致载入失败",
         `# 导出时间：${saveStamp(new Date())}　版本：${GAME_VERSION}`,
+        `# 密文长度：${bodyFlat.length}　末 4 位：${bodyFlat.slice(-4)}`,
         head,
         body
       ].join("\n") + "\n";
@@ -8372,6 +9026,136 @@
       if (!parsed || typeof parsed !== "object") throw new Error("存档内容无法解析");
       return parsed;
     }
+
+    // ===== V0.109（隔壁会话交接的玩家事故）：导入「被截断的存档」时给一条抢救路径 =====
+    //   背景：一位玩家的导出文本被复制工具截断（完整约 8 万字符的密文只剩 4600 字节），
+    //   旧版只报一句「校验失败」就结束了 —— 其余 95% 完好的数据全白扔。
+    //   原理：存档是 **RC4 流密码**，`bytes[i] = cipher[i] ^ keystream` —— 只要密文前缀在，
+    //   解出来的明文前缀就一定是对的。所以能从后往前找**最后一个能闭合的 JSON 前缀**，
+    //   把「尘埃 / 升级 / 部件 / 猎犬」这些救回来，再让 loadSave 补齐默认值 + 全套清洗。
+    // 算「补齐这份残缺 JSON 还需要追加什么」：扫描括号栈 + 判断是否停在字符串里。
+    //   停在字符串中间 / 括号对不上 → 返回 null（这个切点没法用）。
+    function jsonClosers(str) {
+      const stack = [];
+      let inStr = false, esc = false;
+      for (let i = 0; i < str.length; i++) {
+        const c = str.charAt(i);
+        if (inStr) {
+          if (esc) { esc = false; continue; }
+          if (c === "\\") { esc = true; continue; }
+          if (c === '"') inStr = false;
+          continue;
+        }
+        if (c === '"') { inStr = true; continue; }
+        if (c === "{" || c === "[") stack.push(c);
+        else if (c === "}" || c === "]") {
+          const open = stack.pop();
+          if (!open || (open === "{" && c !== "}") || (open === "[" && c !== "]")) return null;
+        }
+      }
+      if (inStr) return null;                 // 切在字符串里 —— 这个切点救不了
+      if (!stack.length) return "";
+      let out = "";
+      for (let i = stack.length - 1; i >= 0; i--) out += stack[i] === "{" ? "}" : "]";
+      return out;
+    }
+    // 从后往前逐个 "}" 试：第一个「能补齐 + 能 JSON.parse 通过」的就是最长可闭合前缀
+    function salvageJsonPrefix(text) {
+      const t = String(text || "");
+      let tries = 0;
+      for (let cut = t.length - 1; cut > 1 && tries < 6000; cut--) {
+        if (t.charAt(cut) !== "}") continue;
+        tries++;
+        let head = t.slice(0, cut + 1);
+        head = head.replace(/[\s,]+$/, "");   // 尾部可能残留逗号 / 空白，先抹掉再补齐括号
+        const closers = jsonClosers(head);
+        if (closers === null) continue;
+        try {
+          const data = JSON.parse(head + closers);
+          if (data && typeof data === "object" && !Array.isArray(data)) {
+            return { data: data, cut: head.length, closers: closers };
+          }
+        } catch (e) { /* 这个切点不行，继续往回退 */ }
+      }
+      return null;
+    }
+    // 解析导出文本的「头部 + 密文」，**不做校验**（抢救时要拿的就是校验不通过的那份）
+    function decodeSaveTextLoose(text) {
+      const empty = { declaredLen: 0, declaredTail: "", plain: "", cipherLen: 0 };
+      if (typeof text !== "string" || !text.trim()) return empty;
+      const rawLines = text.split(/[\r\n]+/).map(x => x.trim()).filter(x => x);
+      const decl = rawLines.filter(x => x.charAt(0) === "#");
+      const lines = rawLines.filter(x => x.charAt(0) !== "#");
+      // 自证行（V0.109 起）：`# 密文长度：N　末 4 位：xxxx`
+      let declaredLen = 0, declaredTail = "";
+      for (const d of decl) {
+        const mm = d.match(/密文长度：(\d+)/);
+        if (mm) declaredLen = parseInt(mm[1], 10) || 0;
+        const mt = d.match(/末 4 位：([A-Za-z0-9+/=]{1,8})/);
+        if (mt) declaredTail = mt[1];
+      }
+      if (lines.length < 2) return { declaredLen: declaredLen, declaredTail: declaredTail, plain: "", cipherLen: 0 };
+      const m = lines[0].match(/^([A-Za-z0-9]+)-([0-9a-fA-F]{8})-([0-9a-fA-F]{8})$/);
+      if (!m || m[1] !== SAVE_FILE_TAG) return { declaredLen: declaredLen, declaredTail: declaredTail, plain: "", cipherLen: 0 };
+      const nonce = m[2].toLowerCase();
+      let b64 = lines.slice(1).join("").replace(/\s+/g, "");
+      // 截断常常停在 base64 分组中间 —— 去掉凑不满 4 个的尾巴再解码
+      b64 = b64.slice(0, b64.length - (b64.length % 4));
+      let cipher = null;
+      try { cipher = base64ToBytes(b64); } catch (e) { cipher = null; }
+      if (!cipher) return { declaredLen: declaredLen, declaredTail: declaredTail, plain: "", cipherLen: b64.length };
+      const ks = rc4Keystream(makeSaveCipherKey(nonce));
+      const bytes = new Uint8Array(cipher.length);
+      for (let i = 0; i < cipher.length; i++) bytes[i] = cipher[i] ^ ks();
+      let plain = "";
+      try { plain = new TextDecoder("utf-8").decode(bytes); } catch (e) { plain = ""; }
+      return { declaredLen: declaredLen, declaredTail: declaredTail, plain: plain, cipherLen: b64.length };
+    }
+    // 抢救总入口：返回 { data, share, cut, plainLen, whole } 或 null
+    function rescueSaveFromText(text) {
+      const loose = decodeSaveTextLoose(text);
+      if (!loose || !loose.plain) return null;
+      const hit = salvageJsonPrefix(loose.plain);
+      if (!hit) return null;
+      const share = loose.declaredLen > 0
+        ? Math.min(100, Math.max(1, Math.round(loose.cipherLen / loose.declaredLen * 100)))
+        : 0;
+      return { data: hit.data, share: share, cut: hit.cut, plainLen: loose.plain.length,
+        whole: hit.cut >= loose.plain.length - 2 };
+    }
+    // 抢救前的「损失评估」：拿默认存档当对照，列出哪些顶层字段整个丢了（会被重置成新档）。
+    //   ⚠️ 只列**玩家看得懂**的那些 —— DEFAULT_SAVE 里还有一大堆内部字段
+    //   （activeHoundId / linesDirty / overflowAuto …），全列出来只会把弹窗撑成天书。
+    const SAVE_FIELD_ORDER = ["dust", "upgrades", "parts", "equipped", "hounds", "transcendedHounds", "shards",
+      "baits", "luckBoost", "achievements", "auto", "possibility", "lines", "bestDust", "paradoxCount",
+      "captures", "invasions", "origin", "originLifetime", "originShop", "invTechPoints", "invLab", "invSave"];
+    const SAVE_FIELD_NAMES = {
+      dust: "时间尘埃", upgrades: "当前升级", parts: "永恒部件", equipped: "装备", hounds: "猎犬",
+      transcendedHounds: "回归记录（全局加成）", shards: "时间碎片", baits: "诱饵", auto: "自动化开关",
+      achievements: "成就", possibility: "可能性 / 基因 / 宇宙", lines: "时间线", bestDust: "历史最高尘埃",
+      paradoxCount: "悖论次数", captures: "被捕获次数", invasions: "狩猎次数", progress: "时间进度",
+      origin: "时间本源", originLifetime: "累计本源", luckBoost: "命运扭曲", seenTabs: "「新功能已读」记录",
+      originShop: "本源商店", invTechPoints: "尖端实验室科技点", invLab: "尖端实验室等级", invSave: "反转世界进度"
+    };
+    function rescueReport(data) {
+      const missing = SAVE_FIELD_ORDER.filter(k => !(k in data));
+      let snap = null;
+      try { snap = loadSave(data); } catch (e) { snap = null; }
+      if (!snap) return { missing: missing, lines: [] };
+      const partLv = Object.keys(snap.parts || {}).reduce((a, k) => a + ((snap.parts[k] && snap.parts[k].level) || 0), 0);
+      const upLv = (snap.upgrades.speed || 0) + (snap.upgrades.dust || 0);
+      return {
+        missing: missing,
+        lines: [
+          "尘埃 <b>" + formatNumber(snap.dust) + "</b>",
+          "升级 <b>Lv." + formatNumber(upLv) + "</b>",
+          "部件 <b>" + Object.keys(snap.parts || {}).length + " 件</b>（等级和 " + formatNumber(partLv) + "）",
+          "猎犬 <b>" + (snap.hounds || []).length + " 只</b>",
+          "被捕获 <b>" + formatNumber(snap.captures || 0) + " 次</b>"
+        ]
+      };
+    }
+
 
     function saveFileName() {
       const d = new Date();
@@ -8443,10 +9227,39 @@
     }
 
     // 载入：解析 → 换存档 → 结算离线 → 落盘 → 重绘
-    function importSaveFromText(text, skipConfirm) {
+    function importSaveFromText(text, skipConfirm, rescuedRaw) {
       let parsed;
       try { parsed = decodeSaveText(text); }
-      catch (e) { showToast("❌ " + e.message); return false; }
+      catch (e) {
+        // V0.109（玩家事故）：校验没过**不等于**没救 —— 先试着把「最长可闭合前缀」捞回来，
+        //   交给玩家决定（能救一部分永远好过整份白扔）。完整但被改过的档也会走到这里。
+        const rescued = rescueSaveFromText(text);
+        if (rescued) {
+          const rep = rescueReport(rescued.data);
+          const lostTxt = rep.missing.length
+            ? rep.missing.map(k => SAVE_FIELD_NAMES[k] || k).join("、")
+            : "（没有整段丢失的字段）";
+          const head = rescued.whole
+            ? "这份存档的<b>校验对不上</b>（多半有字符被改过），但正文能完整解析。"
+            : (rescued.share > 0
+              ? "这份文本<b>不完整</b>（只读到约 <b>" + rescued.share + "%</b>），多半是复制时被截断了。"
+              : "这份文本<b>不完整</b>（只读到前面一段），多半是复制时被截断了。");
+          showConfirm({
+            icon: "🚑", title: rescued.whole ? "校验不通过，但内容能读" : "存档不完整，可以抢救",
+            ok: "抢救并覆盖", danger: true,
+            text: head + "<br>我可以把能救的部分恢复出来：<br>" +
+              "<b style='color: var(--gold);'>" + rep.lines.join("　·　") + "</b><br><br>" +
+              "<b style='color: var(--red);'>这些会按新档重置：</b>" + lostTxt + "<br><br>" +
+              "（原始文本先别删 —— 万一这份救回来不满意，还能再试；旧存档也会自动留一份备份。）<br>" +
+              "要继续吗？"
+          }, () => importSaveFromText(text, true, rescued.data));
+          return false;
+        }
+        showToast("❌ " + e.message +
+          "　—— 这份文本多半是<b>复制时被截断了</b>：请回到游戏里<b>重新导出</b>，" +
+          "并用<b>「下载存档文件」按钮</b>拿 .txt 文件，不要手动复制粘贴长文本。");
+        return false;
+      }
       if (!skipConfirm) {
         showConfirm({
           icon: "📥", title: "导入存档", ok: "覆盖当前存档", danger: true,
@@ -8454,7 +9267,8 @@
         }, () => importSaveFromText(text, true));
         return false;
       }
-      save = loadSave(parsed);
+      // V0.109：抢救路径传进来的就是「能救的那部分」，同样过一遍 loadSave（补默认值 + 清洗）
+      save = loadSave(rescuedRaw || parsed);
       // 运行时状态全部复位：战场、模态、转盘缓存都还指着旧存档
       isCaptured = false;
       stopBattleLoop();
@@ -8480,6 +9294,7 @@
       // 再把本机结算标记也顶上去，堵掉「同一份文件连点两次」的重复兑现。
       const mark = getSettledMark();
       if (mark > save.savedAt) save.savedAt = mark;
+      if (rescuedRaw) showToast("🚑 已抢救载入：只恢复了能读到的部分，缺失的字段按新档重置。");
       const info = applyOfflineProgress();
       setSettledMark(Date.now());
       saveGame(true);
@@ -9918,7 +10733,8 @@
       huntSpeed: {
         field: "huntSpeed", maxLevel: () => HUNT_SPEED_MAX_LEVEL, cost: getHuntSpeedCost,
         maxToast: "自动狩猎速度已达上限。",
-        okToast: () => `猎影加速提升至 Lv.${getOriginShop().huntSpeed}，自动狩猎节奏 <b>×${getHuntSpeedMult().toFixed(2)}</b>。`
+        okToast: () => `猎影加速提升至 Lv.${getOriginShop().huntSpeed}，自动狩猎节奏 <b>×${getHuntSpeedMult().toFixed(2)}</b>` +
+          `（${formatCycleSeconds(getAutoHuntCycleMs())}）。`
       }
     };
     function getOriginShopItem(key) { return ORIGIN_SHOP_ITEMS[key] || ORIGIN_SHOP_ITEMS.huntSpeed; }
@@ -10668,6 +11484,42 @@
       if (b.logs.length > BATTLE_LOG_LIMIT) b.logs.shift();
     }
 
+    // ===== V0.109（作者要求）：自动狩猎的提示条节流 =====
+    //   战斗提速到 0.08 秒/场之后，一秒能打好几场 —— 「一场一条提示」既晃眼又费性能
+    //   （每次 showToast 都要重写一次 DOM 并重启 2.4 秒的计时器）。
+    //   现在自动狩猎不再一场一条：折成**每 2.5 秒最多一条**的汇总，
+    //   而且**只报资源与场次，不带猎犬内容**（名字 / 等级 / 寿命一律不出现 —— 作者要求；
+    //   想看这些去左侧战斗面板与下面的「掉落物 / 最近战果」面板）。
+    //   ⚠️ 手动发起的战斗完全不变（依旧每场一条详细提示，那才是玩家自己按的那一下）。
+    const AUTO_HUNT_TOAST_MS = 2500;
+    let autoToastAcc = null;      // { battles, origin(Big), shards, timeout, transcend, expired }
+    let autoToastAt = 0;
+    function autoHuntToastAdd(patch) {
+      if (!autoToastAcc) autoToastAcc = { battles: 0, origin: BIG_ZERO, shards: 0, timeout: 0, transcend: 0, expired: 0 };
+      autoToastAcc.battles += 1;
+      const p = patch || {};
+      if (p.origin !== undefined) autoToastAcc.origin = bigAdd(autoToastAcc.origin, p.origin);
+      if (p.shards) autoToastAcc.shards += p.shards;
+      if (p.timeout) autoToastAcc.timeout += 1;
+      if (p.transcend) autoToastAcc.transcend += 1;
+      if (p.expired) autoToastAcc.expired += 1;
+    }
+    function autoHuntToastFlush(force) {
+      if (!autoToastAcc || !autoToastAcc.battles) return;
+      const now = Date.now();
+      if (!force && now - autoToastAt < AUTO_HUNT_TOAST_MS) return;
+      const a = autoToastAcc;
+      autoToastAcc = null;
+      autoToastAt = now;
+      const bits = [`<b>${formatNumber(a.battles)}</b> 场`];
+      if (bigCmp(a.origin, 0) > 0) bits.push(`掠夺 <b>${formatNumber(a.origin)}</b> 本源`);
+      if (a.shards > 0) bits.push(`掉落时间碎片 <b>×${formatNumber(a.shards)}</b>`);
+      if (a.timeout > 0) bits.push(`僵持 ${formatNumber(a.timeout)} 场`);
+      if (a.transcend > 0) bits.push(`自动回归 ${formatNumber(a.transcend)} 只`);
+      if (a.expired > 0) bits.push(`寿命耗尽 ${formatNumber(a.expired)} 只`);
+      showToast(`⚔ 自动狩猎：${bits.join(" · ")}`);
+    }
+
     // ===== 战果记录（掉落物面板）=====
     // 每场战斗结束后写入一条，只保留最近 BATTLE_REWARD_LIMIT 场，最新的排最前。
     function pushBattleReward(rec) {
@@ -10788,18 +11640,25 @@
           removeHound(hound.id);
           save.linesDirty = false;
           save.lines = generateLines();
-          showToast(`战斗胜利，掠夺 <b>${formatNumber(gained)}</b> 时间本源，但 ${hound.name} 寿命耗尽，永久消散。` + (shardToastMsg ? " " + shardToastMsg : ""));
+          // V0.109：自动狩猎 → 折进节流汇总（不带猎犬名字）；手动 → 原样的详细提示
+          if (b.autoHunt) autoHuntToastAdd({ origin: gained, shards: (b.shardDrops ? b.shardDrops.length : 0), expired: 1 });
+          else showToast(`战斗胜利，掠夺 <b>${formatNumber(gained)}</b> 时间本源，但 ${hound.name} 寿命耗尽，永久消散。` + (shardToastMsg ? " " + shardToastMsg : ""));
         } else {
           b.outcome = "win";
           logBattle(`${hound.name} 消耗 1 点寿命，剩余 ${formatNumber(hound.lifespan)} / ${formatNumber(hound.maxLifespan)}。`, "");
           save.linesDirty = false;
           save.lines = generateLines();
-          showToast(
-            `战斗胜利，掠夺 <b>${formatNumber(gained)}</b> 时间本源` +
-            (levels > 0 ? `，${hound.name} 升至 Lv.${formatNumber(hound.level)}` : `，${hound.name} 获得 ${formatNumber(expGain)} 经验`) +
-            `。剩余寿命 ${formatNumber(hound.lifespan)}，时间线已重织。` +
-            (shardToastMsg ? " " + shardToastMsg : "")
-          );
+          if (b.autoHunt) {
+            // V0.109：自动狩猎不弹「猎犬相关」的逐场提示 —— 折进 2.5 秒一条的资源汇总
+            autoHuntToastAdd({ origin: gained, shards: (b.shardDrops ? b.shardDrops.length : 0) });
+          } else {
+            showToast(
+              `战斗胜利，掠夺 <b>${formatNumber(gained)}</b> 时间本源` +
+              (levels > 0 ? `，${hound.name} 升至 Lv.${formatNumber(hound.level)}` : `，${hound.name} 获得 ${formatNumber(expGain)} 经验`) +
+              `。剩余寿命 ${formatNumber(hound.lifespan)}，时间线已重织。` +
+              (shardToastMsg ? " " + shardToastMsg : "")
+            );
+          }
         }
       } else if (timeout) {
         // ===== V0.93（方案 B3 + B4）：僵持不再「白打」，而且**寿命只在胜利时消耗** =====
@@ -10823,11 +11682,16 @@
         // 时间线的重织规则与胜负一致（每场战斗后都会重织），避免自动狩猎反复咬同一条打不穿的线
         save.linesDirty = false;
         save.lines = generateLines();
-        showToast(
-          `⚔ 僵持 <b>${BATTLE_MAX_ROUNDS}</b> 回合未分胜负：` +
-          `${hound.name} 获得 <b>${formatNumber(expGain)}</b> 经验（<b>不消耗寿命</b>），` +
-          `但没有本源与碎片。剩余寿命 <b>${formatNumber(hound.lifespan)}</b>，时间线已重织。`
-        );
+        if (b.autoHunt) {
+          // V0.109：自动狩猎的僵持也折进汇总（只计场次，不带猎犬内容）
+          autoHuntToastAdd({ timeout: 1 });
+        } else {
+          showToast(
+            `⚔ 僵持 <b>${BATTLE_MAX_ROUNDS}</b> 回合未分胜负：` +
+            `${hound.name} 获得 <b>${formatNumber(expGain)}</b> 经验（<b>不消耗寿命</b>），` +
+            `但没有本源与碎片。剩余寿命 <b>${formatNumber(hound.lifespan)}</b>，时间线已重织。`
+          );
+        }
       } else {
         // 自动狩猎发起的战斗：只要这只猎犬已经够回归门槛，就不让它白死——
         // 原地转成回归，等级照常变成永久全局加成（与手动回归同一套结算）。
@@ -10841,11 +11705,10 @@
           logBattle(`${hound.name} 战败，但已达回归门槛，自动回归时间本源。`, "sys");
           logBattle(`回归 Lv.${formatNumber(transcended.returnLevel)}，全局加成 +${formatPercent(bonus)}。`, "good");
           save.invasions += 1;
-          showToast(
-            `${hound.name} 战败，已自动回归：全局 <b style="color: var(--gold);">+${formatPercent(bonus)}</b>` +
-            `（回归 Lv.${formatNumber(transcended.returnLevel)}）` +
-            (shardToastMsg ? " " + shardToastMsg : "")
-          );
+          // V0.109（作者要求）：自动狩猎不再弹「带猎犬名字」的提示 —— 折进节流汇总，
+          //   回归这种值得知道的事改记到「事件日志」里（那个面板不会刷屏）。
+          autoHuntToastAdd({ transcend: 1, shards: (b.shardDrops ? b.shardDrops.length : 0) });
+          logEvent("🌌", `展示柜新增：<b>${hound.name}</b> 战败自动回归（回归 Lv.${formatNumber(transcended.returnLevel)}，全局 +${formatPercent(bonus)}）`, "purple");
         } else {
           // ===== V0.93（方案 B2）：战败不再「永久消失」，改成**重伤** =====
           // 老规则：战死 → removeHound() 永久蒸发。一只养了几十级的猎犬因为一次强度误判就没了，
@@ -10862,11 +11725,16 @@
           save.linesDirty = false;
           save.invasions += 1;
           logBattle(`${hound.name} 战败重伤：Lv.${formatNumber(oldLevel)} → Lv.${formatNumber(hound.level)}，经验清零。`, "bad");
-          showToast(
-            `${hound.name} 战败重伤：等级从 Lv.${formatNumber(oldLevel)} 掉到 <b>Lv.${formatNumber(hound.level)}</b>` +
-            `（保留 ${Math.round(WOUND_LEVEL_KEEP * 100)}%）、经验清零 —— 但它<b>活下来了</b>。` +
-            (shardToastMsg ? " " + shardToastMsg : "")
-          );
+          if (b.autoHunt) {
+            autoHuntToastAdd({ shards: (b.shardDrops ? b.shardDrops.length : 0) });
+            logEvent("💥", `<b>${hound.name}</b> 战败重伤：Lv.${formatNumber(oldLevel)} → Lv.${formatNumber(hound.level)}（保留 ${Math.round(WOUND_LEVEL_KEEP * 100)}%），活下来了`, "red");
+          } else {
+            showToast(
+              `${hound.name} 战败重伤：等级从 Lv.${formatNumber(oldLevel)} 掉到 <b>Lv.${formatNumber(hound.level)}</b>` +
+              `（保留 ${Math.round(WOUND_LEVEL_KEEP * 100)}%）、经验清零 —— 但它<b>活下来了</b>。` +
+              (shardToastMsg ? " " + shardToastMsg : "")
+            );
+          }
         }
       }
       // ===== 记录本场战果到「掉落物」面板 =====
@@ -10903,8 +11771,10 @@
       renderBattle();
       // 战后结果在面板上停留多久：自动狩猎的战斗按猎影加速倍率缩短，
       // 让下一场尽快开打；手动战斗保持原来的 2.6 秒，方便你看战报。
+      // V0.108：自动狩猎的战报停留也吃「每场总周期」这条预算（最多占 45%，下限 24ms）——
+      //   否则它会单独把节奏卡在几百毫秒上，0.08 秒/场就永远到不了。
       const holdMs = b.autoHunt
-        ? Math.max(AUTO_HUNT_HOLD_MIN_MS, BATTLE_RESULT_HOLD_MS / getHuntSpeedMult())
+        ? Math.max(AUTO_HUNT_HOLD_MIN_MS, Math.min(BATTLE_RESULT_HOLD_MS / getHuntSpeedMult(), getAutoHuntCycleMs() * 0.45))
         : BATTLE_RESULT_HOLD_MS;
       setTimeout(() => {
         if (activeBattle && activeBattle.over) {
@@ -11761,10 +12631,11 @@
               : "✕ 猎犬战死")
             : `⚔ 正在战斗 · 我方出手 ${b.rounds || 0} / ${BATTLE_MAX_ROUNDS} · ${line ? line.name : ""}`}
           ${(b.shardDrops && b.shardDrops.length)
-            ? b.shardDrops.map(d =>
-              `<div class="shard-drop-line" style="color:${d.color}">` +
-              `${d.icon} 掉落时间碎片【${d.name}】${d.rarity}` +
-              `${d.isNew ? " · 新解锁 Lv.1" : ` · Lv.${formatNumber(d.level)}`}</div>`).join("")
+            // V0.108（作者要求）：战斗面板不再逐块列出「掉了什么碎片 / 什么档位 / 什么等级」——
+            //   统一压成一行「掉落时间碎片 ×N」。想看明细去下面的「掉落物 / 最近战果」面板。
+            ? `<div class="shard-drop-line" style="color: var(--cyan);">` +
+              `✦ 掉落时间碎片 <b>×${formatNumber(b.shardDrops.length)}</b>` +
+              `${b.shardDrops.some(d => d.isNew) ? "（含首次解锁）" : ""}</div>`
             : ""}
         </div>`);
 
@@ -11973,6 +12844,8 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.110", "四处调整。① <b>赌场破产后会自动收场（只在真的没得玩时才收）</b>：破产时如果剩余时间已经不足 1 分钟、<b>而且能源也见底了</b>（两条续命路都走不通），这一局才直接结束、退回虚拟世界；<b>只要还有能源就留在赌场</b>，抢救面板摆在那里由你决定要不要氪金 —— 不会再出现「还有 40 秒、明明能氪金却被踢出来」。本局结束时（破产收场 / 兑现 / 破产后主动离开）<b>剩余时间会清零</b>：下次买 1 分钟就是干净的 1 分钟，不会攒成 1 分 40 秒；<b>下次进场重新发 100 筹码</b>从头再来。② <b>筹码可以「兑现」成虚拟点数</b>：筹码 <b>超过 1000</b> 时，赌场里会出现「💠 兑现筹码 → 虚拟点数」按钮，按 <b>10 筹码 : 1 虚拟点（向上取整）</b>一次性换光、本局结束（兑换比例以后会接加成，现在就是纯换算）。③ <b>「虚拟升级」页先清空成「暂无」</b>：里面的加点项还没定，先撤下（虚拟点数照常累积：赌场通关 / 兑现都会给，等加点开放直接用；逻辑与数据结构都保留着，内容定下来往表里填一行就恢复）。④ 版本号 +0.01 → V0.110。⑤ <b>超越基因的「基础资源」乘数大幅抬高</b>（作者反馈：超越·99 的尘埃基因 10 级才 ×20，太低了）：按「资源越好拿、乘数越高」重排 —— 🌫 尘埃收益 <b>×1.55/级</b>（超越·1 时 Lv.10 = <b>×80</b>、Lv.20 = ×6400；超越·99 时 Lv.10 = <b>×1583</b>，比原来强约 100 倍）、⏩ 时间流速 ×1.45、✨ 本源收益 ×1.35（本源只能靠战斗掠夺，比尘埃难拿）、🐕 猎犬经验 ×1.30、💎 碎片强度 ×1.20、🧬 部件软上限 ×1.15、🌊 洪流峰值 ×1.10、🎲 碎片爆率 <b>×1.05</b>（概率类最容易滚雪球，保持原值）。档位加成也从「每档 +0.001」改成<b>按比例</b>（每上一档 +1%，超越·99 ≈ 基础的 1.98 倍）—— 步长变大之后，比例式才能让高档次继续有感。⑥ <b>德州扑克两处修正</b>：① <b>修「庄家开局亮牌」</b>（玩家反馈：哪有开局就亮牌跟你比大小的）—— 上一手摊牌把「已亮牌」标记置成了 true，而开新一手时**没有清掉**，于是从第二手起庄家一直明着摆牌；现在开局会把这个标记重置，庄家照常盖牌、只有本手结束（摊牌 / 弃牌）才亮出来。② <b>盲注可以自己选</b>：牌桌上多了一排盲注档位（10 / 25 / 50 / 100 / 250 / 500 / 1K / 2.5K / 5K / 10K），**大盲 = 2×小盲、且不能超过你手上的筹码** —— 超过的档位直接置灰点不动，手上筹码掉下来时也会自动往下降档，开局扣的小盲 / 大盲、跟注下限与庄家的下注尺度全部跟着这个档位走。⑦ 「<b>⬆ 虚拟升级</b>」右边新增子页「<b>🎯 虚拟挑战</b>」（目前一条：<b>赌神</b>）：挑战<b>不消耗任何东西就能进</b>（不用能源、不用买时间），但规则更狠 —— <b>不能用氪金</b>、<b>没有时间限制</b>、<b>筹码归零自动退出</b>；进场发 <b>20</b> 筹码，<b>赢到 37,000,000 通关</b>，通关奖励「<b>赌术高手</b>」（永久）：虚拟世界里所有<b>概率 / 赌博类</b>判定的<b>获胜概率 ×1.05</b> —— 目前覆盖 21 点 / 猜大小 / 抽牌比大小 / 德州扑克的胜负判定（判定本来是输的那一次，有 5% 概率被「扳回」成赢，等价于胜率 ×1.05）。挑战里的筹码池与正式赌场完全隔离，进度与奖励跨局保留（退出反转世界 / 进宇宙都不清）。⑧ 能源页最后多了一页「<b>🏆 成就</b>」—— <b>只记反转世界的事</b>（主宇宙那套成就完全独立）：第一条成就就是「<b>赌神</b>」（完成虚拟挑战「赌神」），奖励是<b>能源获取 ×1.5</b>（永久生效：待在反转世界里，能源从每秒 +1 变成每秒 +1.5，能源页的速率读数也会跟着变）。成就是永久记录 —— 退出反转世界、进宇宙重置都不清；以后反转世界再有别的成就，往同一张表里加一行就行。⑨ 三处界面调整（作者要求）：① <b>「成就」搬到右上角</b>（和主宇宙的排布一致）—— 反转世界右上角多了一个「🏆 成就」按钮（带 0/1 这样的进度），点开是统一的成就弹窗，不再占能源页的子页签；② <b>「虚拟挑战」并进「虚拟世界」页</b>（和赌场卡片放在一起，省得左右来回点页签）—— 能源页回到三个子页：能源 / 虚拟世界 / 虚拟升级；③ <b>挑战进行中时，导航栏「⚡ 能源」右边会挂出一个「🎰 赌神」页签</b>，随时一键跳回进行中的挑战（挑战结束页签自动收起）。⑩ <b>德州扑克加上「自选盲注」</b>（作者反馈：挑战要赢到 3700 万，预设最大 1 万的盲注太小）：盲注那一排现在多了个输入框 + 「设定」按钮，<b>想设多大就多大</b>（支持 <b>1e6</b>、1.2e6、1,000,000 这些写法），只要求「大盲 = 2×小盲 ≤ 手上的筹码」，超了会被拒并提示当前筹码；回车也能直接生效。预设档位照旧保留，两项都能随时切换。⑪ <b>进多元宇宙的门槛改成「按历史最高尘埃」判定</b>（作者反馈：想进的时候老是被捕获、尘埃一清零就得再攒一会儿）：只要你这辈子摸到过 1E1000 尘埃（<b>历史最高尘埃</b>是只增不减的终身记录），之后<b>哪怕被捕获清零也随时能撬门</b>；开门时照旧从当前尘埃里扣，扣到 0 为止（不会扣成负数 —— 反正进去就要全清）。门槛那一行会同时列出「最高」与「当前」两个读数。⑫ <b>修两个玩家反馈</b>：① <b>德州扑克弃牌后开不了下一手</b>（挑战里最明显：20 筹码、弃一手剩 10，按钮直接灰掉卡死）—— 原来要求「筹码 ≥ 大盲」才准开局，现在改成**只要手里还有筹码就能开**，盲注按「有多少交多少」，不够就当全下入场（对手那半边照旧由庄家垫），真到 0 才拦。② <b>换宇宙不再重置玩家的设置</b>：以前每进一次多元宇宙，「⚙ 自动化」里的<b>收割时机（100~200% 滑条）</b>、<b>捕获姿态（稳健/平衡/贪婪）</b>、批量档位、自动回归场次都会被重置成默认值，现在这些**偏好设置一律原样保留**（和数字显示方式、自动化开关一个待遇）。⑬ <b>修「21 点可以无限点开一局刷筹码」</b>（玩家反馈）：手牌进行中时「开一局」本该是灰的，但渲染的最后一段又把它按「有筹码就启用」重新赋值了一遍，把禁用状态覆盖掉了 —— 于是手牌没打完也能点：点一下白换一手牌（不结算、不扣注），换到天然 21 点就照 1.5 倍赔，反复点等于印钞。现在「开一局」只在<b>本手已结束且有筹码</b>时可用，「要牌 / 停牌」在手牌进行中保持可用；函数内部也加了一道兜底（手牌没结束时直接拒绝重发），以后就算按钮状态被改坏也刷不出钱。⑭ <b>德州扑克：全压之后自动开牌</b>（玩家反馈：全押完没钱跟注，卡在「跟注 0 / 加注禁用」的干瞪眼状态）：现在只要手牌进行中、而你这边**已经没钱了**，就会<b>自动把剩下的街发完并摊牌</b>，直接给出「你赢了 / 你输了 / 平局」与双方牌型 —— 不用再空点按钮。还有筹码时不受影响，照旧你自己决策。"],
+      ["V0.109", "四处改动：一条性能修复 + 三条体验。① <b>自动狩猎的提示条不再刷屏</b>（玩家反馈「提示太多容易卡」）：战斗提速之后一秒能打好几场，「一场一条」的胜利提示会把右下角刷爆、还费性能；现在自动狩猎折成<b>每 2.5 秒最多一条</b>的资源汇总（「⚔ 自动狩猎：N 场 · 掠夺 X 本源 · 掉落时间碎片 ×M」，僵持 / 自动回归 / 寿命耗尽也各自计数），而且<b>不再带猎犬的名字、等级与寿命</b>——想看那些去左侧战斗面板和下面的「掉落物 / 最近战果」面板；<b>手动发起的战斗完全不变</b>（依旧每场一条详细提示）。② <b>「猎影加速」改成整场周期加速</b>：它以前只压战斗内的节奏，战后战报还要停 2.6 秒、两场之间再等一秒，后期挂机一场一场地干等；现在它压的是<b>一场战斗的总周期</b>（战斗 + 战报停留 + 两场之间的间隔），并给出<b>最快 0.08 秒/场</b>的硬下限 —— Lv.0 是 1 秒/场，每升一级更快一点，<b>Lv.40 满级正好 0.08 秒/场</b>，商店卡片上直接显示当前「多少秒/场」。手动战斗不受影响。③ <b>反转世界不再被多元宇宙重置</b>：它比多元宇宙高一层 —— 以前进一次宇宙，「尖端实验室」的科技点与四项等级、历史最高反转等级、以及没结束的那一局全都会被清掉；现在这些一律跨宇宙保留（主动退出反转世界仍是「本局作废」，那条没变）。④ <b>战斗面板的掉落不再逐块列</b>：一次掉七块就是七行「掉落时间碎片【流砂】微光 · Lv.50」，现在统一压成一行「<b>✦ 掉落时间碎片 ×7</b>」（含首次解锁会标出来）；完整明细照旧留在「掉落物 / 最近战果」面板里。⑤ <b>存档被截断了也能救回来</b>（玩家反馈：导入时报「校验失败」，整份存档直接废掉）：导出文本很长，复制到聊天窗口 / 备忘录时很容易被截断 —— 而存档用的是流式加密，<b>前面的内容永远是对的</b>，所以新版在导入失败时会先<b>试着把能读的部分抢救出来</b>（大多数情况能救回尘埃 / 升级 / 部件 / 猎犬），然后弹窗列清楚「能救回什么、哪些会按新档重置」，由你自己决定要不要；救不回来时也会给一句人话提示（请用「下载存档文件」按钮重新导出，别手动复制长文本）。另外导出文本末尾多了一行「密文长度 / 末 4 位」自证行 —— 复制少了一截时一眼可辨。⑥ 修<b>「反转世界的进度条有时候一跳一跳」</b>（玩家反馈）：那些进度条由主循环每 0.1 秒推一次、靠 CSS 过渡连成平滑移动，而过渡时长恰好也是 0.1 秒 —— 只要浏览器把某一拍拖后一点（窗口失焦 / 被别的窗口遮住 / 那一帧恰好在忙），过渡就先跑完了，于是「走一步、停一下」，刷新后计时器重新起跑又变顺。现在把过渡放宽到 0.3 秒兜住这种抖动，同时加了「回退与大跳跃直接贴上去」的处理（被捕获清空进度时不会慢慢往回滑）；顺手把「人在反转世界里还每帧重绘那两块看不见的面板」也删掉了，帧时间更稳。⑦ <b>反转宇宙的「解析」四项全部改成乘法（复利）</b>（玩家反馈成长太慢）：以前是加法（尘埃 +20%/级、抵抗 +10%/级、概率 −2%/级、速度 −3%/级），投几十级也就几倍；现在每级都是<b>乘上去</b>的 —— 🌫 尘埃共鸣 <b>×1.10/级</b>（Lv.20 ×6.7、Lv.40 ×45）、🛡 护盾协议 <b>×1.12/级</b>（还自带 +10%/级的底子，抵抗为 0 时也不白买）、🎯 弱点图谱 <b>×0.93/级</b>、🐌 缓速力场 <b>×0.96/级</b>（最低压到 5%）。成本成长率同步放松一档（×1.6 → ×1.45、缓速 ×1.8 → ×1.5）—— 否则「收益指数级、成本也指数级」会让等级永远卡在 25~30 上，复利的好处摸不到。⑧ <b>爆基础科技不再刷屏</b>（玩家反馈太卡）：以前每一件掉落都弹一条提示，其中大半是「还不如此前的 Lv.X —— 新件被消耗」的废件；现在只有<b>第一次拿到</b>和<b>刷新了最高等级</b>才弹，废件折成每 3 秒一条的汇总（「顺手爆出 N 件低阶科技，折算 +X 尘埃」）。⑨ <b>解除「基础科技有效等级」的软上限</b>：以前超过 400 级的部分只按平方根计入，后期怎么刷都推不动；现在等级多大效果就多大。里程碑原来那两条「软上限 ×1.01 / ×1.2」的福利顺势改成<b>直接抬高有效等级</b>（大里程碑 +2%/座、超级 +20%/座），不再有天花板。⑩ 反转世界新增子系统「<b>⚡ 能源</b>」（页签在「自动化」右边，<b>进入反转世界即解锁</b>）：只要待在反转世界里，能源就<b>每秒 +1</b> —— 而且<b>不吃任何加成</b>（等级、科技、里程碑、解析统统不影响它）。它是<b>唯一不会被清空的东西</b>：退出反转世界、甚至进宇宙重置，能源都原样留着（主界面的一切照旧归零）。能源能换什么内容还没定，这一版先把资源与进度做出来，消费留到下个版本。⑪ <b>提示框可以逐类关闭了</b>（设置面板里新的一节）：战斗与狩猎 / 碎片与掉落 / 反转世界与科技 / 基因与可能性 / 成就与里程碑 / 自动化 / 其它 —— 勾掉哪一类，那一类就完全不弹（连 DOM 都不碰，更省性能）；「系统与存档」是固定开启的（导入失败、异常、版本提醒这类漏掉会出大事）。⑫ 能源页里多了个子页「<b>🕹 虚拟世界</b>」（<b>界面先行版</b>）：打算做成「玩小游戏赚虚拟点数 → 花点数永久加点」的循环。这一版先把版式与数据链路做出来 —— 上方是<b>三个小游戏位</b>（反应类 / 策略类 / 运气类，标注「待定」、玩法还没定，确定后把列表里的 status 改成 open 就能接上），下方是<b>六条永久加点</b>（尘埃增幅 / 抵抗增幅 / 数据点增幅 / 科技爆率 / 铸级折扣 / 得分加成，数值都是草稿，随时可以改）。虚拟点数与加点<b>和能源一样是永久的</b>：记在主存档上，退出反转世界、进宇宙重置都不会清掉。⑬ 虚拟世界开出第一个小游戏「<b>🎰 赛博赌场</b>」（界面与玩法都能玩了）：进门要先<b>缴能源买时间</b>（每秒 2 点，1 / 5 / 15 分钟三档），时间到会自动离开、但<b>筹码与进度都留着</b>，下次进来接着玩 —— 只有<b>破产</b>（筹码归零）才会在下次进场时重新发 100 筹码、从头再来。桌上有三样：<b>21 点</b>（起手 21 点赔 1.5 倍、庄家 17 点停牌）、<b>猜大小</b>（三颗骰子，小 3~10 / 大 11~18）、<b>抽牌比大小</b>（同点算平局）。押注可以用<b>滑动条从 1% 拉到 100%</b>（另有 1% / 25% / 50% / 全押 四个快捷档，一律按手上的筹码算）。<b>通关目标：从 100 筹码赢到 10000</b>，达成一次就发 <b>250 虚拟点数</b>（掉回线下再冲上去可以反复通关）。另外两条「续命」通道：<b>氪金</b>（能源按 <b>1:1</b> 换成筹码，100 / 500 / 1000 / 全部能源四档），以及<b>破产抢救</b> —— 筹码归零时可以<b>扣 1 分钟剩余时间换 100 筹码</b>，或者直接氪金；两条都走不通就先回去攒能源（每秒 +1）再来。筹码、剩余时间与战绩（已玩 / 赢 / 最高筹码 / 通关次数 / 已氪能源）跨局保留。⑭ 赌场多了一张桌子「<b>♠ 德州扑克</b>」（单挑版）：盲注 <b>10 / 20</b>，四条街（翻牌前 / 翻牌 / 转牌 / 河牌），动作有<b>过牌 · 跟注 · 加注 · 全下 · 弃牌</b>（每条街最多加注 3 次，免得无限拉锯）；摊牌时从 7 张里取最好的 5 张比大小 —— 高牌 / 一对 / 两对 / 三条 / 顺子 / 同花 / 葫芦 / 四条 / 同花顺九档都判得出来（A 也能当 1 用，A2345 算顺子）。庄家会看牌力决策、偶尔诈唬。摊牌赢下整个底池、平局退回自己的下注、弃牌只亏已投入的部分；单独记「已玩几手 / 赢几手 / 最大底池」。<b>本手不管怎么结束都会亮牌</b>：庄家的两张手牌与<b>五张公共牌</b>一并摆出来（哪怕你在翻牌前就弃了），还会顺手算一句「你本来会赢 / 会输 / 本来是平局」（按双方的最终牌型）。⑮ 三处界面调整：<b>破产抢救面板挪到了最上面</b>（一破产就顶在赌场界面顶端，同时把下注行与氪金行收起 —— 抢救面板里自带氪金按钮，不用再往下找）；能源页的「<b>永久加点</b>」从虚拟世界里搬出来，成为独立子页「<b>⬆ 虚拟升级</b>」，排「虚拟世界」右边 —— 里面有虚拟点数 / 总级数 / <b>已投入点数</b> 三个读数与全部加点项。⑯ <b>修三个玩家反馈的问题</b>。① <b>悖论「不清空尘埃与升级」的承诺漏了一截</b>：里程碑第 20 次之后虽然尘埃与升级保住了，但「本次循环」的三样状态还是被一起清掉了 —— <b>进度条</b>（清零后又被「持续收割」立刻填回满格，看起来就是「重置了又复原」）、<b>本循环已消耗尘埃</b>（它一归零，主界面那条「下次被捕获的部件成长预告」就直接掉到下限，结算里写着「消耗 0」）以及 <b>8 秒猎影窗口</b>（被硬生生打断）。现在这三样只在<b>真正清空经济</b>时才重置，吃到豁免就原样保留。② <b>挑衅猎犬在猎影期间不再可能被随机捕获</b>：统计口径本来就该是 0，但这次加了一道<b>显式保险丝</b>（猎影中直接跳过捕获判定），免得以后谁改了数值口径又把这个 8 秒承诺悄悄破坏掉。③ <b>设置里新增「清理缓存 · 释放内存」</b>（挂久了发慢的救急按钮，就在「性能」那一行，旁边显示当前 JS 内存占用）：一次清掉渲染样式缓存、转盘 / 猎犬网格签名、崩溃日志，并把日志按上限裁一遍 —— <b>不动存档、不重置进度</b>；内存告警的提示里也指到了这个按钮。⑰ <b>超越基因不再一律 ×1.05</b>（作者：像尘埃收益这种最基础的起码要十几倍）：每级倍率现在**按基因强度分档**，越基础给得越高、越强给得越低 —— 🌫 尘埃收益 <b>×1.22/级</b>（Lv.15 ≈ <b>×20</b>、Lv.20 ≈ ×54、Lv.30 ≈ ×400，旧版同样等级只有 ×2.1 / ×2.7 / ×4.4）、⏩ 时间流速 ×1.16、✨ 本源收益 ×1.13、🐕 猎犬经验 ×1.12、💎 碎片强度 ×1.08、🧬 部件软上限 ×1.07、🌊 洪流峰值 ×1.06、🎲 碎片爆率 <b>×1.05</b>（保持原值）。超越序号仍然会往上叠一点（+0.001 × 序号，超越·99 时最强的那条也有 ×1.149），所以「档位越高越强」没变，变的是**每条基因有自己的成长曲线**。⑱ <b>赌场两处修正</b>：① 21 点 / 德州扑克**输掉时也要把这一手讲清楚** —— 破产不再把牌桌藏起来（牌桌继续显示，下面补一条破产提示，抢救面板仍在最上面），牌桌还会直接标出**对手的牌型**（例如「庄家 A♠ K♦　两对」）并单列一行「本手结果：你输了 · 你的牌型 高牌 · 对手 一对」；② 牌桌下方新增破产提示条，写明两条续命路。"],
       ["V0.108", "修复一个「展示柜永远打不开」的严重问题，并汇总发布 V0.107。① <b>展示柜（超越回归）以前可能一辈子解锁不了</b>：回归 / 放逐按钮在执行里本来是只看「它自己在不在打」的，但按钮的<b>禁用条件</b>写得太狠 —— 只要有任意一场战斗在进行就把这两个按钮整片禁掉；而<b>自动狩猎</b>开着时战斗几乎不停，于是按钮<b>根本不渲染</b>，玩家手上唯一那只够等级的猎犬永远回归不了，展示柜（要求「至少回归过 1 只」）自然一直锁着（玩家反馈「进入游戏后怎么样都无法开启展示柜」）。现在：回归按钮只要求「够 10 级 + 还有寿命」，它正在打也照样能点 —— 确认时会先把那场战斗就地收掉（战斗面板不会再引用一只已经不存在的犬），并提示「它当时正在战斗，那场战斗已随之中止」；放逐按钮只对「正在打的那一只」禁用，不再被整场战斗卡住。该有的限制一个没少：战斗中<b>时间线入侵</b>按钮照旧禁用（不能同时开两场），放逐的原有守卫全部保留。② 本版一并发布 V0.107 的全部内容：自动回归「打够 N 场就回归」、基因实验室刷新费改成「每次都是上一次的 4 倍」、可能性解锁高亮修复（含「苦痛挑战」子页签点过即熄灭）、苦痛之路入口提前到「基因实验室解锁」、高级基因（超越段）成长比例按档位递增（x1.051 → x1.060）、牙 / 爪 / 沙漏三件永恒部件新增成长曲线（复利）—— 详细条目见下方 V0.107。③ <b>反转世界</b>的页签改回「达成条件才现身」：以前（V0.98 起）它一直挂在导航栏上，现在要等<b>历史最高尘埃 1E30080 + 苦痛挑战全部完成</b>之后才出现 —— 现身那一刻会自带「新」高亮，不会让人错过。④ <b>基因点数 / 基因修饰点数不再被 1e308 卡住</b>：这两个点数原本是普通数字，涨到 1.8e308 就到顶、界面会印出 <b>3e+307</b> 这种难看的样子；现在它们和尘埃、本源一样走<b>大数</b>（可以一直涨下去），购买 / 刷新的判定、扣除与所有读数都跟着换过了。⑤ <b>数字显示规则写进底层</b>：凡是显示出来的数字，量级到 <b>100 万</b>（1e6）就自动缩写成 K/M/B/T 或科学计数法（跟随「设置」里的数字偏好）—— 不会再出现「4398046511104 基因点」这种一长串数字；JS 原生的科学计数（<b>3e+307</b>、toExponential 出来的 <b>1e+9</b>）一律改写成游戏的 E 记法，那个多余的「<b>+</b>」号没有了。低于 100 万的数字照旧原样显示，价格看得准。⑥ <b>基因成长重做</b>：<b>超越段</b>每上一档的成长比例至少 +0.001（超越·1 = ×1.051、超越·2 = ×1.052、…… 超越·99 = ×1.149）—— 之前用 √ 曲线压得太狠，超越·95 与超越·98 印出来一模一样；现在每一档都看得出差距。<b>「超越」之前的六档基因改成加法</b>：每级直接加算、数值整体抬一档（<b>本版再加强</b>：普通 +1.5%/级、优秀 +2%、稀有 +2.8%、史诗 +3.6%、传说 +4.4%、神话 +5%—— Lv.10 就是 +15% 到 +50%）—— 普通基因 Lv.1 就有 +1.5%，不再是「每级 ×1.002」这种看不出效果的东西；超越段保持<b>乘法复利</b>（那是它越级越强的身份）。⑧ <b>基因修饰点数的获取倍率提高</b>：进宇宙时把本轮进度折算成修饰点数的那一步，新增一层<b>全局获取倍率 ×3</b>（和「前期加成」「苦痛倍率」相乘，折算明细里会单独列出来）—— 基因强化因此快得多；想再调只改这一个数。⑦ 修<b>「基因不能强化了」</b>：④ 把修饰点数改成大数之后，基因卡片的四个强化按钮拿大数去和价格做裸比较（永远不成立），结果全部显示成灰的、点不了 —— 现在改用大数比较，强化恢复正常。"],
       ["V0.107", "六处改动（部件平衡第一步：给「心」以外的三件补上成长曲线）。① <b>自动回归</b>新增「<b>打够 N 场就回归</b>」：自动化页「自动回归」那一行右侧多了一个场次输入框 —— 出战猎犬打满填写的场数后会立刻回展示柜、把等级换成永久全局加成，随后自动换上仓库里最强的一只继续出战（填 <b>0</b> = 关闭，沿用旧规则：只在寿命只剩 1 点时回归）。后期一场一个目标时把它设小一点，就不用再等寿命耗光才轮换；「寿命将尽必回归」的兜底照旧生效。② <b>基因实验室的「刷新清单」花费改成「每次都是上一次的 4 倍」</b>：第 1 次 <b>1</b> 点、第 2 次 4 点、第 3 次 16 点、第 4 次 64 点、第 5 次 256 点、第 6 次 1024 点……（前 3 次合计 21 点，之后指数上涨）。刷新按钮旁边会直接写清「下次刷新要多少点」；进入下一个宇宙照旧免费重抽、价格归 1。③ 修<b>「可能性」解锁时的高亮</b>：以前如果玩家早先点过这个页签（已读记录里躺着它），五个挑战再次全部完成时就只剩一句「已解锁」的提示、页签一动不动 —— 现在解锁那一刻会<b>强制把页签重新点亮一次</b>（「⚔ 挑战」页里的「🩸 苦痛挑战」子页签同样点亮），重复解锁的提示也改成「已重新点亮」。顺带修掉「苦痛挑战子页签解锁后一直闪、点进去也不灭」，并把「已读页签」记录上限从 24 条放宽到 200 条。④ <b>「🩸 苦痛之路」的入口提前</b>：以前要玩家自己先植入满 10 条基因，那个子页签才冒出来，很多人根本找不到它；现在<b>解锁「🧪 基因实验室」时它就会出现在同一排子页签里</b>（带「新」高亮），点进去写明还差几条基因、凑够 10 条自动变成可预约。⑤ <b>高级基因之间终于有区别了</b>：以前「超越」段的每级成长比例一律钉在 <b>×1.050</b>，档位再高也一模一样；现在按超越档位递增 —— 超越·1 = ×1.051 … 超越·25 = ×1.055 … 超越·99 = ×1.060，越高档每级涨得越快（仍然是严格递增、不会爆表）。⑥ <b>永恒部件第一批平衡（心不动）</b>：<b>牙 / 爪 / 沙漏</b>新增各自的<b>成长曲线</b> —— 除了原来的固定加成，这三件还会按你的<b>升级等级</b>复利放大（牙看尘埃升级、爪看速度升级、沙漏取两者平均），复利率由部件自身等级决定（满配时每级 ×1.008，约等于每 100 级升级 ×2.22）。标定实测：两条升级都到 300 级时，三件合计约为「心」的 11 倍，500 级时约 1.5 倍，约 540 级之后心反超 —— 「一个心顶其他三件」的后期差距被压平了；部件页与属性详情面板都能看到实时读数。"],
       ["V0.106", "两条小调 + 一次结算。① 基因实验室的「刷新清单」花费改为<b>对数增长</b>：第一次 <b>1</b> 点，之后 1、2、2、3、3、3、3、4…（原来按 2×2ⁿ 翻倍、还封顶在 4096 —— 基因点攒多之后刷新等于免费，玩家滚雪球太快）；基因植入的「每次翻倍」保持不变。② 本版把 V0.104 / V0.105 的积累一并发布：反转世界正式开放（进度持久化、科技点数、尖端实验室、灵感、科技跃迁、自动化养成、八条猎犬、精英猎犬、反转里程碑、解析、科技软上限）、基因去除等级上限并统一巨削成长、修复「猎犬刚开始吃不到保底」与「离线奖励后实验室加成缩水」等 —— 详细条目见下方 V0.104 / V0.105。"],
@@ -12947,7 +13820,7 @@
           </p>
           <div class="mv-actions">
             <button class="primary-button" data-mv-begin="1" ${afford && hasClearedAllChallenges() ? "" : "disabled"}>${hasClearedAllChallenges() ? "支付并窥探多元宇宙" : "需先通关全部主线挑战"}</button>
-            ${hasClearedAllChallenges() ? `<span class="mv-cost">需要持有 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃（当前 ${formatNumber(save.dust)}）</span>` : multiverseGateHtml()}
+            ${hasClearedAllChallenges() ? `<span class="mv-cost">需要 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃（<b>按历史最高判定</b>：最高 ${formatNumber(bigOf(save.bestDust || 0))} · 当前 ${formatNumber(save.dust)}）—— 被捕获清零也能进</span>` : multiverseGateHtml()}
           </div>`);
         return;
       }
@@ -12969,7 +13842,7 @@
         ${cur}
         <div class="mv-actions">
           <button class="primary-button" data-mv-begin="1" ${afford && hasClearedAllChallenges() ? "" : "disabled"}>${hasClearedAllChallenges() ? "支付并开启新的一批宇宙" : "需先通关全部主线挑战"}</button>
-          ${hasClearedAllChallenges() ? `<span class="mv-cost">需要持有 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃（当前 ${formatNumber(save.dust)}）</span>` : multiverseGateHtml()}
+          ${hasClearedAllChallenges() ? `<span class="mv-cost">需要 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃（<b>按历史最高判定</b>：最高 ${formatNumber(bigOf(save.bestDust || 0))} · 当前 ${formatNumber(save.dust)}）—— 被捕获清零也能进</span>` : multiverseGateHtml()}
         </div>`);
     }
 
@@ -14024,7 +14897,7 @@
       const hspMaxed = isHuntSpeedMaxed();
       setText("shopHuntSpeedLevel", String(hspLv));
       setText("shopHuntSpeedMax", ` / ${HUNT_SPEED_MAX_LEVEL}`);
-      setText("shopHuntSpeedValue", `×${getHuntSpeedMult().toFixed(2)}`);
+      setText("shopHuntSpeedValue", `×${getHuntSpeedMult().toFixed(2)} · ${formatCycleSeconds(getAutoHuntCycleMs())}`);
       setText("shopHuntSpeedCost", hspMaxed ? "已满级" : formatNumber(getHuntSpeedCost(hspLv)));
       renderShopBuys("shopHuntSpeedBuy", "huntSpeed");
       updateShopMeter("shopHuntSpeedMeter", hspLv, HUNT_SPEED_MAX_LEVEL);
@@ -14160,13 +15033,20 @@
         save.huntPool = 0;
         save.upgrades = { speed: 0, dust: 0 };
       }
-      // 猎影（8 秒窗口）是「本次循环」的状态 —— 重置即打断，免得旧循环的猎影跨到新循环里。
-      //   （冷却时间照常走，不额外补偿）
-      hunt = null;
-      // 使用悖论后立刻清零本次循环消耗，并让玩家重新开始本次循环
-      save.currentSpent = 0;
-      save.progress = 0;
-      save.harvestAcc = 0;
+      // ⚠️⚠️ V0.109 修复（玩家反馈）：下面这三样都是**「本次循环」的状态** ——
+      //   以前无论有没有「里程碑第 20 次后不再清空尘埃与升级」的豁免，它们都会被清 ✗：
+      //     · hunt=null → 8 秒猎影窗口被硬生生打断（玩家看到的「挑衅到一半被打断」）；
+      //     · currentSpent=0 → 「下次被捕获的部件成长预告」直接掉到下限（结算里写着「消耗 0」）；
+      //     · progress/harvestAcc=0 → 进度条被清零，随后「持续收割」又立刻把它填回满格
+      //       —— 玩家看到的就是「重置了又复原」，还会以为升级 / 尘埃被吞了。
+      //   现在：**只有真正清空经济的那条路**（没有豁免时）才重置这三样；有豁免时原样保留。
+      if (!keepEconomy) {
+        // 猎影（8 秒窗口）是「本次循环」的状态 —— 真重置就打断，免得旧循环的猎影跨到新循环里。
+        hunt = null;
+        save.currentSpent = 0;
+        save.progress = 0;
+        save.harvestAcc = 0;
+      }
       if (!isParadoxKeepsParts()) {
         Object.keys(save.parts).forEach(k => { save.parts[k].level = 0; });
         save.equipped = [];
@@ -14875,10 +15755,63 @@
     on("offlineClose", () => el("offlineModal").classList.remove("show"));
 
     // ===== 设置面板（右上角齿轮）=====
+    // ===== V0.109（玩家反馈：挂久一点就变得很慢）=====
+    //   游戏本身没做「清缓存」，长会话里会慢慢攒下一些用不到的东西：
+    //     · 渲染用的样式 / 签名缓存（styleCache、各种 Sig）
+    //     · 崩溃日志（存在 localStorage 里，久了会越积越多）
+    //     · 一堆已经没用的运行时引用（旧战斗、旧转盘组、旧猎影池快照）
+    //   这个按钮把它们一次性清干净，并顺手把日志按上限裁一遍、立刻落盘，最后报一句省了多少内存。
+    function heapMB() {
+      try {
+        const m = performance && performance.memory;
+        if (m && typeof m.usedJSHeapSize === "number") return m.usedJSHeapSize / 1048576;
+      } catch (e) {}
+      return -1;
+    }
+    function fmtHeap(v) { return v >= 0 ? (v.toFixed(1) + " MB") : "（本浏览器不提供读数）"; }
+    function refreshPerfHint() {
+      const h = heapMB();
+      setText("perfHint", "挂久了如果变慢，点右边的按钮清一次缓存（不清存档、不重置进度）。" +
+        (h >= 0 ? "　当前 JS 内存约 " + fmtHeap(h) + "。" : ""));
+    }
+    function cleanCaches() {
+      const before = heapMB();
+      styleCache.clear();
+      wheelSig = null;
+      wheelGroup = null;
+      baitWheelSig = "";
+      houndGridSig = "";
+      // 日志按上限裁一遍（正常情况下本来就是满的，这里只是兜底）
+      if (Array.isArray(save.eventLog) && save.eventLog.length > EVENT_LOG_LIMIT) save.eventLog.length = EVENT_LOG_LIMIT;
+      if (Array.isArray(save.drawLog) && save.drawLog.length > DRAW_LOG_LIMIT) save.drawLog.length = DRAW_LOG_LIMIT;
+      if (Array.isArray(save.battleRewards) && save.battleRewards.length > BATTLE_REWARD_LIMIT) save.battleRewards.length = BATTLE_REWARD_LIMIT;
+      if (Array.isArray(save.hounds) && save.hounds.length > 0) {
+        // 回收数组里的空洞 / 已删除引用（长会话里反复增删会留下碎片）
+        save.hounds = save.hounds.filter(h => h && typeof h === "object");
+      }
+      try { localStorage.removeItem(CRASH_LOG_KEY); } catch (e) {}
+      activeBattle = null;   // 战斗面板会被下一次 render 重建
+      saveGame(true);
+      render();
+      const after = heapMB();
+      const freed = (before >= 0 && after >= 0) ? Math.max(0, before - after) : -1;
+      showToast("🧹 缓存已清理：样式 / 转盘 / 猎犬网格缓存与崩溃日志都清空了（存档没动）。" +
+        (freed >= 0 ? "　当前 JS 内存 " + fmtHeap(after) + (freed > 0.1 ? "（省了约 " + freed.toFixed(1) + " MB）" : "") : ""), "sys");
+      refreshPerfHint();
+    }
+    on("cacheCleanBtn", cleanCaches);
     on("settingsButton", () => {
       renderNumberModeChoice();
+      renderToastMuteList();   // V0.109：提示框开关按当前存档刷新
+      refreshPerfHint();       // V0.109：性能读数（内存占用）
       refreshWipedRow();   // V0.96：只有存在「误删备份」时才显示恢复入口
       el("settingsModal").classList.add("show");
+    });
+    // V0.109：提示框开关的勾选（事件代理 —— 清单是动态渲染的）
+    el("toastMuteList").addEventListener("change", e => {
+      const t = e.target;
+      if (!t || !t.dataset || !t.dataset.toastMute) return;
+      setToastMute(t.dataset.toastMute, !t.checked);
     });
     on("settingsClose", () => el("settingsModal").classList.remove("show"));
     // ⚠️ V0.96 修的三个坑：`on(id, fn)` 是把监听器直接挂在 click 上，所以 fn 会收到**事件对象**。
@@ -15338,9 +16271,17 @@
       if (isCaptured || wheelSpinning) return;
       const now = Date.now();
       if (now < autoHuntNextAt) return;
-      autoHuntNextAt = now + Math.max(AUTO_HUNT_STEP_MIN_MS, AUTO_HUNT_STEP_MS / getHuntSpeedMult());
+      autoHuntToastFlush();   // V0.109：把攒下的自动狩猎汇总按节流刷出去
+      const cycle = getAutoHuntCycleMs();
+      // V0.108：巡检只是「勤快地看一眼」（每场预算的 1/4，最快 12ms），真正的节拍由下面这条限速决定：
+      //   距上一场「开打」不足一个总周期就不开新的 —— 战斗/战报/间隔都算在这一个周期里。
+      autoHuntNextAt = now + Math.max(12, cycle * 0.25);
+      if (autoHuntLastBattleAt && now - autoHuntLastBattleAt < cycle) return;
+      const beforeBattle = activeBattle;
       autoHuntStep();
+      if (!beforeBattle && activeBattle) autoHuntLastBattleAt = now;   // 这一拍真的开打了 → 记下节拍起点
     }
+    let autoHuntLastBattleAt = 0;   // 上一场自动狩猎的「开打时刻」（总周期限速用）
 
     // ===== 自动悖论（V0.85）=====
     // 解锁条件：苦痛挑战全部完成。之后每 AUTO_PARADOX_INTERVAL_MS 自动发动一次悖论。
@@ -15498,7 +16439,7 @@
         memWarnedAt = Date.now();
         pushCrashLog("内存看门狗", `堆内存 ${usedMB.toFixed(0)}MB / 上限 ${limitMB.toFixed(0)}MB（接近崩溃线，建议刷新）`, "");
         saveGame(true);
-        showToast(`⚠️ 页面内存已达 <b>${usedMB.toFixed(0)}MB</b>（上限 ${limitMB.toFixed(0)}MB），快摸到浏览器崩溃线了。<br>存档已保存 —— 建议刷新一次页面清空内存。`);
+        showToast(`⚠️ 页面内存已达 <b>${usedMB.toFixed(0)}MB</b>（上限 ${limitMB.toFixed(0)}MB），快摸到浏览器崩溃线了。<br>存档已保存 —— 到「⚙ 设置」里点一次「<b>清理缓存 · 释放内存</b>」，或刷新一次页面。`);
       } catch (_) { }
     }
     window.addEventListener("error", e => {
@@ -15602,10 +16543,14 @@
     //   不设的话后期抵抗无限膨胀，猎犬的等级压制就完全打不出来了。
     //   例：有效等级 400 以内原样；4000 → 400 + √3600 ≈ 460（原来 ×10 的收益只剩 ×1.15）。
     const INV_TECH_EFF_SOFT_CAP = 400;
+    // ===== V0.109（作者要求：解除反转宇宙的等级上限）=====
+    //   以前基础科技的**有效等级**超过 400 之后只按平方根计入 —— 后期怎么刷都推不动
+    //   （静默信标 400 级往后加得越多越没用）。现在**不再封顶**：等级多大，效果就多大。
+    //   ⚠️ 里程碑原来那两条「软上限 ×1.01 / ×1.2」的福利随之悬空，已改成直接抬高**有效等级**：
+    //      大里程碑 +2%/座、超级里程碑 +20%/座 —— 手感与旧版在软上限附近相当，但不再有天花板。
     function invTechEffSoft(raw) {
-      const cap = INV_TECH_EFF_SOFT_CAP * invMilestoneCapMult();   // V0.105：软上限吃里程碑倍率
-      if (!(raw > cap)) return Math.max(0, raw || 0);
-      return cap + Math.sqrt(raw - cap);
+      const base = Math.max(0, raw || 0);
+      return base * invMilestoneCapMult();
     }
     // V0.104：进阶科技放大对应基础科技的效果倍率 —— 有效等级 = 软上限(基础等级 ×（1 + 0.5 × 进阶等级）)
     function invTechEffLv(id) {
@@ -15781,9 +16726,10 @@
     function invEliteChance() {
       const el = invWorld && invWorld.elite;
       if (!el) return 0;
-      let resist = invTechResistPct() + invLabResistBonus() + invMilestoneResist() + invParseResistBonus();
+      // V0.109：护盾协议（乘抵抗）/ 弱点图谱（打折剩余概率）都换成了复利口径
+      let resist = invResistTotal();
       if (el.specials.indexOf("pierce") >= 0) resist *= 0.5;   // 破甲：抵抗减半
-      return Math.max(0, Math.min(1, 1 - resist / el.strength - invParseChanceCut()));
+      return Math.max(0, Math.min(1, (1 - resist / el.strength) * invParseChanceFactor()));
     }
     function invSpawnElite() {
       if (!invWorld || !isInvEliteUnlocked()) return null;   // V0.105：500 级解锁
@@ -15794,7 +16740,7 @@
       //   强度基准 = 你现在全部来源的抵抗（含软上限后的基础科技），在 0.8 ~ 1.6 倍之间浮动，
       //   保证它打你打得动；再加一条随等级的保底（就算 0 抵抗也会随等级变强）。
       //   速度/伤害随等级线性放大（等级越高，精英越疯）。
-      const estR = invTechResistPct() + invLabResistBonus() + invMilestoneResist() + invParseResistBonus();
+      const estR = invResistTotal();
       //   强度完全跟着抵抗走（0 抵抗时保底 800%）；速度/伤害的等级放大已经让等级有意义，
       //   不再加等级保底 —— 否则 500 级的保底（8800%）会远超玩家抵抗，变成必死局。
       const strengthBase = Math.max(8, estR * (0.8 + Math.random() * 0.8));
@@ -15887,10 +16833,12 @@
     //   从第二条猎犬起，每被追逐 1 秒积攒数据点：两条 1 点/秒、三条 2 点、四条 4 点…翻倍递增。
     //   数据点在本趟旅程里花（退出即清），可买四种特殊升级。
     const INV_PARSE_DEFS = [
-      { id: "weak",   icon: "🎯", name: "弱点图谱", desc: "被捕获概率 −2% / 级",                 base: 2, growth: 1.6 },
-      { id: "dust",   icon: "🌫", name: "尘埃共鸣", desc: "反转尘埃收益 +20% / 级",              base: 3, growth: 1.6 },
-      { id: "shield", icon: "🛡", name: "护盾协议", desc: "捕获抵抗 +10% / 级",                  base: 3, growth: 1.6 },
-      { id: "slow",   icon: "🐌", name: "缓速力场", desc: "所有猎犬进度速度 −3% / 级（最低 10%）", base: 4, growth: 1.8 }
+      // V0.109：效果改复利的同时，成本成长率也放松了一档（1.6 → 1.45）——
+      //   否则「收益指数级、成本也指数级」会让等级永远卡在 25~30，复利的好处摸不到。
+      { id: "weak",   icon: "🎯", name: "弱点图谱", desc: "被捕获概率 ×0.93 / 级（复利）",        base: 2, growth: 1.45 },
+      { id: "dust",   icon: "🌫", name: "尘埃共鸣", desc: "反转尘埃收益 ×1.10 / 级（复利）",      base: 3, growth: 1.45 },
+      { id: "shield", icon: "🛡", name: "护盾协议", desc: "捕获抵抗 ×1.12 / 级（复利）",          base: 3, growth: 1.45 },
+      { id: "slow",   icon: "🐌", name: "缓速力场", desc: "所有猎犬进度速度 ×0.96 / 级（最低 5%）", base: 4, growth: 1.5 }
     ];
     function invParseState() {
       if (!invWorld) return { pts: 0, lv: {} };
@@ -15910,10 +16858,33 @@
       return (typeof v === "number" && isFinite(v) && v > 0) ? Math.floor(v) : 0;
     }
     function invParseCost(def) { return Math.ceil(def.base * Math.pow(def.growth, invParseLv(def.id))); }
-    function invParseDustMult() { return 1 + 0.20 * invParseLv("dust"); }
-    function invParseResistBonus() { return 0.10 * invParseLv("shield"); }
-    function invParseChanceCut() { return 0.02 * invParseLv("weak"); }
-    function invHoundSpeedMult() { return Math.max(0.1, 1 - 0.03 * invParseLv("slow")); }
+    // ===== V0.109（作者要求）：解析四项全部改成**乘法（复利）** =====
+    //   以前是加法（尘埃 +20%/级、抵抗 +10%/级、概率 −2%/级、速度 −3%/级）——
+    //   投几十级也只换来几倍，玩家反馈「成长太慢」。现在每一级都是**乘上去**的：
+    //     🌫 尘埃共鸣  ×1.10 / 级   （Lv.10 ×2.6 · Lv.20 ×6.7 · Lv.40 ×45）
+    //     🛡 护盾协议  ×1.12 / 级   （抵抗整体放大：Lv.10 ×3.1 · Lv.20 ×9.6 · Lv.40 ×92）
+    //     🎯 弱点图谱  ×0.93 / 级   （被捕获概率整体打折：Lv.10 ×0.48 · Lv.20 ×0.23）
+    //     🐌 缓速力场  ×0.96 / 级   （猎犬速度：Lv.10 ×0.66 · Lv.20 ×0.44，最低压到 5%）
+    //   成本曲线没动（基础价 ×1.6^级），所以「前期照样便宜、中期明显更强、后期值得刷」。
+    const INV_PARSE_STEP = { dust: 1.10, shield: 1.12, weak: 0.93, slow: 0.96 };
+    function invParseMult(id) {
+      const step = INV_PARSE_STEP[id] || 1;
+      return Math.pow(step, invParseLv(id));
+    }
+    function invParseDustMult() { return invParseMult("dust"); }
+    // 护盾协议：**乘在抵抗总量上**（复利），同时自带 +10%/级的底子 ——
+    //   否则「基础抵抗为 0」时乘法毫无意义（买了等于没买）。口径：
+    //     抵抗 = (其它来源之和 + 0.10 × 级) × 1.12^级
+    const INV_PARSE_SHIELD_FLOOR_PER_LEVEL = 0.10;
+    function invParseShieldFloor() { return INV_PARSE_SHIELD_FLOOR_PER_LEVEL * invParseLv("shield"); }
+    function invParseResistMult() { return invParseMult("shield"); }
+    // 抵抗总量（含护盾协议的底子与复利）—— 捕获判定统一走这个
+    function invResistTotal() {
+      const base = invTechResistPct() + invLabResistBonus() + invMilestoneResist();
+      return (base + invParseShieldFloor()) * invParseResistMult();
+    }
+    function invParseChanceFactor() { return invParseMult("weak"); }
+    function invHoundSpeedMult() { return Math.max(0.05, invParseMult("slow")); }
     function invParseBuy(id) {
       if (!invActive || !invWorld || !isInvParseUnlocked()) return false;
       const def = INV_PARSE_DEFS.filter(d => d.id === id)[0];
@@ -15931,6 +16902,26 @@
     function invTechResistPct() { return 0.005 * invTechEffLv("dampener"); }
     // V0.105（作者要求）：反转里程碑 —— 本局最高反转等级每 50 级一层，自动获得奖励加成：
     //   每层：反转尘埃收益 +25%、捕获抵抗 +25%（无限叠）。
+    // ===== V0.109（作者要求）：新子系统「能源」=====
+    //   · **进入反转世界即解锁**（页签排在「自动化」右边）
+    //   · 在里面每过 1 秒 → 能源进度 +1，**不吃任何加成**（不看等级 / 科技 / 里程碑 / 解析）
+    //   · 它是**唯一跨局保留**的东西：退出反转世界、进宇宙重置，它都原样留着
+    //   · 「能源能换什么」作者还没定 —— 这一版先把资源与进度做出来，消费留到下一版
+    const INV_ENERGY_PER_SEC = 1;      // 每秒进度（固定值，刻意不接任何倍率）
+
+    // ===== V0.109：虚拟世界（作者要求「先做个界面看看」）=====
+    //   · 小游戏位：**玩法待定** —— 这几条只是占位，确定玩法后把 status 改成 "open" 并接上入口即可
+    //   · 永久加点：草稿数值（cost = base × growth^级，max 级封顶），花「虚拟点数」买，永久生效
+    //   · 虚拟点数与加点都记在主存档上 → 退出反转世界 / 进宇宙都不会清（和能源同待遇）
+    const INV_VWORLD_GAMES = [
+      { id: "casino", icon: "🎰", name: "赛博赌场", desc: "21 点 / 猜大小 / 抽牌比大小。进门前先缴能源买时间，筹码跨次保留。", status: "open" },
+      { id: "g2", icon: "♟", name: "待定 · 策略类", desc: "比如「摆位置 / 排顺序，用最少步数达成目标」这类动脑子的。", status: "todo" },
+      { id: "g3", icon: "🎲", name: "待定 · 运气类", desc: "比如「押注虚拟点数、赢一把翻倍」这类赌一把的。", status: "todo" }
+    ];
+    // V0.110（作者要求）：「虚拟升级」的内容先整体撤下 —— 只留「暂无」占位。
+    //   点数照常累积（赛博赌场通关 / 筹码兑现），加点表留空，等作者定下内容后往这里填即可
+    //   （填进去之后页面会自动渲染成加点卡片，逻辑函数都还在）。
+    const INV_VWORLD_UPS = [];
     const INV_MILESTONE_STEP = 50;
     const INV_MILESTONE_DUST_STEP = 0.25;
     const INV_MILESTONE_RESIST_STEP = 0.25;
@@ -15941,8 +16932,9 @@
     const INV_MILESTONE_MEGA_BONUS = 5.0;   // 每座超级里程碑：尘埃 +500% · 抵抗 +500%
     // V0.105（作者要求）：里程碑还会抬高「基础科技软上限」——
     //   每座大里程碑 ×1.01、每座超级里程碑 ×1.2（逐座复利）。
-    const INV_MILESTONE_CAP_STEP_BIG = 1.01;
-    const INV_MILESTONE_CAP_STEP_MEGA = 1.2;
+    // V0.109：软上限取消后，这两级里程碑改为**直接抬高基础科技的有效等级**（见 invTechEffSoft）
+    const INV_MILESTONE_CAP_STEP_BIG = 1.02;    // 每座大里程碑：有效等级 +2%
+    const INV_MILESTONE_CAP_STEP_MEGA = 1.2;    // 每座超级里程碑：有效等级 +20%
     function invMilestoneCapMult() {
       return Math.pow(INV_MILESTONE_CAP_STEP_BIG, invMilestoneBigCount())
         * Math.pow(INV_MILESTONE_CAP_STEP_MEGA, invMilestoneMegaCount());
@@ -15968,9 +16960,10 @@
     }
     // V0.105：被某条猎犬捕获的概率（0~1）
     function invCaptureChance(strength) {
-      const resist = invTechResistPct() + invLabResistBonus() + invMilestoneResist() + invParseResistBonus();
+      // V0.109：护盾协议改成「乘在抵抗总量上」、弱点图谱改成「把剩下的概率再打折」
+      const resist = invResistTotal();
       const s = (typeof strength === "number" && strength > 0) ? strength : INV_HOUND1_STRENGTH;
-      return Math.max(0, Math.min(1, 1 - resist / s - invParseChanceCut()));
+      return Math.max(0, Math.min(1, (1 - resist / s) * invParseChanceFactor()));
     }
     function invTechDropChance() { return Math.min(1, INV_TECH_DROP_CHANCE + 0.002 * invTechEffLv("sampler") + invLabDropBonus()); }
 
@@ -16138,6 +17131,13 @@
       // V0.104（作者要求）：关网页不算退出 —— 存档里有没结束的进度就直接恢复它；否则从零开始。
       const resuming = !!(save.invSave && typeof save.invSave === "object");
       invWorld = resuming ? normalizeInvState(save.invSave) : freshInvState();
+      // V0.109（作者要求）：**进入反转世界立刻解锁「能源」** —— 页签出现在「自动化」右边。
+      //   它是唯一跨局保留的东西（退出 / 进宇宙都不清），所以解锁标记也记在主存档里。
+      if (!save.invEnergyUnlocked) {
+        save.invEnergyUnlocked = true;
+        invWorld.energySeen = false;      // 首次现身时挂「新」高亮
+        showToast("⚡ 新子系统「<b>能源</b>」已解锁：它每秒 +1，而且<b>是唯一不会被清空的东西</b>。");
+      }
       // V0.105（作者要求）：大里程碑的开局福利 —— 历史最高到过 500 之后，
       //   **每次开新局**开局直接获得「5000 次点击收益」的尘埃（恢复中的局不重复发）。
       if (!resuming && Math.max(0, Math.floor(save.invBestEver || 0)) >= INV_MILESTONE_BIG_STEP) {
@@ -16147,6 +17147,8 @@
       }
       invActive = true;
       invEnteredAt = Date.now();       // 退场时按这个把主宇宙的挂钟状态整体顺延
+      // V0.109：能源的「本局进度」起点（退出后再进来重新起算，总量不受影响）
+      invWorld.energyRunStart = Math.max(0, Number(save.invEnergy) || 0);
       document.body.classList.add("inv-mode");
       applyInvHeader(true);            // 标题换皮：时间科技增量 / 反转尘埃
       switchTab("inv");
@@ -16229,7 +17231,7 @@
       if (par) par.classList.toggle("active", name === "parse");
     }
     function switchInvPane(name) {
-      if (name !== "main" && name !== "auto" && name !== "bag" && name !== "leap" && name !== "elite") name = "main";
+      if (name !== "main" && name !== "auto" && name !== "bag" && name !== "leap" && name !== "elite" && name !== "energy") name = "main";
       // V0.104：还没解锁的页签切不进去 —— 科技页要拿到第一件基础科技，跃迁页要本局最高等级到 20
       if (name === "bag" && !isInvBagUnlocked()) name = "main";
       if (name === "elite" && !isInvEliteUnlocked()) name = "main";   // V0.105：精英要 500 级
@@ -16245,11 +17247,14 @@
       el("invTabBag").classList.toggle("active", name === "bag");
       el("invTabLeap").classList.toggle("active", name === "leap");
       el("invTabElite").classList.toggle("active", name === "elite");
+      el("invPaneEnergy").classList.toggle("active", name === "energy");
+      el("invTabEnergy").classList.toggle("active", name === "energy");
       // 看过即熄灭「新」高亮（会话级）
       if (invWorld) {
         if (name === "bag") invWorld.bagSeen = true;
         if (name === "elite") invWorld.eliteSeen = true;
         if (name === "leap") invWorld.leapSeen = true;
+        if (name === "energy") invWorld.energySeen = true;   // V0.109：看过即熄灭「新」
       }
       renderInvWorld();
     }
@@ -16314,16 +17319,42 @@
       const refund = consumed * INV_TECH_REFUND_PER_LEVEL;
       if (refund > 0) invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, bigOf(refund)));
       const refundNote = refund > 0 ? `，折算 <b>+${formatNumber(refund)}</b> 反转尘埃` : "";
+      // ===== V0.109（作者要求：爆科技刷屏太卡）=====
+      //   以前**每一件**掉落都弹一条（含大量「还不如此前的 Lv.X —— 新件被消耗」的废件），
+      //   后期科技等级一高，绝大多数掉落都是废件 → 提示条刷爆。
+      //   现在只有「第一次拿到」（值得知道）和「刷新了最高等级」（真的变强了）才弹；
+      //   废件折进每 3 秒一条的汇总（只报件数与折算到的尘埃）。
       if (cur === 0) {
         showToast(`🧪 爆出基础科技：<b>${def.icon} ${def.name} Lv.${formatNumber(lv)}</b>！`);
       } else if (lv > cur) {
         showToast(`🧪 爆出 <b>${def.icon} ${def.name} Lv.${formatNumber(lv)}</b>：替换掉 Lv.${formatNumber(cur)} 的旧件${refundNote}。`);
       } else {
-        showToast(`🧪 爆出 <b>${def.icon} ${def.name} Lv.${formatNumber(lv)}</b>，但不如此前的 Lv.${formatNumber(cur)} —— 新件被消耗${refundNote}。`);
+        invTechConsumedAdd(refund);
       }
       if (invTechCount() > 0) invWorld.bagUnlocked = true;   // V0.104：拿到过就永久点亮科技页
       return { id: id, kept: kept, consumed: consumed, refund: refund };
     }
+    // V0.109（作者要求）：被消耗的废件折成汇总 —— 每 INV_TECH_TOAST_MS 最多一条，
+    //   在 invStep 里跟着每帧检查（早退，几乎零开销）。
+    const INV_TECH_TOAST_MS = 3000;
+    let invTechToastAcc = null;   // { count, refund }
+    let invTechToastAt = 0;
+    function invTechConsumedAdd(refund) {
+      if (!invTechToastAcc) invTechToastAcc = { count: 0, refund: 0 };
+      invTechToastAcc.count += 1;
+      invTechToastAcc.refund += Math.max(0, refund || 0);
+    }
+    function invTechConsumedFlush(force) {
+      if (!invTechToastAcc || !invTechToastAcc.count) return;
+      const now = Date.now();
+      if (!force && now - invTechToastAt < INV_TECH_TOAST_MS) return;
+      const a = invTechToastAcc;
+      invTechToastAcc = null;
+      invTechToastAt = now;
+      showToast(`🧪 顺手爆出 <b>${formatNumber(a.count)}</b> 件低阶科技，已被消耗` +
+        (a.refund > 0 ? `，折算 <b>+${formatNumber(a.refund)}</b> 反转尘埃` : "") + "。");
+    }
+
     // V0.104：科技爆炸 —— 一次只能选择一个基础科技；选中后把它整件丢入
     function invLeapSelect(id) {
       if (!invWorld || !isInvLeapUnlocked()) return;
@@ -16402,7 +17433,7 @@
       if (bigNow > bigSeen) {
         invWorld.milestoneBigSeen = bigNow;
         showToast(`🏆 <b>大里程碑</b> Lv.${formatNumber(bigNow * INV_MILESTONE_BIG_STEP)} 达成！灵魂应用：` +
-          `尘埃/抵抗各 <b>+${formatNumber(bigNow * INV_MILESTONE_BIG_BONUS * 100)}%</b>、基础科技软上限 <b>×${invMilestoneCapMult().toFixed(3)}</b>；` +
+          `尘埃/抵抗各 <b>+${formatNumber(bigNow * INV_MILESTONE_BIG_BONUS * 100)}%</b>、基础科技有效等级 <b>×${invMilestoneCapMult().toFixed(3)}</b>；` +
           `并且此后<b>每次进入反转世界，开局直接获得 5000 次点击收益</b>的尘埃（已记账，永久生效）。`);
       }
       const megaNow = invMilestoneMegaCount();
@@ -16410,7 +17441,7 @@
       if (megaNow > megaSeen) {
         invWorld.milestoneMegaSeen = megaNow;
         showToast(`👑 <b>超级里程碑</b> Lv.${formatNumber(megaNow * INV_MILESTONE_MEGA_STEP)} 达成！！` +
-          `尘埃/抵抗各 <b>+${formatNumber(megaNow * INV_MILESTONE_MEGA_BONUS * 100)}%</b>、基础科技软上限 <b>×${invMilestoneCapMult().toFixed(3)}</b>。`);
+          `尘埃/抵抗各 <b>+${formatNumber(megaNow * INV_MILESTONE_MEGA_BONUS * 100)}%</b>、基础科技有效等级 <b>×${invMilestoneCapMult().toFixed(3)}</b>。`);
       }
       saveGame();   // V0.105：历史最高（开局福利记账）及时落盘
       if (!silent) {
@@ -16435,8 +17466,8 @@
       const s = (typeof strength === "number" && strength > 0) ? strength : INV_HOUND1_STRENGTH;
       const dmg = Math.max(1, Math.floor(damage || 1));   // V0.105：第三条猎犬一口 2 级
       const houndName = invHoundNameOfStrength(s);   // V0.105：泛化到八条
-      const resistPct = invTechResistPct() + invLabResistBonus() + invMilestoneResist() + invParseResistBonus();
-      const chance = Math.max(0, Math.min(1, 1 - resistPct / s - invParseChanceCut()));
+      const resistPct = invResistTotal();
+      const chance = Math.max(0, Math.min(1, (1 - resistPct / s) * invParseChanceFactor()));
       if (chance <= 0) {
         if (!quiet) {
           showToast(`◑ ${houndName}扑了上来，但<b>完全啃不动</b>（抵抗 ${(resistPct * 100).toFixed(1)}% ≥ 强度 ${(s * 100).toFixed(0)}%）。`);
@@ -16466,6 +17497,12 @@
     // 独立结算：只在反转世界模式下由 runLoop 调用 —— 主宇宙的 gameStep 整段跳过
     function invStep(dt) {
       if (!invWorld) return;
+      invTechConsumedFlush();   // V0.109：废件汇总按 3 秒节流刷出
+      // V0.109（作者要求）：能源 —— 在反转世界里的每一秒 +1，**不吃任何加成**（刻意不乘任何倍率）。
+      //   它直接记在主存档上：退出反转世界、进宇宙重置都不会清掉它（它是唯一跨局保留的东西）。
+      // V0.110：能源速率 = 基础 1/秒 × 成就奖励（「赌神」→ ×1.5）
+      save.invEnergy = Math.max(0, (Number(save.invEnergy) || 0)) + INV_ENERGY_PER_SEC * invEnergyRateMult() * dt;
+      invCasinoTick(dt);   // V0.109：赌场倒计时（只在赌场界面开着时走字）
       const lv = invLevelNow();
       // 被动凝析：每秒 +（1 + 等级）—— V0.104：被动采集器再加成
       invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, bigMul(bigOf((1 + lv) * invTechMult("passive", 0.15) * invInspireMult() * invLabDustMult() * invMilestoneDustMult() * invParseDustMult()), dt)));
@@ -16700,6 +17737,11 @@
       invTabWasUnlocked = unlocked;
       setTabLocked("invTab", !unlocked, "◑ 反转世界");
       if (unlocked && was === false) relightTab("invTab");
+      // V0.109：**人在反转世界里时不要再刷这两块面板** —— 入口页与尖端实验室此刻是隐藏的，
+      //   而主循环每 100ms 就会调一次 renderInvTab()，白白重绘两棵用不上的 DOM 树
+      //   （实验室的货架越长越费）→ 帧时间被拖长 → 进度条就会一跳一跳。
+      //   退出反转世界时 invActive 已变回 false，下一次 render 会顺手把它们刷新到位。
+      if (invActive) return;
       renderInvGatePane();   // V0.104：反转页的两个子页实时刷新
       renderInvLabPane();
     }
@@ -16729,12 +17771,12 @@
       `<b>大里程碑 · 每 500 级 · 巨额奖励</b><div class="ms-chips">` +
       `<span class="ms-chip gold">尘埃 +100%</span><span class="ms-chip gold">抵抗 +100%</span>` +
       `<span class="ms-chip gold">💥 开局直得 5000 次点击收益</span>` +
-      `<span class="ms-chip gold">🧪 基础科技软上限 ×1.01 / 座</span>` +
+      `<span class="ms-chip gold">🧪 基础科技有效等级 +2% / 座</span>` +
       `</div></div></div>` +
       `<div class="ms-node mega"><div class="ms-medal">5000<small>级</small></div><div class="ms-info">` +
       `<b>超级里程碑 · 每 5000 级 · 超级巨额</b><div class="ms-chips">` +
       `<span class="ms-chip red">尘埃 +500%</span><span class="ms-chip red">抵抗 +500%</span>` +
-      `<span class="ms-chip red">🧪 基础科技软上限 ×1.2 / 座</span>` +
+      `<span class="ms-chip red">🧪 基础科技有效等级 +20% / 座</span>` +
       `</div></div></div>` +
       `<p class="inventory-note" style="margin: 2px 0 0;">（层数/软上限按本局最高等级实时生效，退出即清零；` +
       `「开局直得」= 历史最高到过 500 级后，<b>此后每开一局</b>都白送 5000 次点击收益的尘埃。）</p></div>`;
@@ -16791,8 +17833,10 @@
       setText("invCapturesVal", formatNumber(invWorld.captures));
       setText("invBestVal", "Lv." + formatNumber(invWorld.best));
       setText("invRateVal", "+" + formatNumber((1 + lv) * invTechMult("passive", 0.15) * invInspireMult() * invLabDustMult() * invMilestoneDustMult() * invParseDustMult()) + " / 秒");
+      // V0.110：能源速率（成就奖励会乘上去）
+      if (el("invEnergyRateVal")) setText("invEnergyRateVal", "+" + (INV_ENERGY_PER_SEC * invEnergyRateMult()).toFixed(2) + " / 秒");
       const pct = Math.max(0, Math.min(1, invWorld.progress)) * 100;
-      setStyle("invCapFill", "width", pct.toFixed(1) + "%");
+      setInvTrackWidth("invCapFill", pct);
       // V0.105（作者要求）：进度条上写明「被这条猎犬捕获的概率」
       setText("invCapText", invWorld.progress >= 1
         ? `反转猎犬 100% · 被捕获概率 ${(invCaptureChance(INV_HOUND1_STRENGTH) * 100).toFixed(1)}%`
@@ -16803,7 +17847,7 @@
         setStyle("invTrack4", "display", show4 ? "" : "none");
         if (show4) {
           const pr4 = Math.max(0, Math.min(1, invWorld.progress4 || 0));
-          setStyle("invCap4Fill", "width", (pr4 * 100).toFixed(1) + "%");
+          setInvTrackWidth("invCap4Fill", pr4 * 100);
           setText("invCap4Text", `第四条猎犬 ${Math.floor(pr4 * 100)}% · 还有 ${Math.max(0, (1 - pr4) * invCapSec() / INV_HOUND4_SPEED_MULT).toFixed(3)} 秒 · 被捕获概率 ${(invCaptureChance(INV_HOUND4_STRENGTH) * 100).toFixed(1)}% · 一口 ${INV_HOUND4_DAMAGE} 级`);
         }
       }
@@ -16815,7 +17859,7 @@
         setStyle("invTrack" + h.n, "display", showN ? "" : "none");
         if (!showN) return;
         const prN = Math.max(0, Math.min(1, invWorld["progress" + h.n] || 0));
-        setStyle("invCap" + h.n + "Fill", "width", (prN * 100).toFixed(1) + "%");
+        setInvTrackWidth("invCap" + h.n + "Fill", prN * 100);
         const leftMs = Math.max(0, (1 - prN) * invCapSec() / (h.speed * invHoundSpeedMult()) * 1000);
         const leftTxt = leftMs >= 10 ? (leftMs / 1000).toFixed(2) + " 秒" : leftMs.toFixed(1) + " 毫秒";
         setText("invCap" + h.n + "Text", `${INV_HOUND_NAMES[h.n - 1]} ${Math.floor(prN * 100)}% · 还有 ${leftTxt} · 被捕获概率 ${(invCaptureChance(h.strength) * 100).toFixed(1)}% · 一口 ${formatNumber(h.damage)} 级`);
@@ -16829,7 +17873,7 @@
         if (showEl) {
           const pr = Math.max(0, Math.min(1, elv.progress || 0));
           const tierName = GENE_TIERS[elv.tier] ? GENE_TIERS[elv.tier].name : "普通";
-          setStyle("invEliteFill", "width", (pr * 100).toFixed(1) + "%");
+          setInvTrackWidth("invEliteFill", pr * 100);
           const leftSec = Math.max(0, Math.round(((elv.deadline || 0) - Date.now()) / 1000));
           setText("invEliteText", `👑 精英·${tierName} Lv.${formatNumber(elv.level)} ${Math.floor(pr * 100)}% · 限时剩 ${formatDuration(leftSec)} · 被捕获概率 ${(invEliteChance() * 100).toFixed(1)}% · 已承受 ${formatNumber(elv.attacks)}/100`);
         }
@@ -16841,7 +17885,7 @@
         setStyle("invTrack3", "display", show3 ? "" : "none");
         if (show3) {
           const pr3 = Math.max(0, Math.min(1, invWorld.progress3 || 0));
-          setStyle("invCap3Fill", "width", (pr3 * 100).toFixed(1) + "%");
+          setInvTrackWidth("invCap3Fill", pr3 * 100);
           setText("invCap3Text", `第三条猎犬 ${Math.floor(pr3 * 100)}% · 还有 ${Math.max(0, (1 - pr3) * invCapSec() / INV_HOUND3_SPEED_MULT).toFixed(2)} 秒 · 被捕获概率 ${(invCaptureChance(INV_HOUND3_STRENGTH) * 100).toFixed(1)}% · 一口 ${INV_HOUND3_DAMAGE} 级`);
         }
       }
@@ -16851,7 +17895,7 @@
         setStyle("invTrack2", "display", show2 ? "" : "none");
         if (show2) {
           const pr2 = Math.max(0, Math.min(1, invWorld.progress2 || 0));
-          setStyle("invCap2Fill", "width", (pr2 * 100).toFixed(1) + "%");
+          setInvTrackWidth("invCap2Fill", pr2 * 100);
           setText("invCap2Text", `第二条猎犬 ${Math.floor(pr2 * 100)}% · 还有 ${Math.max(0, (1 - pr2) * invCapSec() / INV_HOUND2_SPEED_MULT).toFixed(2)} 秒 · 被捕获概率 ${(invCaptureChance(INV_HOUND2_STRENGTH) * 100).toFixed(1)}%`);
         }
       }
@@ -16872,10 +17916,31 @@
         `大里程碑 <b>${formatNumber(invMilestoneBigCount())}</b> 座 · 超级 <b>${formatNumber(invMilestoneMegaCount())}</b> 座 · ` +
         `加成：尘埃 <b>×${invMilestoneDustMult().toFixed(2)}</b> · 抵抗 <b>+${(invMilestoneResist() * 100).toFixed(0)}%</b> · 软上限 <b>×${invMilestoneCapMult().toFixed(3)}</b>`);
       renderInvAutoPane();   // V0.104：自动化两行（解锁 / 开关 / 效率）
+      renderInvEnergyPane(); // V0.109：能源页
       renderInvTechPane();   // V0.104：科技页的八格
       renderInvLeapPane();   // V0.104：科技跃迁 · 科技爆炸
       // V0.104：页签的隐藏与高亮 —— 科技页没拿到第一件前不显示；跃迁页到 20 级才现身；
       //   首次出现时挂「新」高亮，看过一次即熄灭（会话级，不落盘）。
+      // V0.109：能源页签 —— 进过反转世界就常驻（它是唯一跨局保留的东西）
+      // V0.110：右上角的「🏆 成就」入口（只在反转世界里出现）
+      const achvBtn = el("invAchvBtn");
+      if (achvBtn) {
+        achvBtn.style.display = "";
+        setText("invAchvBadge", invAchvCount() + "/" + INV_ACHV_DEFS.length);
+      }
+      const energyTab = el("invTabEnergy");
+      if (energyTab) {
+        const onEn = !!save.invEnergyUnlocked;
+        energyTab.style.display = onEn ? "" : "none";
+        energyTab.classList.toggle("new-glow", onEn && !invWorld.energySeen);
+      }
+      // V0.110：挑战进行中 → 在「能源」右边挂出挑战页签
+      const chalTab = el("invTabChal");
+      if (chalTab) {
+        const running = invChalRunState().running;
+        chalTab.style.display = running ? "" : "none";
+        chalTab.classList.toggle("active", running && invPane === "energy" && invEnergySub === "vworld");
+      }
       const bagTab = el("invTabBag");
       if (bagTab) {
         const unlocked = isInvBagUnlocked();   // V0.104：粘性解锁 —— 丢光也不黑回去
@@ -17050,6 +18115,1293 @@
             `<span class="inv-leap-btns"><button class="primary-button" data-inv-parse="${def.id}" ${can ? "" : "disabled"}>升级（${formatNumber(cost)}）</button></span></div></div>`;
         }).join(""));
     }
+    // ===== V0.109：虚拟世界 —— 子页切换 / 渲染 / 加点 =====
+    let invEnergySub = "energy";   // 会话级：能源页里的哪个子页（energy | vworld）
+    function switchInvEnergySub(name) {
+      // V0.110：挑战并进虚拟世界、成就搬到右上角 → 这里回到三页
+      invEnergySub = (name === "vworld" || name === "vup") ? name : "energy";
+      const panes = { energy: el("invEnergySubEnergy"), vworld: el("invEnergySubVworld"), vup: el("invEnergySubVup") };
+      const tabs = { energy: el("invEnergySubTabEnergy"), vworld: el("invEnergySubTabVworld"), vup: el("invEnergySubTabVup") };
+      Object.keys(panes).forEach(k => {
+        if (panes[k]) panes[k].style.display = (k === invEnergySub) ? "" : "none";
+        if (tabs[k]) tabs[k].classList.toggle("active", k === invEnergySub);
+      });
+      renderInvEnergyPane();
+    }
+    function invVWorldState() {
+      if (!save.invVWorld || typeof save.invVWorld !== "object") save.invVWorld = { ups: {} };
+      if (!save.invVWorld.ups || typeof save.invVWorld.ups !== "object") save.invVWorld.ups = {};
+      return save.invVWorld;
+    }
+    function invVpNow() { return Math.max(0, Math.floor(Number(save.invVirtualPoints) || 0)); }
+    function invVwLv(id) {
+      const v = invVWorldState().ups[id];
+      const def = INV_VWORLD_UPS.filter(u => u.id === id)[0];
+      const lv = (typeof v === "number" && isFinite(v) && v > 0) ? Math.floor(v) : 0;
+      return def ? Math.min(def.max, lv) : lv;
+    }
+    function invVwCost(def) { return Math.ceil(def.base * Math.pow(def.growth, invVwLv(def.id))); }
+    // 已投入的虚拟点数（按当前等级反推：底价 × (r^级 − 1) / (r − 1) 的累加）
+    function invVWorldSpent() {
+      let sum = 0;
+      INV_VWORLD_UPS.forEach(u => {
+        const lv = invVwLv(u.id);
+        for (let i = 0; i < lv; i++) sum += Math.ceil(u.base * Math.pow(u.growth, i));
+      });
+      return sum;
+    }
+    function invVwBuy(id) {
+      const def = INV_VWORLD_UPS.filter(u => u.id === id)[0];
+      if (!def) return false;
+      const lv = invVwLv(id);
+      if (lv >= def.max) { showToast("「" + def.name + "」已满级。", "tech"); return false; }
+      const cost = invVwCost(def);
+      if (invVpNow() < cost) { showToast("虚拟点数不足：「" + def.name + "」下一级要 <b>" + cost + "</b> 点（现有 " + invVpNow() + "）。", "tech"); return false; }
+      save.invVirtualPoints = invVpNow() - cost;
+      invVWorldState().ups[id] = lv + 1;
+      saveGame(true);
+      renderInvEnergyPane();
+      showToast("♾ 永久加点：<b>" + def.icon + " " + def.name + " → Lv." + (lv + 1) + "</b>（剩 " + invVpNow() + " 虚拟点数）", "tech");
+      return true;
+    }
+    function renderInvVWorld() {
+      const games = el("invVwGames");
+      if (games) {
+        setHTML("invVwGames", INV_VWORLD_GAMES.map(g => {
+          if (g.id === "casino") {
+            return '<div class="inv-vw-game open"><div class="vw-g-icon">' + g.icon + '</div>' +
+              '<div class="vw-g-name">' + g.name + ' <span class="vw-g-open">可玩</span></div>' +
+              '<div class="vw-g-desc">' + g.desc + '</div>' +
+              '<button class="primary-button vw-g-btn" data-inv-casino="open">进入赌场（先缴能源）</button></div>';
+          }
+          return '<div class="inv-vw-game' + (g.status === "open" ? "" : " todo") + '">' +
+            '<div class="vw-g-icon">' + g.icon + '</div>' +
+            '<div class="vw-g-name">' + g.name + '</div>' +
+            '<div class="vw-g-desc">' + g.desc + '</div>' +
+            '<button class="secondary-button vw-g-btn" disabled>' + (g.status === "open" ? "玩一局" : "尚未开放") + '</button>' +
+            '</div>';
+        }).join(""));
+        // V0.109：赌场大厅（预缴时长档位）的可用性 —— 能源够才点得动
+        ["invCsSlot0", "invCsSlot1", "invCsSlot2"].forEach((id, i) => {
+          const b = el(id);
+          if (!b) return;
+          const slot = INV_CASINO_SLOTS[i];
+          b.disabled = !slot || !(typeof save.invEnergy === "number" && save.invEnergy >= slot.cost);
+        });
+      }
+      // V0.110：加点内容已撤下（虚拟升级页只留「暂无」）—— 这里按需渲染，容器没了就跳过
+      const ups = el("invVwUps");
+      if (ups) {
+        setHTML("invVwUps", INV_VWORLD_UPS.map(u => {
+          const lv = invVwLv(u.id);
+          const maxed = lv >= u.max;
+          const cost = invVwCost(u);
+          const can = !maxed && invVpNow() >= cost;
+          return '<div class="inv-vw-up">' +
+            '<div class="vw-u-head"><span class="vw-u-name">' + u.icon + ' ' + u.name + '</span>' +
+            '<span class="vw-u-lv">Lv.' + lv + ' / ' + u.max + '</span></div>' +
+            '<div class="vw-u-desc">' + u.desc + '</div>' +
+            '<div class="vw-u-foot"><span class="vw-u-cost">' + (maxed ? "已满级" : "花费 " + cost + " 点") + '</span>' +
+            '<button class="secondary-button" data-inv-vw-buy="' + u.id + '"' + (can ? "" : " disabled") + '>' +
+            (maxed ? "满级" : "加点") + '</button></div>' +
+            '</div>';
+        }).join(""));
+      }
+      const total = INV_VWORLD_UPS.reduce((a, u) => a + invVwLv(u.id), 0);
+      setText("invVpVal", formatNumber(invVpNow()));
+      setText("invVpBonusVal", total > 0 ? ("共 " + total + " 级") : "—");
+      // V0.109：虚拟升级页的读数（同源）
+      // V0.110：虚拟升级页改成占位版，这三个读数已经不在 DOM 里 —— 用可选写入
+      if (el("invVpVal2")) setText("invVpVal2", formatNumber(invVpNow()));
+      if (el("invVpBonusVal2")) setText("invVpBonusVal2", total > 0 ? ("共 " + total + " 级") : "—");
+      if (el("invVpSpent2")) setText("invVpSpent2", formatNumber(invVWorldSpent()));
+      setText("invVpState", INV_VWORLD_GAMES.some(g => g.status === "open") ? "开放中" : "筹备中");
+      // V0.109：赛博赌场（大厅 + 牌桌）
+      setText("invCsLobbyEnergy", formatNumber(save.invEnergy));
+      setHTML("invCsLobbyState", "当前筹码 <b>" + formatNumber(invCasinoChips()) + "</b> · 剩余时间 <b>" +
+        invCasinoTimeText() + "</b>" + (invCasinoState().broke ? "　💥 已破产：下次进场重发 100 筹码" : ""));
+      renderInvCasino();
+    }
+    // ===== V0.109：赛博赌场（虚拟世界的第一个小游戏）=====
+    //   规则（按作者原话落地）：
+    //     · 进入要先**提前缴纳能源**买一段时间（每秒 2 点），买几档时长在赌场卡片上选
+    //     · 时间到 → 自动退出，但**数据保留**（筹码、剩余时间都留着），下次进来接着玩
+    //     · 破产（筹码归 0）→ 标记「本局失败」，**下次进入从 0 开始**（重新发 100 筹码）
+    //     · 筹码、剩余时间、战绩都记在主存档上 —— 和能源同待遇，退出反转世界 / 进宇宙都不清
+    const INV_CASINO_ENERGY_PER_SEC = 2;                       // 每秒消耗的能源（作者指定）
+    const INV_CASINO_START_CHIPS = 100;                        // 开局筹码
+    const INV_CASINO_SLOTS = [                                 // 预缴时长档位（分钟 → 花费能源）
+      { min: 1, cost: 120 },
+      { min: 5, cost: 600 },
+      { min: 15, cost: 1800 }
+    ];
+    const INV_CASINO_CLEAR_TARGET = 10000;                     // 通关线：从 100 赢到 10000
+    const INV_CASINO_CLEAR_VP = 250;                           // 每次通关奖励的虚拟点数
+    const INV_CASINO_RESCUE_TIME_MS = 60000;                   // 破产抢救：扣 1 分钟剩余时间
+    const INV_CASINO_RESCUE_CHIPS = 100;                       // 破产抢救：换回 100 筹码
+    const INV_CASINO_BET_PCTS = [1, 25, 50, 100];              // 押注滑条的快捷档（百分比）
+    // V0.110（作者要求）：筹码可以「兑现」成虚拟点数（退出赌场用）。
+    //   门槛：筹码 **> 1000** 才能兑现；汇率：**10 筹码 = 1 虚拟点，向上取整**。
+    //   ⚠️ 目前没有任何加成，所以这就是个纯换算的读数（作者原话：现在还没做加成，仅是数字）。
+    // ===== V0.110（作者要求）：虚拟挑战 —— 目前只有一条「赌神」=====
+    //   · 免费进入（不消耗能源 / 不用买时间）、**不能用氪金**、**没有时间限制**
+    //   · 进去发 20 筹码；**筹码归 0 自动退出**（失败，无惩罚，可以再进）
+    //   · 通关：赢到 **37,000,000** 及以上 → 奖励「赌术高手」：
+    //     在虚拟世界里，所有「概率 / 赌博类」判定的获胜概率 **×1.05**（永久，跨局保留）
+    const INV_CHAL_GAMBLER_CHIPS = 20;             // 进场发多少筹码
+    const INV_CHAL_GAMBLER_TARGET = 37000000;      // 通关线
+    const INV_CHAL_LUCK_BONUS = 1.05;              // 赌术高手：概率类获胜概率 ×1.05
+    // ===== V0.110（作者要求）：反转世界专属成就页 =====
+    //   只放「反转世界」里的成就（主宇宙那套成就完全独立）。第一条：赌神。
+    //   奖励用 reward 文本 + 真实的数值钩子（见 invEnergyRateMult 等）。
+    const INV_ACHV_DEFS = [
+      { id: "gambler", icon: "🎰", name: "赌神", cond: "完成虚拟挑战「赌神」",
+        reward: "能源获取 ×1.5", check: () => invChalState().gamblerCleared }
+    ];
+    function invAchvOn(id) {
+      if (!save.invAchv || typeof save.invAchv !== "object") save.invAchv = {};
+      return save.invAchv[id] === true;
+    }
+    function invAchvCount() { return INV_ACHV_DEFS.filter(d => invAchvOn(d.id)).length; }
+    // 检查有没有新达成的（达成即记录 + 提示；每帧调用开销可忽略）
+    function checkInvAchv() {
+      let got = 0;
+      INV_ACHV_DEFS.forEach(d => {
+        if (invAchvOn(d.id)) return;
+        let ok = false;
+        try { ok = !!d.check(); } catch (e) { ok = false; }
+        if (!ok) return;
+        save.invAchv[d.id] = true;
+        got += 1;
+        logEvent("🏆", "反转世界成就达成：<b>" + d.name + "</b>（" + d.cond + "）—— " + d.reward, "gold");
+        showToast("🏆 反转世界成就：<b>" + d.icon + " " + d.name + "</b>　成就条件：" + d.cond + "<br>奖励：<b>" + d.reward + "</b>", "tech");
+      });
+      if (got > 0) { saveGame(true); renderInvEnergyPane(); }
+      return got;
+    }
+    // 「赌神」成就的奖励：能源获取 ×1.5（作者指定）
+    const INV_ACHV_GAMBLER_ENERGY_MULT = 1.5;
+    function invEnergyRateMult() { return invAchvOn("gambler") ? INV_ACHV_GAMBLER_ENERGY_MULT : 1; }
+    const INV_CASINO_CASH_MIN = 1000;
+    const INV_CASINO_CASH_RATE = 10;
+    function invCasinoCashOutVP(chips) {
+      const c = Math.max(0, Math.floor(chips));
+      return Math.ceil(c / INV_CASINO_CASH_RATE);
+    }
+    function invCasinoCashOut() {
+      if (invCasinoMode() === "challenge") { showToast("挑战里的筹码不能兑现。", "tech"); return false; }
+      const st = invCasinoState();
+      const c = invCasinoChips();
+      if (c <= INV_CASINO_CASH_MIN) {
+        showToast("筹码要超过 <b>" + formatNumber(INV_CASINO_CASH_MIN) + "</b> 才能兑现（现在 " + formatNumber(c) + "）。", "tech");
+        return false;
+      }
+      const vp = invCasinoCashOutVP(c);
+      save.invVirtualPoints = Math.max(0, Math.floor(Number(save.invVirtualPoints) || 0)) + vp;
+      st.chips = 0;
+      st.ended = true;        // 这一局到此为止（下次进场重发 100 筹码）
+      st.broke = false;
+      st.cashedOut = Math.max(0, Math.floor(st.cashedOut || 0)) + vp;
+      st.prepaidMs = 0;   // V0.110：本局结束（兑现）→ 剩余时间一并清掉，下次重新缴
+      saveGame(true);
+      invCasinoLeave(true);
+      logEvent("💠", "赛博赌场：筹码兑现 —— " + formatNumber(c) + " 筹码 → <b>" + formatNumber(vp) + "</b> 虚拟点数。", "gold");
+      showToast("💠 兑现成功：<b>" + formatNumber(c) + "</b> 筹码 → <b>" + formatNumber(vp) +
+        "</b> 虚拟点数（10 : 1，向上取整）　当前虚拟点数 <b>" + formatNumber(save.invVirtualPoints) + "</b>", "tech");
+      renderInvEnergyPane();
+      return true;
+    }
+    const INV_CASINO_BJ_DEALER_STAND = 17;                     // 庄家停牌线
+    const INV_CASINO_CARDS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+    // 虚拟挑战的进度（永久；跨局保留 —— 和能源 / 虚拟点数同待遇）
+    function invChalState() {
+      if (!save.invChal || typeof save.invChal !== "object" || Array.isArray(save.invChal)) {
+        save.invChal = { gamblerCleared: false, gamblerClears: 0, gamblerBest: 0 };
+      }
+      const c = save.invChal;
+      c.gamblerCleared = !!c.gamblerCleared;
+      ["gamblerClears", "gamblerBest"].forEach(k => {
+        if (!(typeof c[k] === "number" && isFinite(c[k]) && c[k] >= 0)) c[k] = 0;
+        c[k] = Math.floor(c[k]);
+      });
+      return c;
+    }
+    // 「赌术高手」：通关过赌神 → 虚拟世界里的概率 / 赌博类判定获胜概率 ×1.05
+    function invLuckMult() { return invChalState().gamblerCleared ? INV_CHAL_LUCK_BONUS : 1; }
+    function invLuckBonusOwned() { return invChalState().gamblerCleared; }
+    // 幸运兜底：本次判定本来是「输」——有 (倍率−1) 的概率把它改判成「赢」
+    //   （等价于「获胜概率 ×倍率」，代码上只需要在输的分支多掷一次骰子）
+    function invLuckySave() {
+      const extra = invLuckMult() - 1;
+      if (!(extra > 0)) return false;
+      const win = Math.random() < extra;
+      if (win) showToast("🍀 <b>赌术高手</b>生效：这一次判定本来要输，被扳了回来。", "tech");
+      return win;
+    }
+    function invCasinoState() {
+      // V0.110：挑战模式用的是独立筹码池（同字段，逻辑函数不用改）
+      if (invCasinoMode() === "challenge") {
+        const r = invChalRunState();
+        // 挑战里没有「时间」，用 sentinel -1 表示无限
+        if (typeof r.prepaidMs !== "number") r.prepaidMs = -1;
+        if (!("broke" in r)) r.broke = false;
+        if (!("ended" in r)) r.ended = false;
+        return r;
+      }
+      if (!save.invCasino || typeof save.invCasino !== "object" || Array.isArray(save.invCasino)) {
+        save.invCasino = { chips: INV_CASINO_START_CHIPS, prepaidMs: 0, broke: false, plays: 0, wins: 0, best: 0, seen: false };
+      }
+      const c = save.invCasino;
+      if (!(typeof c.chips === "number" && isFinite(c.chips) && c.chips >= 0)) c.chips = INV_CASINO_START_CHIPS;
+      if (!(typeof c.prepaidMs === "number" && isFinite(c.prepaidMs) && c.prepaidMs >= 0)) c.prepaidMs = 0;
+      c.chips = Math.floor(c.chips);
+      c.prepaidMs = Math.floor(c.prepaidMs);
+      c.broke = !!c.broke;
+      c.seen = !!c.seen;
+      ["plays", "wins", "best"].forEach(k => {
+        if (!(typeof c[k] === "number" && isFinite(c[k]) && c[k] >= 0)) c[k] = 0;
+        c[k] = Math.floor(c[k]);
+      });
+      return c;
+    }
+    // 挑战模式下筹码池换成 save.invChalRun（与正式赌场完全隔离）
+    function invCasinoMode() {
+      const c = invWorld && invWorld.casino;
+      return (c && c.mode === "challenge") ? "challenge" : "normal";
+    }
+    function invChalRunState() {
+      if (!save.invChalRun || typeof save.invChalRun !== "object" || Array.isArray(save.invChalRun)) {
+        save.invChalRun = { chips: 0, plays: 0, wins: 0, best: 0, running: false };
+      }
+      const r = save.invChalRun;
+      ["chips", "plays", "wins", "best"].forEach(k => {
+        if (!(typeof r[k] === "number" && isFinite(r[k]) && r[k] >= 0)) r[k] = 0;
+        r[k] = Math.floor(r[k]);
+      });
+      r.running = !!r.running;
+      return r;
+    }
+    function invCasinoChips() { return Math.max(0, Math.floor(invCasinoState().chips)); }
+    function invCasinoLeftMs() { return Math.max(0, Math.floor(invCasinoState().prepaidMs)); }
+    // 赌场里的会话状态（这一轮的手牌之类，不落盘）
+    function invCasinoSession() {
+      if (!invWorld) return null;
+      if (!invWorld.casino || typeof invWorld.casino !== "object") {
+        invWorld.casino = { open: false, bet: 10, msg: "", msgKind: "", bj: null, dice: null, draw: null };
+      }
+      const s = invWorld.casino;
+      if (!(typeof s.bet === "number") || s.bet <= 0) s.bet = 10;
+      return s;
+    }
+    function invCasinoIsOpen() {
+      const s = invWorld ? invWorld.casino : null;
+      return !!(s && s.open);
+    }
+    function invCasinoTimeText() {
+      const ms = invCasinoLeftMs();
+      if (ms <= 0) return "0 秒";
+      const sec = Math.ceil(ms / 1000);
+      if (sec < 60) return sec + " 秒";
+      return Math.floor(sec / 60) + " 分 " + (sec % 60) + " 秒";
+    }
+    // 进入「赌神」挑战：免费、发 20 筹码、无限时间、不能用氪金
+    function invChalGamblerEnter() {
+      if (!invActive || !invWorld) return false;
+      const r = invChalRunState();
+      r.chips = INV_CHAL_GAMBLER_CHIPS;
+      r.played = 0; r.wins = 0;
+      r.running = true;
+      r.broke = false; r.ended = false;
+      r.prepaidMs = -1;          // 无限时间
+      const sc = invCasinoSession();
+      if (sc) { sc.open = true; sc.mode = "challenge"; sc.msg = ""; sc.msgKind = ""; sc.bj = null; sc.dice = null; sc.draw = null; }
+      saveGame(true);
+      logEvent("🎰", "进入虚拟挑战「赌神」：发 20 筹码，赢到 37,000,000 通关（不能用氪金、无时间限制）。", "purple");
+      showToast("🎰 <b>赌神挑战</b>开始：发 <b>" + INV_CHAL_GAMBLER_CHIPS + "</b> 筹码 —— 赢到 <b>" +
+        formatNumber(INV_CHAL_GAMBLER_TARGET) + "</b> 通关；筹码归零自动退出（可以再进）。", "tech");
+      renderInvEnergyPane();
+      return true;
+    }
+    function invChalGamblerExit(reason) {
+      const r = invChalRunState();
+      const sc = invCasinoSession();
+      if (sc) { sc.open = false; sc.mode = "normal"; sc.bj = null; sc.dice = null; sc.draw = null; sc.msg = ""; sc.msgKind = ""; }
+      const chips = Math.max(0, Math.floor(r.chips));
+      if (chips > r.best) r.best = chips;
+      r.running = false;
+      r.chips = 0;
+      saveGame(true);
+      if (reason === "broke") {
+        showToast("💥 筹码归零 —— <b>赌神挑战</b>结束（已退出）。历史最高 <b>" + formatNumber(r.best) +
+          "</b>；想再来一次直接重进，还是免费发 20 筹码。", "tech");
+        logEvent("🎰", "赌神挑战：筹码归零，挑战失败（历史最高 " + formatNumber(r.best) + "）。", "bad");
+      } else if (reason === "leave") {
+        showToast("🎰 已退出赌神挑战（历史最高 <b>" + formatNumber(r.best) + "</b>）。", "tech");
+      }
+      renderInvEnergyPane();
+    }
+    // 通关判定：赢到 3700 万
+    function invChalCheckClear() {
+      const r = invChalRunState();
+      if (!r.running) return false;
+      if (r.clearedRun) return false;
+      if (Math.max(0, Math.floor(r.chips)) < INV_CHAL_GAMBLER_TARGET) return false;
+      r.clearedRun = true;
+      const st = invChalState();
+      st.gamblerCleared = true;
+      st.gamblerClears = Math.max(0, Math.floor(st.gamblerClears || 0)) + 1;
+      if (r.chips > st.gamblerBest) st.gamblerBest = Math.floor(r.chips);
+      saveGame(true);
+      logEvent("🏆", "赌神挑战通关（第 " + formatNumber(st.gamblerClears) + " 次）：筹码 " + formatNumber(r.chips) +
+        " → 获得「赌术高手」（虚拟世界里概率 / 赌博类获胜概率 ×1.05）。", "gold");
+      showToast("🏆 <b>赌神挑战通关</b>！筹码达到 <b>" + formatNumber(math_roundish(r.chips)) + "</b> —— 获得「<b>赌术高手</b>」：" +
+        "虚拟世界里所有概率 / 赌博类判定的获胜概率 <b>×" + INV_CHAL_LUCK_BONUS.toFixed(2) + "</b>（永久）。", "tech");
+      checkInvAchv();   // V0.110：反转世界成就（赌神）立刻判定
+      renderInvEnergyPane();
+      return true;
+    }
+    function math_roundish(v) { return Math.floor(v); }
+
+    // 买时间进场：先扣能源，再把时长加进「剩余时间」；破产过的话这次重新发 100 筹码
+    function invCasinoBuySlot(idx) {
+      if (!invActive || !invWorld) return false;
+      if (invCasinoMode() === "challenge") { showToast("挑战里不用买时间（免费、无时限）。", "tech"); return false; }
+      const slot = INV_CASINO_SLOTS[idx];
+      if (!slot) return false;
+      const st = invCasinoState();
+      if (!(typeof save.invEnergy === "number") || save.invEnergy < slot.cost) {
+        showToast("⚡ 能源不够：这档要 <b>" + slot.cost + "</b> 能源（现有 " + formatNumber(save.invEnergy) +
+          "）。能源在反转世界里每秒 +1。", "tech");
+        return false;
+      }
+      save.invEnergy = Math.max(0, save.invEnergy - slot.cost);
+      st.prepaidMs += slot.min * 60000;
+      st.seen = true;
+      // V0.110：上一局是「破产 / 兑现」结束的 → 这次重新发 100 筹码，从头再来
+      if (st.broke || st.ended || invCasinoChips() <= 0) {
+        st.chips = INV_CASINO_START_CHIPS;
+        st.broke = false;
+        st.ended = false;
+        showToast("🎰 新的一局：重新发 <b>" + INV_CASINO_START_CHIPS + "</b> 筹码（上次是破产 / 兑现结束的）。", "tech");
+      }
+      const s = invCasinoSession();
+      if (s) { s.open = true; s.msg = ""; s.msgKind = ""; }
+      saveGame(true);
+      renderInvEnergyPane();
+      showToast("🎰 赛博赌场：缴纳 <b>" + slot.cost + "</b> 能源买 <b>" + slot.min + " 分钟</b>（每秒 2 点）" +
+        "　筹码 <b>" + formatNumber(invCasinoChips()) + "</b> · 本次可用时间 <b>" + invCasinoTimeText() + "</b>", "tech");
+      return true;
+    }
+    // 离开赌场（数据一律保留）
+    function invCasinoLeave(quiet) {
+      const s = invCasinoSession();
+      if (s) { s.open = false; s.bj = null; s.dice = null; s.draw = null; s.msg = ""; s.msgKind = ""; }
+      // V0.110（作者反馈「下次买 1 分钟怎么变成 1 分 40 秒」）：**破产状态下离开 = 本局结束** ——
+      //   记成失败（下次重发 100 筹码）并把剩余时间清零，免得留下一条能绕开清零的后路。
+      //   （筹码还在的正常中途离开不受影响，剩余时间照旧留着。）
+      const stLv = invCasinoState();
+      if (invCasinoChips() <= 0 && !stLv.ended) {
+        stLv.ended = true;
+        stLv.broke = true;
+        stLv.prepaidMs = 0;
+        saveGame(true);
+      }
+      if (!quiet) showToast("🎰 已离开赌场：筹码 <b>" + formatNumber(invCasinoChips()) + "</b> · 剩余时间 <b>" +
+        invCasinoTimeText() + "</b> 都留着，下次进来接着玩（破产 / 兑现那种「本局结束」才会清零）。", "tech");
+      renderInvEnergyPane();
+    }
+    // 计时：只在「反转世界里、赌场界面开着」时走字（能源已经在买时间时提前缴过）
+    function invCasinoTick(dt) {
+      if (!invActive || !invWorld) return;
+      const s = invWorld.casino;
+      if (!s || !s.open) return;
+      if (invCasinoMode() === "challenge") return;   // V0.110：挑战无时间限制
+      const st = invCasinoState();
+      const before = st.prepaidMs;
+      if (before <= 0) {
+        invCasinoLeave(true);
+        showToast("⏳ 赌场时间到，自动离开 —— 筹码与进度都留着，下次进来继续。", "tech");
+        return;
+      }
+      st.prepaidMs = Math.max(0, before - dt * 1000);
+      if (st.prepaidMs <= 0) {
+        invCasinoLeave(true);
+        saveGame(true);
+        renderInvEnergyPane();
+        showToast("⏳ 赌场时间到，自动离开 —— 筹码与进度都留着，下次进来继续。", "tech");
+      }
+    }
+    // 结算：result = "win" | "lose" | "push"；mult 是赢时的赔率（1 = 1:1，1.5 = 黑杰克）
+    // 挑战模式：结算完发现筹码归零 → 自动退出（作者要求）
+    function rung_after() {
+      const r = invChalRunState();
+      if (!r.running) return;
+      if (Math.max(0, Math.floor(r.chips)) <= 0) {
+        setTimeout(() => { invChalGamblerExit("broke"); }, 900);
+      }
+      renderInvCasino();
+    }
+    function invCasinoSettle(bet, result, mult) {
+      const st = invCasinoState();
+      const s = invCasinoSession();
+      const b = Math.min(Math.max(0, Math.floor(bet)), invCasinoChips());
+      if (b <= 0) {
+        if (s) { s.msg = "筹码不够，先把押注调小一点。"; s.msgKind = "bad"; }
+        renderInvCasino();
+        return false;
+      }
+      st.plays += 1;
+      if (result === "win") {
+        const gain = Math.floor(b * (mult === undefined ? 1 : mult));
+        st.chips = invCasinoChips() + gain;
+        st.wins += 1;
+        if (s) { s.msg = "🎉 押中：<b>+" + formatNumber(gain) + "</b> 筹码"; s.msgKind = "good"; }
+      } else if (result === "push") {
+        if (s) { s.msg = "🤝 平局：押注退回，不赚不亏。"; s.msgKind = ""; }
+      } else {
+        st.chips = Math.max(0, invCasinoChips() - b);
+        if (s) { s.msg = "💀 这把输了：<b>−" + formatNumber(b) + "</b> 筹码"; s.msgKind = "bad"; }
+      }
+      if (st.chips > st.best) st.best = st.chips;
+      if (invCasinoMode() === "challenge") {
+        // V0.110：挑战模式 —— 先判通关（3700 万），再看是不是归零退出
+        invChalCheckClear();
+        if (rung_after) rung_after();
+      } else {
+        invCasinoCheckClear();   // V0.109：通关判定（100 → 10000）
+      }
+      if (st.chips <= 0 && !st.broke) {
+        st.broke = true;
+        if (s) { s.msg += "　💥 <b>破产</b>：下面可以「扣 1 分钟换 100 筹码」或「氪金」续命。"; s.msgKind = "bad"; }
+        logEvent("🎰", "赛博赌场：筹码归零 —— 可以扣 1 分钟剩余时间换 100 筹码，或者氪金（能源 1:1 换筹码）。", "bad");
+      }
+      saveGame(true);
+      renderInvEnergyPane();
+      return true;
+    }
+    // ---- 21 点 ----
+    function invCasinoCard() { return 1 + Math.floor(Math.random() * 13); }
+    function invCasinoCardText(c) { return INV_CASINO_CARDS[Math.max(0, Math.min(12, c - 1))]; }
+    function invCasinoBjValue(hand) {
+      let sum = 0, aces = 0;
+      (hand || []).forEach(c => {
+        if (c === 1) { aces += 1; sum += 11; } else sum += Math.min(10, c);
+      });
+      while (sum > 21 && aces > 0) { sum -= 10; aces -= 1; }
+      return sum;
+    }
+    function invCasinoBjStart() {
+      const s = invCasinoSession();
+      if (!s) return;
+      // ⚠️⚠️ V0.110 兜底：本手还没结束时**不许重发**（否则等于「免费换牌」→ 换到 21 点白拿钱）。
+      //   按钮那边也会禁用，这里再挡一道：万一以后谁又覆盖了按钮状态，也刷不了筹码。
+      if (s.bj && !s.bj.over) { s.msg = "这一手还没结束 —— 先「要牌」或「停牌」。"; s.msgKind = ""; renderInvCasino(); return false; }
+      if (invCasinoChips() <= 0) { s.msg = "筹码不够，先把押注调小一点。"; s.msgKind = "bad"; renderInvCasino(); return false; }
+      s.msg = ""; s.msgKind = "";
+      s.bj = { hand: [invCasinoCard(), invCasinoCard()], dealer: [invCasinoCard(), invCasinoCard()], over: false };
+      if (invCasinoBjValue(s.bj.hand) === 21) { invCasinoBjFinish(true); return; }
+      renderInvCasino();
+    }
+    function invCasinoBjHit() {
+      const s = invCasinoSession();
+      if (!s || !s.bj || s.bj.over) return;
+      s.bj.hand.push(invCasinoCard());
+      if (invCasinoBjValue(s.bj.hand) > 21) invCasinoBjFinish(false);
+      else renderInvCasino();
+    }
+    function invCasinoBjStand() {
+      const s = invCasinoSession();
+      if (!s || !s.bj || s.bj.over) return;
+      invCasinoBjFinish(false);
+    }
+    // playerBlackjack = 起手就 21 点（庄家不再补牌，赔率 1.5 倍）
+    function invCasinoBjFinish(playerBlackjack) {
+      const s = invCasinoSession();
+      if (!s || !s.bj) return;
+      const bet = s.bet;
+      const pv = invCasinoBjValue(s.bj.hand);
+      let dv = invCasinoBjValue(s.bj.dealer);
+      if (!playerBlackjack && pv <= 21) {
+        let guard = 0;
+        while (dv < INV_CASINO_BJ_DEALER_STAND && guard++ < 20) {
+          s.bj.dealer.push(invCasinoCard());
+          dv = invCasinoBjValue(s.bj.dealer);
+        }
+      }
+      s.bj.over = true;
+      s.bj.playerValue = pv;
+      s.bj.dealerValue = dv;
+      // V0.110：赌神奖励同样照顾 21 点（本该输的那次有 5% 被扳回）
+      const luckyBj = (pv > 21 || (pv < dv && dv <= 21)) && invLuckySave();
+      if (pv > 21 && !luckyBj) invCasinoSettle(bet, "lose");
+      else if (dv > 21 || pv > dv || luckyBj) invCasinoSettle(bet, "win", playerBlackjack ? 1.5 : 1);
+      else if (pv === dv) invCasinoSettle(bet, "push");
+      else invCasinoSettle(bet, "lose");
+      renderInvCasino();
+    }
+    // ---- 猜大小（3d6：小 = 3~10、大 = 11~18）----
+    function invCasinoDice(guess) {
+      const s = invCasinoSession();
+      if (!s) return;
+      const d = [0, 0, 0].map(() => 1 + Math.floor(Math.random() * 6));
+      const sum = d[0] + d[1] + d[2];
+      const isBig = sum >= 11;
+      const win = (guess === "big") === isBig;
+      s.dice = { dice: d, sum: sum, guess: guess, big: isBig };
+      // V0.110：赌神奖励生效时，输的那一次有 5% 被扳成赢（= 获胜概率 ×1.05）
+      const luckyDice = !win && invLuckySave();
+      invCasinoSettle(s.bet, (win || luckyDice) ? "win" : "lose");
+      renderInvCasino();
+    }
+    // ---- 抽牌比大小（1~13，比点数，同点算平局）----
+    function invCasinoDraw() {
+      const s = invCasinoSession();
+      if (!s) return;
+      const me = invCasinoCard(), you = invCasinoCard();
+      s.draw = { me: me, you: you };
+      const luckyDraw = (me < you) && invLuckySave();
+      if (me > you || luckyDraw) invCasinoSettle(s.bet, "win");
+      else if (me === you) invCasinoSettle(s.bet, "push");
+      else invCasinoSettle(s.bet, "lose");
+      renderInvCasino();
+    }
+    // 押注：既可以直接给数量，也可以给百分比（滑条 1~100%）
+    function invCasinoSetBet(v) {
+      const s = invCasinoSession();
+      if (!s) return;
+      const chips = invCasinoChips();
+      if (chips <= 0) { s.bet = 0; renderInvCasino(); return; }
+      const n = Math.max(1, Math.floor(v));
+      s.bet = Math.min(n, Math.max(1, chips));
+      renderInvCasino();
+    }
+    function invCasinoSetBetPct(pct) {
+      const chips = invCasinoChips();
+      const p = Math.max(1, Math.min(100, Math.floor(pct)));
+      invCasinoSetBet(Math.max(1, Math.floor(chips * p / 100)));
+    }
+    function invCasinoBetPct() {
+      const s = invCasinoSession();
+      const chips = invCasinoChips();
+      if (!s || chips <= 0) return 0;
+      return Math.max(1, Math.min(100, Math.round(s.bet / chips * 100)));
+    }
+    // 氪金：能源 → 筹码，**1:1**（作者指定）
+    function invCasinoTopUp(amount) {
+      if (invCasinoMode() === "challenge") { showToast("赌神挑战里<b>不能用氪金</b>（规则如此）。", "tech"); return false; }
+      const st = invCasinoState();
+      const energy = Math.max(0, Math.floor(Number(save.invEnergy) || 0));
+      let a = Math.floor(amount);
+      if (amount === "all" || amount === Infinity) a = energy;
+      a = Math.max(0, Math.min(a, energy));
+      if (a <= 0) {
+        showToast("⚡ 能源不够氪金（现在 " + formatNumber(energy) + " 能源）。能源在反转世界里每秒 +1。", "tech");
+        return false;
+      }
+      save.invEnergy = energy - a;
+      st.chips = invCasinoChips() + a;
+      st.spent = Math.max(0, Math.floor(st.spent || 0)) + a;
+      if (st.chips > st.best) st.best = st.chips;
+      if (st.chips > 0) st.broke = false;
+      saveGame(true);
+      renderInvEnergyPane();
+      showToast("💎 氪金：花 <b>" + formatNumber(a) + "</b> 能源 → 筹码 +<b>" + formatNumber(a) +
+        "</b>（1:1）　现有筹码 <b>" + formatNumber(invCasinoChips()) + "</b>", "tech");
+      invCasinoCheckClear();
+      renderInvCasino();
+      return true;
+    }
+    // 破产抢救：扣 1 分钟剩余时间换 100 筹码
+    function invCasinoRescueTime() {
+      const st = invCasinoState();
+      if (st.prepaidMs < INV_CASINO_RESCUE_TIME_MS) {
+        showToast("⏳ 剩余时间不足 1 分钟（只有 " + invCasinoTimeText() + "），换不了。", "tech");
+        return false;
+      }
+      st.prepaidMs -= INV_CASINO_RESCUE_TIME_MS;
+      st.chips = invCasinoChips() + INV_CASINO_RESCUE_CHIPS;
+      if (st.chips > st.best) st.best = st.chips;
+      st.broke = false;
+      saveGame(true);
+      renderInvEnergyPane();
+      showToast("⏳ 用 <b>1 分钟</b>剩余时间换了 <b>" + INV_CASINO_RESCUE_CHIPS + "</b> 筹码（剩余时间 " +
+        invCasinoTimeText() + "）。", "tech");
+      renderInvCasino();
+      return true;
+    }
+    // 通关：从 100 一路赢到 10000 → 发一次奖励（虚拟点数），掉回线下可以再冲一次
+    function invCasinoCheckClear() {
+      const st = invCasinoState();
+      const above = invCasinoChips() >= INV_CASINO_CLEAR_TARGET;
+      if (above && !st.aboveTarget) {
+        st.aboveTarget = true;
+        st.clears = Math.max(0, Math.floor(st.clears || 0)) + 1;
+        save.invVirtualPoints = Math.max(0, Math.floor(Number(save.invVirtualPoints) || 0)) + INV_CASINO_CLEAR_VP;
+        logEvent("🏆", "赛博赌场：筹码突破 " + formatNumber(INV_CASINO_CLEAR_TARGET) + " —— 第 " +
+          formatNumber(st.clears) + " 次通关，奖励 " + INV_CASINO_CLEAR_VP + " 虚拟点数。", "gold");
+        showToast("🏆 <b>通关赛博赌场</b>！筹码达到 <b>" + formatNumber(INV_CASINO_CLEAR_TARGET) + "</b> —— 奖励 <b>" +
+          INV_CASINO_CLEAR_VP + "</b> 虚拟点数（累计通关 " + formatNumber(st.clears) + " 次）。", "tech");
+        renderInvEnergyPane();
+      } else if (!above && st.aboveTarget) {
+        st.aboveTarget = false;   // 掉回线下 → 下次再冲上去还能拿一次
+      }
+    }
+    // ===== V0.109：德州扑克（赛博赌场第二张桌子 · 单挑版）=====
+    //   规则：单挑（我 vs 庄家），盲注 10 / 20，四条街（翻牌前 / 翻牌 / 转牌 / 河牌），
+    //   动作：弃牌 / 过牌 / 跟注 / 加注(×2) / 全下。摊牌时从 7 张里取最好的 5 张比大小。
+    //   筹码口径：我的下注从筹码里扣；对手那一半由庄家出，赢了整个底池给我。
+    // V0.110（作者要求）：盲注可以自己选（大盲 = 2×小盲，不能超过手上的筹码）
+    const INV_POKER_BLINDS = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
+    const INV_POKER_SB = 10;                 // 默认小盲（我）
+    const INV_POKER_BB = 20;                 // 大盲（庄家）
+    const INV_POKER_SUITS = ["♠", "♥", "♦", "♣"];
+    const INV_POKER_RANKS = { 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9", 10: "10", 11: "J", 12: "Q", 13: "K", 14: "A" };
+    const INV_POKER_NAMES = ["高牌", "一对", "两对", "三条", "顺子", "同花", "葫芦", "四条", "同花顺"];
+    function invPokerCardText(c) {
+      if (!c) return "??";
+      return INV_POKER_RANKS[c.r] + INV_POKER_SUITS[c.s];
+    }
+    function invPokerCardColor(c) {
+      return (c && (c.s === 1 || c.s === 2)) ? "var(--red)" : "inherit";
+    }
+    function invPokerNewDeck() {
+      const d = [];
+      for (let s = 0; s < 4; s++) for (let r = 2; r <= 14; r++) d.push({ r: r, s: s });
+      for (let i = d.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const t = d[i]; d[i] = d[j]; d[j] = t;
+      }
+      return d;
+    }
+    // 7 张里最好的 5 张 → 可比较的数组 [类别, ...关键牌]
+    function invPokerBest(cards) {
+      const list = (cards || []).filter(Boolean);
+      if (list.length < 5) return [0];
+      const bySuit = [[], [], [], []];
+      list.forEach(c => bySuit[c.s].push(c.r));
+      const count = {};
+      list.forEach(c => { count[c.r] = (count[c.r] || 0) + 1; });
+      const uniq = Object.keys(count).map(Number).sort((a, b) => b - a);
+      const straightHigh = (ranks) => {
+        const u = Array.from(new Set(ranks)).sort((a, b) => b - a);
+        if (u.indexOf(14) >= 0) u.push(1);      // A 当 1 用（轮子顺）
+        let run = 1;
+        for (let i = 1; i < u.length; i++) {
+          if (u[i] === u[i - 1] - 1) { run += 1; if (run >= 5) return u[i] + 4; }
+          else run = 1;
+        }
+        return 0;
+      };
+      let flushSuit = -1;
+      for (let s = 0; s < 4; s++) if (bySuit[s].length >= 5) flushSuit = s;
+      if (flushSuit >= 0) {
+        const sf = straightHigh(bySuit[flushSuit]);
+        if (sf) return [8, sf];
+      }
+      const quads = uniq.filter(r => count[r] === 4);
+      const trips = uniq.filter(r => count[r] === 3);
+      const pairs = uniq.filter(r => count[r] === 2);
+      if (quads.length) return [7, quads[0], uniq.filter(r => r !== quads[0])[0] || 0];
+      if (trips.length && (pairs.length || trips.length > 1)) {
+        return [6, trips[0], trips.length > 1 ? trips[1] : pairs[0]];
+      }
+      if (flushSuit >= 0) return [5].concat(bySuit[flushSuit].sort((a, b) => b - a).slice(0, 5));
+      const st = straightHigh(list.map(c => c.r));
+      if (st) return [4, st];
+      if (trips.length) return [3, trips[0]].concat(uniq.filter(r => r !== trips[0]).slice(0, 2));
+      if (pairs.length >= 2) return [2, pairs[0], pairs[1]].concat(uniq.filter(r => r !== pairs[0] && r !== pairs[1]).slice(0, 1));
+      if (pairs.length === 1) return [1, pairs[0]].concat(uniq.filter(r => r !== pairs[0]).slice(0, 3));
+      return [0].concat(uniq.slice(0, 5));
+    }
+    function invPokerCmp(a, b) {
+      const n = Math.max(a.length, b.length);
+      for (let i = 0; i < n; i++) {
+        const x = a[i] || 0, y = b[i] || 0;
+        if (x !== y) return x - y;
+      }
+      return 0;
+    }
+    function invPokerName(score) {
+      return INV_POKER_NAMES[score && score.length ? score[0] : 0] || "高牌";
+    }
+    // V0.109（作者要求）：本手不管怎么结束，都要让玩家**看到庄家的手牌**，
+    //   而且公共牌要**发满五张**（哪怕早在翻牌前就弃了牌）—— 至少知道「本来会怎样」。
+    function invPokerReveal() {
+      const p = invPokerState();
+      if (!p || !p.me.length) return "";
+      while (p.board.length < 5 && p.deck.length) p.board.push(p.deck.pop());
+      p.revealed = true;
+      const my = invPokerBest(p.me.concat(p.board));
+      const foe = invPokerBest(p.foe.concat(p.board));
+      const d = invPokerCmp(my, foe);
+      const verdict = d > 0 ? "你本来会赢" : (d < 0 ? "你本来会输" : "本来是平局");
+      return "　（已亮牌 —— 庄家 " + p.foe.map(invPokerCardText).join(" ") + " · 公共牌 " +
+        p.board.map(invPokerCardText).join(" ") + "　" + verdict + "：" + invPokerName(my) + " vs " + invPokerName(foe) + "）";
+    }
+    // 当前选中的小盲（会话级；大盲 = 2 倍）。没选过 / 选得太大 → 回落到能承受的一档
+    function invPokerBlind() {
+      const sc = invCasinoSession();
+      const chips = invCasinoChips();
+      let b = (sc && typeof sc.pokerBlind === "number" && sc.pokerBlind > 0) ? sc.pokerBlind : INV_POKER_SB;
+      if (b * 2 > chips) {
+        // 手上筹码不够这个盲注 → 自动往下降一档（降到最低档还不行就保持最低档，开局会被拦）
+        const ok = INV_POKER_BLINDS.filter(x => x * 2 <= chips);
+        b = ok.length ? ok[ok.length - 1] : INV_POKER_BLINDS[0];
+      }
+      return b;
+    }
+    // V0.110（作者要求：挑战要赢到 3700W，1 万的盲注上限太小）——
+    //   自选盲注：支持纯数字、科学计数（1e5 / 1.2e6）与千分位逗号
+    function parseBlindInput(raw) {
+      const t = String(raw == null ? "" : raw).trim().replace(/[,，\s]/g, "");
+      if (!t) return NaN;
+      const n = Number(t);
+      if (!isFinite(n) || n <= 0) return NaN;
+      return Math.floor(n);
+    }
+    function invPokerSetBlind(v) {
+      const sc = invCasinoSession();
+      if (!sc) return;
+      const chips = invCasinoChips();
+      const b = Math.max(1, Math.floor(v));
+      if (b * 2 > chips) {
+        showToast("筹码不够：这档要至少 <b>" + formatNumber(b * 2) + "</b> 筹码（现在 " + formatNumber(chips) + "）。", "tech");
+        return false;
+      }
+      sc.pokerBlind = b;
+      renderInvCasino();
+      return true;
+    }
+    function invPokerState() {
+      const s = invCasinoSession();
+      if (!s) return null;
+      if (!s.poker || typeof s.poker !== "object") {
+        s.poker = { stage: "idle", over: true, me: [], foe: [], board: [], deck: [], pot: 0, myBet: 0, foeBet: 0, myTotal: 0, foeTotal: 0, msg: "点「开一手」发牌 —— 单挑德州，盲注 10 / 20。", msgKind: "", result: "" };
+      }
+      return s.poker;
+    }
+    function invPokerChipsIn(id, amount) {
+      // 从筹码里扣下注（不足则按持有的算）
+      const st = invCasinoState();
+      const a = Math.min(Math.max(0, Math.floor(amount)), invCasinoChips());
+      if (a <= 0) return 0;
+      st.chips = invCasinoChips() - a;
+      return a;
+    }
+    function invPokerStart() {
+      const st = invCasinoState();
+      // ⚠️ V0.110 修（玩家反馈：弃牌之后开不了下一手）：
+      //   原来要求「筹码 ≥ 2×小盲（大盲）」才准开局 —— 挑战里 20 筹码、弃一手亏 10 之后
+      //   就剩 10 筹码，按钮直接变灰，卡死 ✗。
+      //   现在只要**手里还有筹码**就能开：盲注按「有多少交多少」交（不够就是全下），
+      //   对手那半边照旧由庄家垫。没钱（0）才真开不了。
+      if (invCasinoChips() <= 0) {
+        const p = invPokerState();
+        if (p) { p.msg = "没有筹码了 —— 去氪金 / 抢救，或者等本局结束重开。"; p.msgKind = "bad"; }
+        renderInvCasino();
+        return false;
+      }
+      const p = invPokerState();
+      const bb = invPokerBlind() * 2;                 // 大盲 = 2 × 小盲（玩家可调）
+      // V0.110：筹码不够大盲也能开（按持有量全下入场），只有真没钱才拦
+      if (invCasinoChips() <= 0) {
+        p.msg = "没有筹码了 —— 去氪金 / 抢救，或者等本局结束重开。";
+        p.msgKind = "bad";
+        renderInvCasino();
+        return false;
+      }
+      const deck = invPokerNewDeck();
+      p.deck = deck;
+      p.me = [deck.pop(), deck.pop()];
+      p.foe = [deck.pop(), deck.pop()];
+      p.board = [];
+      p.stage = "pre";
+      p.over = false;
+      p.result = "";
+      p.msgKind = "";
+      // ⚠️⚠️ V0.110 修 BUG（玩家反馈「哪有庄家开局亮牌跟你比大小的」）：
+      //   上一手摊牌 / 弃牌时把 revealed 置成了 true，但开局这里**没有清掉**，
+      //   于是从第二手起庄家的两张牌一直明着摆 —— 等于白送信息、完全没得玩。
+      p.revealed = false;
+      p.raises = 0;
+      p.myBet = 0; p.foeBet = 0; p.myTotal = 0; p.foeTotal = 0; p.pot = 0;
+      // 盲注：我出小盲、庄家出大盲（都是玩家选的档位）
+      const sb = invPokerChipsIn("me", invPokerBlind());
+      const bbAmt = invPokerBlind() * 2;
+      p.myBet = sb;
+      p.myTotal = sb;
+      p.foeBet = bbAmt;
+      p.foeTotal = bbAmt;
+      p.pot = sb + bbAmt;
+      p.msg = "翻牌前：你跟注还需 " + formatNumber(bbAmt - sb) + "（大盲 " + formatNumber(bbAmt) + "）。";
+      invPokerAfterChips();
+      saveGame(true);
+      renderInvCasino();
+      return true;
+    }
+    function invPokerAfterChips() {
+      const st = invCasinoState();
+      if (invCasinoChips() > st.best) st.best = invCasinoChips();
+      invCasinoCheckClear();
+      if (invCasinoChips() <= 0 && !st.broke) {
+        st.broke = true;
+        const p = invPokerState();
+        if (p) { p.msgKind = "bad"; }
+      }
+      saveGame(true);
+    }
+    // 摊牌：赢家通吃底池
+    function invPokerShowdown() {
+      const st = invCasinoState();
+      const p = invPokerState();
+      while (p.board.length < 5) p.board.push(p.deck.pop());
+      p.revealed = true;   // V0.109：摊牌时庄家手牌与五张公共牌都摆出来
+      const myScore = invPokerBest(p.me.concat(p.board));
+      const foeScore = invPokerBest(p.foe.concat(p.board));
+      const diff = invPokerCmp(myScore, foeScore);
+      p.over = true;
+      p.stage = "end";
+      st.pokerPlays = Math.max(0, Math.floor(st.pokerPlays || 0)) + 1;
+      if (diff > 0) {
+        st.chips = invCasinoChips() + p.pot;
+        st.pokerWins = Math.max(0, Math.floor(st.pokerWins || 0)) + 1;
+        if (p.pot > (st.pokerBest || 0)) st.pokerBest = p.pot;
+        p.result = "win";
+        p.msg = "🎉 你赢了：<b>" + invPokerName(myScore) + "</b> 胜 <b>" + invPokerName(foeScore) + "</b>，收下底池 <b>+" + formatNumber(p.pot) + "</b>";
+        p.msgKind = "good";
+        logEvent("♠", "德州扑克：以 " + invPokerName(myScore) + " 赢下底池 " + formatNumber(p.pot) + " 筹码。", "good");
+      } else if (diff < 0) {
+        p.result = "lose";
+        p.msg = "💀 你输了：<b>" + invPokerName(myScore) + "</b> 不敌 <b>" + invPokerName(foeScore) + "</b>，底池 " + formatNumber(p.pot) + " 归对手";
+        p.msgKind = "bad";
+      } else {
+        st.chips = invCasinoChips() + p.myTotal;   // 平局：退回我的下注（对手那份归庄家）
+        p.result = "push";
+        p.msg = "🤝 平局：双方都是 <b>" + invPokerName(myScore) + "</b>，退回你的下注 " + formatNumber(p.myTotal);
+        p.msgKind = "";
+      }
+      // V0.110：全下自动跑完时，结果文案前补一句说明（放在结果之后，免得被覆盖）
+      if (p.allIn) p.msg = "（你已全压 —— 自动发完并开牌）" + (p.msg || "");
+      invPokerAfterChips();
+      renderInvCasino();
+    }
+    // 庄家的决策（简单启发式 + 一点诈唬）
+    function invPokerFoeAct() {
+      const p = invPokerState();
+      if (!p || p.over) return;
+      const toCall = Math.max(0, p.myBet - p.foeBet);
+      const strong = (p.stage === "pre")
+        ? (p.foe[0].r === p.foe[1].r || (p.foe[0].r >= 12 && p.foe[1].r >= 10) || Math.max(p.foe[0].r, p.foe[1].r) >= 14 && Math.min(p.foe[0].r, p.foe[1].r) >= 10)
+        : invPokerBest(p.foe.concat(p.board))[0] >= 1;
+      const great = (p.stage !== "pre") && invPokerBest(p.foe.concat(p.board))[0] >= 3;
+      const bluff = Math.random() < 0.12;
+      if (toCall <= 0) {
+        // 可以过牌或主动下注
+        if (great || (strong && Math.random() < 0.6) || bluff) {
+          const size = Math.max(invPokerBlind() * 2, Math.floor(p.pot * 0.5));
+          p.foeBet = p.foeBet + Math.min(size, Math.max(0, 4000));
+          p.foeTotal += size;
+          p.pot += size;
+          p.msg = "庄家下注 <b>" + formatNumber(size) + "</b>。";
+          p.msgKind = "";
+          renderInvCasino();
+          return;                                  // 交给玩家决定
+        }
+        p.msg = "庄家过牌。";
+        p.msgKind = "";
+        invPokerNextStreet();
+        return;
+      }
+      // 需要跟注
+      if (great || strong || bluff) {
+        if (great && Math.random() < 0.45) {
+          const size = Math.max(toCall, Math.floor(p.pot * 0.4));
+          p.foeBet = p.foeBet + size;
+          p.foeTotal += size;
+          p.pot += size;
+          p.raises = (p.raises || 0) + 1;
+          p.msg = "庄家加注到 <b>" + formatNumber(p.foeBet) + "</b>。";
+          renderInvCasino();
+          return;
+        }
+        p.foeBet = p.myBet;
+        p.foeTotal += toCall;
+        p.pot += toCall;
+        p.msg = "庄家跟注 " + formatNumber(toCall) + "。";
+        invPokerNextStreet();
+        return;
+      }
+      p.over = true;
+      p.stage = "end";
+      p.result = "foefold";
+      const st = invCasinoState();
+      st.pokerPlays = Math.max(0, Math.floor(st.pokerPlays || 0)) + 1;
+      st.pokerWins = Math.max(0, Math.floor(st.pokerWins || 0)) + 1;
+      st.chips = invCasinoChips() + p.pot;
+      if (p.pot > (st.pokerBest || 0)) st.pokerBest = p.pot;
+      p.msg = "🎉 庄家弃牌 —— 你收下底池 <b>+" + formatNumber(p.pot) + "</b>" + invPokerReveal();
+      p.msgKind = "good";
+      invPokerAfterChips();
+      renderInvCasino();
+    }
+    // 一条街结束 → 发牌 / 摊牌
+    function invPokerNextStreet() {
+      const p = invPokerState();
+      if (!p || p.over) return;
+      p.myBet = 0; p.foeBet = 0;
+      p.raises = 0;   // 每条街重置加注次数
+      if (p.stage === "pre") {
+        p.board.push(p.deck.pop(), p.deck.pop(), p.deck.pop());
+        p.stage = "flop";
+        p.msg = "翻牌：" + p.board.map(invPokerCardText).join(" ") + "　轮到你。";
+      } else if (p.stage === "flop") {
+        p.board.push(p.deck.pop());
+        p.stage = "turn";
+        p.msg = "转牌：" + invPokerCardText(p.board[3]) + "　轮到你。";
+      } else if (p.stage === "turn") {
+        p.board.push(p.deck.pop());
+        p.stage = "river";
+        p.msg = "河牌：" + invPokerCardText(p.board[4]) + "　轮到你。";
+      } else {
+        invPokerShowdown();
+        return;
+      }
+      p.msgKind = "";
+      saveGame(true);
+      // V0.110：换街之后如果我已经没钱了，直接继续跑完（不再让玩家空点）
+      if (!invPokerRunOutIfBroke()) renderInvCasino();
+    }
+    // ===== V0.110（作者要求）：玩家已经全压 / 没钱跟注时，**直接把牌发完摊牌** =====
+    //   以前卡在「跟注 0 / 加注禁用」的干瞪眼状态（筹码 0 时既跟不动也加不了）✗，
+    //   现在检测到「手牌进行中 + 我这边没钱了」就自动把剩下的街发完并摊牌出结果。
+    function invPokerRunOutIfBroke() {
+      const p = invPokerState();
+      if (!p || p.over || !p.me.length) return false;
+      if (invCasinoChips() > 0) return false;     // 还有钱 → 正常让玩家操作
+      p.allIn = true;
+      let guard = 0;
+      while (!p.over && guard++ < 12) {
+        p.myBet = Math.max(p.myBet, p.foeBet);    // 视为跟到底（全下）
+        invPokerNextStreet();                     // 逐街发牌；河牌后自动摊牌
+      }
+      if (!p.over) invPokerShowdown();
+      return true;
+    }
+    // 我的动作
+    function invPokerAct(action) {
+      const p = invPokerState();
+      if (!p || p.over) return false;
+      const toCall = Math.max(0, p.foeBet - p.myBet);
+      if (action === "fold") {
+        p.over = true; p.stage = "end"; p.result = "fold";
+        const st = invCasinoState();
+        st.pokerPlays = Math.max(0, Math.floor(st.pokerPlays || 0)) + 1;
+        p.msg = "你弃牌 —— 这手亏掉已投入的 <b>" + formatNumber(p.myTotal) + "</b> 筹码。" + invPokerReveal();
+        p.msgKind = "bad";
+        invPokerAfterChips();
+        renderInvCasino();
+        return true;
+      }
+      if (action === "call" || action === "check") {
+        if (toCall > 0) {
+          const paid = invPokerChipsIn("me", toCall);
+          p.myBet += paid; p.myTotal += paid; p.pot += paid;
+          p.msg = "你跟注 " + formatNumber(paid) + "。";
+        } else {
+          p.msg = "你过牌。";
+        }
+        p.msgKind = "";
+        invPokerFoeAct();
+        if (!invPokerRunOutIfBroke()) renderInvCasino();
+        return true;
+      }
+      if (action === "raise" || action === "allin") {
+        if (action === "raise" && (p.raises || 0) >= 3) { p.msg = "这条街的加注已经到上限了（最多 3 次）。"; p.msgKind = ""; renderInvCasino(); return false; }
+        p.raises = (p.raises || 0) + 1;
+        let target;
+        if (action === "allin") target = invCasinoChips() + p.myBet;
+        else target = Math.max(p.foeBet + invPokerBlind() * 2, p.myBet + invPokerBlind() * 4, Math.floor(p.pot * 0.6));
+        const need = Math.max(0, target - p.myBet);
+        const paid = invPokerChipsIn("me", need);
+        p.myBet += paid; p.myTotal += paid; p.pot += paid;
+        p.msg = (action === "allin" ? "你全下 " : "你加注到 ") + "<b>" + formatNumber(p.myBet) + "</b>。";
+        p.msgKind = "";
+        invPokerFoeAct();
+        if (!invPokerRunOutIfBroke()) renderInvCasino();
+        return true;
+      }
+      return false;
+    }
+    // 渲染：德州扑克那一块
+    function renderInvPoker() {
+      const box = el("invPokerBox");
+      if (!box) return;
+      const p = invPokerState();
+      if (!p) return;
+      const st = invCasinoState();
+      // V0.110：盲注选择 —— 每档一个按钮，大盲超过手上筹码的档位直接禁掉
+      const blindNow = invPokerBlind();
+      setText("invPkBlindLabel", "单挑 · 盲注 " + formatNumber(blindNow) + " / " + formatNumber(blindNow * 2));
+      setHTML("invPkBlindBtns", INV_POKER_BLINDS.map(b => {
+        const can = b * 2 <= invCasinoChips();
+        return "<button class=\"secondary-button cs-pk-blind" + (b === blindNow ? " active" : "") + "\" data-inv-pk-blind=\"" + b + "\"" +
+          (can ? "" : " disabled") + ">" + formatNumber(b) + "</button>";
+      }).join(""));
+      setText("invPkStats", "德州扑克：已玩 " + formatNumber(st.pokerPlays || 0) + " 手 · 赢 " +
+        formatNumber(st.pokerWins || 0) + " 手 · 最大底池 " + formatNumber(st.pokerBest || 0));
+      setText("invPkStage", p.over
+        ? (p.stage === "idle" ? "还没开局" : "本手结束")
+        : ({ pre: "翻牌前", flop: "翻牌圈", turn: "转牌圈", river: "河牌圈" }[p.stage] || p.stage));
+      setHTML("invPkMe", p.me.length
+        ? p.me.map(c => "<span style=\"color:" + invPokerCardColor(c) + ";font-weight:700\">" + invPokerCardText(c) + "</span>").join(" ")
+        : "—");
+      // V0.109（作者反馈：得看得见对手是什么牌）：亮牌后顺手标出对方的牌型
+      setHTML("invPkFoe", (p.over || p.revealed) && p.foe.length
+        ? p.foe.map(c => "<span style=\"color:" + invPokerCardColor(c) + ";font-weight:700\">" + invPokerCardText(c) + "</span>").join(" ") +
+          (p.board.length >= 3 ? "　<b>" + invPokerName(invPokerBest(p.foe.concat(p.board))) + "</b>" : "")
+        : (p.foe.length ? "🂠 🂠" : "—"));
+      const boardCells = [];
+      for (let i = 0; i < 5; i++) {
+        const c = p.board[i];
+        boardCells.push(c
+          ? "<span style=\"color:" + invPokerCardColor(c) + ";font-weight:700\">" + invPokerCardText(c) + "</span>"
+          : "🂠");
+      }
+      setHTML("invPkBoard", p.me.length ? boardCells.join(" ") : "— 还没发公共牌 —");
+      setText("invPkPot", formatNumber(p.pot));
+      setText("invPkNeed", p.over ? "—" : formatNumber(Math.max(0, p.foeBet - p.myBet)));
+      setHTML("invPkMsg", p.msg || "");
+      setHTML("invPkResult", p.over && p.result
+        ? ("本手结果：" + ({ win: "<b style=\"color:var(--green)\">你赢了</b>", lose: "<b style=\"color:var(--red)\">你输了</b>",
+            push: "<b>平局</b>", fold: "<b style=\"color:var(--red)\">你弃牌</b>",
+            foefold: "<b style=\"color:var(--green)\">对手弃牌</b>" }[p.result] || p.result) +
+          "　·　你的牌型 <b>" + invPokerName(invPokerBest(p.me.concat(p.board))) + "</b>" +
+          (p.board.length >= 5 ? "　·　对手 <b>" + invPokerName(invPokerBest(p.foe.concat(p.board))) + "</b>" : ""))
+        : "");
+      const msgEl = el("invPkMsg");
+      if (msgEl && msgEl.style) msgEl.style.color = p.msgKind === "bad" ? "var(--red)" : (p.msgKind === "good" ? "var(--green)" : "");
+      const live = !p.over;
+      const need = Math.max(0, p.foeBet - p.myBet);
+      const setD = (id, dis) => { const b = el(id); if (b) b.disabled = dis; };
+      setD("invPkStart", live || invCasinoChips() <= 0);   // V0.110：有筹码就能开下一手
+      setD("invPkCall", !live || invCasinoChips() <= 0);
+      setD("invPkRaise", !live || invCasinoChips() <= 0 || (p.raises || 0) >= 3);
+      setD("invPkAllin", !live || invCasinoChips() <= 0);
+      setD("invPkFold", !live);
+      const callBtn = el("invPkCall");
+      if (callBtn) callBtn.textContent = need > 0 ? ("跟注 " + formatNumber(Math.min(need, invCasinoChips()))) : "过牌";
+      // V0.110：没钱时给一句人话（手牌会自动跑完，不用点）
+      if (live && invCasinoChips() <= 0 && p.myBet < p.foeBet) {
+        if (el("invPkType")) setText("invPkType", "已全压 —— 会自动发完开牌");
+      }
+      // 本手我的牌型提示（有公共牌时才显示）
+      const myType = p.me.length && p.board.length >= 3
+        ? ("当前牌型：" + invPokerName(invPokerBest(p.me.concat(p.board))))
+        : (p.me.length ? "起手两张已发" : "");
+      setText("invPkType", myType);
+    }
+
+    // V0.110：反转世界成就页渲染
+    function renderInvAchvPane() {
+      const list = el("invAchvList");
+      if (!list) return;
+      setText("invAchvSum", "已达成 " + invAchvCount() + " / " + INV_ACHV_DEFS.length +
+        (invAchvOn("gambler") ? "　·　赌神奖励已生效：能源 ×" + INV_ACHV_GAMBLER_ENERGY_MULT.toFixed(2) : ""));
+      setHTML("invAchvList", INV_ACHV_DEFS.map(d => {
+        const on = invAchvOn(d.id);
+        return '<div class="inv-achv-card' + (on ? " on" : "") + '">' +
+          '<div class="achv-ico">' + d.icon + '</div>' +
+          '<div class="achv-mid">' +
+            '<div class="achv-name">' + d.name + (on ? '　<span class="achv-got">已达成</span>' : '') + '</div>' +
+            '<div class="achv-cond">条件：' + d.cond + '</div>' +
+            '<div class="achv-reward">奖励：' + d.reward + '</div>' +
+          '</div>' +
+          '<div class="achv-flag">' + (on ? "✓" : "—") + '</div>' +
+          '</div>';
+      }).join(""));
+    }
+    // V0.110：虚拟挑战页渲染
+    function renderInvChalPane() {
+      const st = invChalState();
+      const r = invChalRunState();
+      if (el("invChalGamblerTarget")) setText("invChalGamblerTarget", formatNumber(INV_CHAL_GAMBLER_TARGET));
+      setText("invChalGamblerState", st.gamblerCleared
+        ? ("已通关 " + formatNumber(st.gamblerClears) + " 次 · 奖励已生效")
+        : (r.running ? "挑战进行中" : "未通关"));
+      setText("invChalGamblerStat", "历史最高筹码 " + formatNumber(r.best) +
+        (st.gamblerCleared ? "　·　赌术高手：概率类获胜概率 ×" + INV_CHAL_LUCK_BONUS.toFixed(2) : ""));
+      const btn = el("invChalGamblerGo");
+      if (btn) btn.textContent = r.running ? "回到挑战（进行中）" : "进入挑战（免费）";
+    }
+    // ---- 渲染：赌场视图 ----
+    function renderInvCasino() {
+      const box = el("invCasinoView");
+      if (!box) return;
+      const open = invCasinoIsOpen();
+      box.style.display = open ? "" : "none";
+      const lobby = el("invCasinoLobby");
+      if (lobby) lobby.style.display = open ? "none" : "";
+      // 进场后把「小游戏」卡片列表收起来，让牌桌顶上来（离开时自动回来）
+      const grid = el("invVwGames");
+      if (grid) grid.style.display = open ? "none" : "";
+      const gamesTitle = el("invVwGamesTitle");
+      if (gamesTitle) gamesTitle.style.display = open ? "none" : "";
+      if (!open) return;
+      const st = invCasinoState();
+      const s = invCasinoSession();
+      const chalMode = invCasinoMode() === "challenge";
+      const banner = el("invCsChalBanner");
+      if (banner) banner.style.display = chalMode ? "" : "none";
+      if (chalMode && el("invCsChalTarget")) setText("invCsChalTarget", formatNumber(INV_CHAL_GAMBLER_TARGET));
+      setText("invCsChips", formatNumber(invCasinoChips()));
+      // 挑战没有时间限制 → 读数写「无限」
+      if (chalMode) setText("invCsTime", "无限");
+      else setText("invCsTime", invCasinoTimeText());
+      setText("invCsEnergy", formatNumber(save.invEnergy));
+      setText("invCsStats", "已玩 " + formatNumber(st.plays) + " 局 · 赢 " + formatNumber(st.wins) +
+        " 局 · 最高筹码 " + formatNumber(st.best));
+      setText("invCsBet", formatNumber(s ? s.bet : 0));
+      const pctNow = invCasinoBetPct();
+      setText("invCsBetPct", pctNow + "%");
+      const slider = el("invCsBetSlider");
+      if (slider && document.activeElement !== slider) {
+        slider.max = String(Math.max(1, invCasinoChips()));
+        slider.value = String(Math.max(1, Math.min(invCasinoChips() || 1, s ? s.bet : 1)));
+      }
+      setText("invCsClear", invCasinoChips() >= INV_CASINO_CLEAR_TARGET
+        ? ("🏆 已通关 " + formatNumber(st.clears) + " 次")
+        : ("通关进度 " + formatNumber(invCasinoChips()) + " / " + formatNumber(INV_CASINO_CLEAR_TARGET) +
+           "　·　最高筹码 " + formatNumber(st.best) + "　·　通关 " + formatNumber(st.clears) + " 次"));
+      setText("invCsSpent", formatNumber(st.spent || 0));
+      // V0.110：兑现按钮 —— 筹码 > 1000 才点得动，旁边写明能换多少虚拟点数
+      const cashBtn = el("invCsCashOut");
+      if (cashBtn) cashBtn.disabled = invCasinoChips() <= INV_CASINO_CASH_MIN;
+      setHTML("invCsCashHint", invCasinoChips() > INV_CASINO_CASH_MIN
+        ? ("筹码 <b>" + formatNumber(invCasinoChips()) + "</b> → <b>" + formatNumber(invCasinoCashOutVP(invCasinoChips())) +
+           "</b> 虚拟点数（10 : 1 向上取整）　兑现后本局结束")
+        : ("攒到 <b>" + formatNumber(INV_CASINO_CASH_MIN + 1) + "</b> 筹码以上才能兑现（现在 " + formatNumber(invCasinoChips()) + "）"));
+      setText("invCsMsg", s && s.msg ? s.msg.replace(/<[^>]+>/g, "") : "挑一张桌子开始 —— 押注在下面调。");
+      const msgEl = el("invCsMsg");
+      if (msgEl && msgEl.style) msgEl.style.color = (s && s.msgKind === "bad") ? "var(--red)" : ((s && s.msgKind === "good") ? "var(--green)" : "");
+      // 21 点
+      const bj = s ? s.bj : null;
+      setText("invCsBjPlayer", bj ? bj.hand.map(invCasinoCardText).join(" ") + "（" + invCasinoBjValue(bj.hand) + " 点）" : "— 还没开局 —");
+      setText("invCsBjDealer", bj ? bj.dealer.map(invCasinoCardText).join(" ") + (bj.over ? "（" + invCasinoBjValue(bj.dealer) + " 点）" : "（暗牌）") : "");
+      const hitBtn = el("invCsBjHit"), standBtn = el("invCsBjStand"), startBtn = el("invCsBjStart");
+      if (hitBtn) hitBtn.disabled = !(bj && !bj.over);
+      if (standBtn) standBtn.disabled = !(bj && !bj.over);
+      if (startBtn) startBtn.disabled = !!(bj && !bj.over) || invCasinoChips() <= 0;
+      // 猜大小
+      const dd = s ? s.dice : null;
+      setHTML("invCsDice", dd
+        ? dd.dice.join(" + ") + " = <b>" + dd.sum + "</b>（" + (dd.big ? "大" : "小") + "）· 你押的是" + (dd.guess === "big" ? "大" : "小")
+        : "三个骰子，小 3~10 / 大 11~18");
+      // 抽牌比大小
+      const dr = s ? s.draw : null;
+      setText("invCsDraw", dr
+        ? "你 " + invCasinoCardText(dr.me) + " vs 庄家 " + invCasinoCardText(dr.you)
+        : "抽一张牌比大小，同点算平局");
+      renderInvPoker();   // V0.109：德州扑克那一块
+      // 押注快捷百分比按钮的可用性（V0.109：改成 1% / 25% / 50% / 全押）
+      const chipsNow = invCasinoChips();
+      Array.prototype.slice.call(document.querySelectorAll("[data-inv-cs-pct]")).forEach(btn => {
+        const pct = Number(btn.dataset.invCsPct) || 1;
+        btn.disabled = chipsNow <= 0 || Math.floor(chipsNow * pct / 100) < 1;
+      });
+      // 氪金按钮：能源不足就点不动
+      const energyNow = Math.max(0, Math.floor(Number(save.invEnergy) || 0));
+      Array.prototype.slice.call(document.querySelectorAll("[data-inv-cs-topup]")).forEach(btn => {
+        const raw = btn.dataset.invCsTopup;
+        const want = raw === "all" ? energyNow : (Number(raw) || 0);
+        btn.disabled = energyNow <= 0 || (raw !== "all" && want > energyNow);
+      });
+      // V0.109：破产抢救面板 —— 筹码归 0 时只显示它
+      const broke = invCasinoChips() <= 0;
+      // V0.110（作者反馈：买了 1 分钟、20 秒破产，还有 40 秒却被直接踢出来、没机会氪金）：
+      //   收场条件收紧成「**两条续命路都走不通**」才结束 ——
+      //   剩余时间不足 1 分钟（扣时间那条不行）**并且**能源见底（氪金这条也不行）。
+      //   只要还有一点能源，就留在赌场里把抢救面板摆着，让玩家自己决定。
+      const canTopUp = Math.max(0, Math.floor(Number(save.invEnergy) || 0)) > 0;
+      if (broke && invCasinoLeftMs() < INV_CASINO_RESCUE_TIME_MS && !canTopUp) {
+        const st2 = invCasinoState();
+        if (!st2.ended) {
+          st2.ended = true;
+          st2.broke = true;          // 记成「本局失败」→ 下次进场重发 100 筹码
+          st2.chips = 0;
+          // V0.110（作者反馈「下次买 1 分钟怎么变成 1 分 40 秒」）：本局结束就把剩余时间清掉，
+          //   下次进场是干净的一张白纸（要玩就重新缴）。
+          st2.prepaidMs = 0;
+          saveGame(true);
+          setTimeout(() => {
+            if (invCasinoIsOpen()) {
+              invCasinoLeave(true);
+              showToast("💥 破产，而且剩余时间不足 1 分钟、能源也见底了 —— 本局结束，已退回虚拟世界。" +
+                "下次进来会重新发 <b>" + INV_CASINO_START_CHIPS + "</b> 筹码（剩余时间已清零）。", "tech");
+              renderInvEnergyPane();
+            }
+          }, 1200);
+        }
+      }
+      const rescue = el("invCsRescue");
+      if (rescue) rescue.style.display = broke ? "" : "none";
+      const tables = el("invCsTables");
+      // V0.109（作者反馈）：破产时**不要**把牌桌藏起来 —— 玩家必须能看到这一手的最终结果
+      //   （对手的牌、公共牌、自己输在哪）。牌桌照常显示，只在下面补一条破产提示。
+      if (tables) tables.style.display = "";
+      // （破产提示条：挑战模式下面不再提示「去抢救」，统一在下面那段处理）
+      // V0.109（作者要求）：破产时抢救面板顶到最上面，下注行与氪金行一并收起（抢救面板里自带氪金）
+      const betRow = el("invCsBetRow");
+      if (betRow) betRow.style.display = broke ? "none" : "";
+      const topRow = el("invCsTopUpRow");
+      // V0.110：挑战里禁止氪金 → 氪金行整行收起
+      if (topRow) topRow.style.display = (broke || chalMode) ? "none" : "";
+      const cashRow = el("invCsCashOut");
+      if (cashRow && cashRow.parentElement) cashRow.parentElement.style.display = chalMode ? "none" : "";
+      const rescueBox = el("invCsRescue");
+      if (rescueBox) rescueBox.style.display = (broke && !chalMode) ? "" : "none";
+      const brokeNote = el("invCsBrokeNote");
+      if (brokeNote) brokeNote.style.display = (broke && !chalMode) ? "" : "none";
+      const rescueTime = el("invCsRescueTime");
+      if (rescueTime) rescueTime.disabled = invCasinoLeftMs() < INV_CASINO_RESCUE_TIME_MS;
+      const rescueHint = el("invCsRescueHint");
+      if (rescueHint) {
+        rescueHint.textContent = broke
+          ? ("筹码已经见底。两条路：扣 1 分钟剩余时间换 " + INV_CASINO_RESCUE_CHIPS + " 筹码（现在剩余 " +
+             invCasinoTimeText() + "）；或者氪金 —— 能源按 1:1 换筹码（现在 " + formatNumber(save.invEnergy) + " 能源）。" +
+             (invCasinoLeftMs() < INV_CASINO_RESCUE_TIME_MS && !(save.invEnergy > 0)
+               ? "　⚠️ 两条路现在都走不通（时间不足 1 分钟、能源也见底）：先在反转世界里攒点能源（每秒 +1）再来 —— 走了以后本局就结束，剩余时间会清零、下次重新发 100 筹码。"
+               : "　（只要还有能源，赌场就不会强行把你踢出去；走不走由你决定。）"))
+          : "";
+      }
+      const slider2 = el("invCsBetSlider");
+      if (slider2) slider2.disabled = broke;
+      // ⚠️⚠️ V0.110 修 BUG（玩家反馈：21 点可以无限点「开一局」刷筹码）：
+      //   这一轮 forEach 以前**连 invCsBjStart 一起赋值**，把上面 21 点那一段算好的
+      //   「本手还没结束就禁用」直接覆盖掉了 —— 于是手牌进行中「开一局」照样能点：
+      //   点一下就白换一手牌（不结算、不扣注），换到天然 21 点就照 1.5 倍赔 → 无限刷钱 ✗。
+      //   现在这里只负责「没筹码就禁用」，21 点的开关交给 21 点那一段单独管。
+      ["invCsDiceSmall", "invCsDiceBig", "invCsDrawGo"].forEach(id => {
+        const b = el(id);
+        if (b) b.disabled = invCasinoChips() <= 0;
+      });
+    }
+
+    // V0.109：能源页渲染 —— 总量 / 本局进度 / 速率 / 进度条
+    function renderInvEnergyPane() {
+      const total = Math.max(0, Number(save.invEnergy) || 0);
+      const whole = Math.floor(total + 1e-9);
+      const frac = total - whole;
+      setText("invEnergyVal", formatNumber(whole));
+      // 「本局进度」= 这一趟进来之后攒的量（退出去就重新起算，但总量照留）
+      const runStart = (invWorld && typeof invWorld.energyRunStart === "number") ? invWorld.energyRunStart : 0;
+      setText("invEnergyRunVal", formatNumber(Math.max(0, total - runStart)));
+      setInvTrackWidth("invEnergyFill", frac * 100);
+      setText("invEnergyText", "下一单位 " + (frac * 100).toFixed(0) + "%　·　总计 " + formatNumber(total) + " 能源");
+      renderInvVWorld();   // V0.109：虚拟世界子页
+      renderInvChalPane(); // V0.110：虚拟挑战子页
+      renderInvAchvPane(); // V0.110：反转世界成就子页
+      checkInvAchv();      // V0.110：顺手检查有没有新达成的成就
+    }
     // V0.104：自动化页两行 —— 未解锁显示解锁按钮；解锁后显示「效率升级 + 开关」
     function renderInvAutoPane() {
       ["harvest", "level"].forEach(kind => {
@@ -17088,12 +19440,101 @@
         `<div class="inv-tech-note">「深度凝析」每次（手动与自动都算）有 <b>${(invTechDropChance() * 100).toFixed(1)}%</b> 概率爆出基础科技` +
         `（基础 ${(INV_TECH_DROP_CHANCE * 100).toFixed(0)}%，采样增幅器 +0.2%/级）；掉落等级 = 当前反转等级；` +
         `同种科技<b>高等级自动替换低等级</b>，被消耗的那份按「等级 × ${INV_TECH_REFUND_PER_LEVEL}」折算成反转尘埃。` +
-        `八项科技全部<b>持续生效</b>；有效等级有<b>软上限</b>（超过 ${INV_TECH_EFF_SOFT_CAP} 的部分只按平方根计入，越堆越钝但永不封死）。</div>`);
+        `八项科技全部<b>持续生效</b>，而且<b>有效等级没有上限</b>（等级多大效果就多大 —— 反转里程碑还会把它再抬高）。</div>`);
     }
     on("invExit", () => confirmExitInvWorld());
     on("invTabMain", () => switchInvPane("main"));
     on("invTabAuto", () => switchInvPane("auto"));
     on("invTabBag", () => switchInvPane("bag"));
+    on("invTabEnergy", () => switchInvPane("energy"));   // V0.109：能源页
+    on("invTabChal", () => {                              // V0.110：跳回进行中的挑战
+      switchInvPane("energy");
+      switchInvEnergySub("vworld");
+      const sc = invCasinoSession();
+      if (sc && !sc.open && invChalRunState().running) { sc.open = true; sc.mode = "challenge"; }
+      renderInvWorld();
+    });
+    // V0.109：虚拟世界 —— 子页签与加点按钮（都在动态/新增节点上，用代理）
+    el("invEnergySubTabs").addEventListener("click", e => {
+      const t = e.target && e.target.closest ? e.target.closest("[data-inv-energy-sub]") : null;
+      if (!t) return;
+      switchInvEnergySub(t.dataset.invEnergySub);
+    });
+    // V0.109：赛博赌场 —— 大厅 / 牌桌的所有按钮（事件代理，节点是动态渲染的）
+    el("invVwGames").addEventListener("click", e => {
+      const t = e.target && e.target.closest ? e.target.closest("[data-inv-casino]") : null;
+      if (!t) return;
+      const lobby = el("invCasinoLobby");
+      if (lobby) { lobby.style.display = lobby.style.display === "none" ? "" : "none"; }
+    });
+    el("invCsSlots").addEventListener("click", e => {
+      const t = e.target && e.target.closest ? e.target.closest("[data-inv-casino-slot]") : null;
+      if (!t) return;
+      invCasinoBuySlot(Number(t.dataset.invCasinoSlot));
+    });
+    on("invCsLeave", () => invCasinoLeave(false));
+    // V0.109：押注滑条（1% ~ 100%）+ 快捷百分比 + 氪金 + 破产抢救
+    el("invCsBetSlider").addEventListener("input", e => {
+      const chips = invCasinoChips();
+      const v = Math.max(1, Math.min(chips || 1, Number(e.target.value) || 1));
+      invCasinoSetBet(v);
+    });
+    el("invCasinoView").addEventListener("click", e => {
+      const t = e.target && e.target.closest ? e.target.closest("[data-inv-cs-pct],[data-inv-cs-topup]") : null;
+      if (!t) return;
+      if (t.dataset.invCsPct) { invCasinoSetBetPct(Number(t.dataset.invCsPct)); return; }
+      if (t.dataset.invCsTopup) {
+        const v = t.dataset.invCsTopup === "all" ? "all" : Number(t.dataset.invCsTopup);
+        invCasinoTopUp(v);
+      }
+    });
+    on("invCsRescueTime", () => invCasinoRescueTime());
+    on("invCsCashOut", () => invCasinoCashOut());   // V0.110：筹码兑现成虚拟点数
+    on("invChalGamblerGo", () => invChalGamblerEnter());   // V0.110：进入赌神挑战
+    on("invAchvBtn", () => {                               // V0.110：右上角成就弹窗
+      renderInvAchvPane();
+      el("invAchvModal").classList.add("show");
+    });
+    on("invAchvClose", () => el("invAchvModal").classList.remove("show"));
+    el("invAchvModal").addEventListener("click", e => {
+      if (e.target === el("invAchvModal")) el("invAchvModal").classList.remove("show");
+    });
+    // V0.109：德州扑克的动作
+    el("invPokerBox").addEventListener("click", e => {
+      if (e.target && e.target.id === "invPkBlindSet") {
+        const v = parseBlindInput(el("invPkBlindInput") ? el("invPkBlindInput").value : "");
+        if (!isFinite(v)) { showToast("盲注要填一个正数（支持 1e6 这种写法）。", "tech"); return; }
+        const okSet = invPokerSetBlind(v);
+        if (okSet && el("invPkBlindInput")) el("invPkBlindInput").value = "";
+        return;
+      }
+      const t = e.target && e.target.closest ? e.target.closest("[data-inv-pk-blind]") : null;
+      if (!t) return;
+      invPokerSetBlind(Number(t.dataset.invPkBlind));
+    });
+    el("invPkBlindInput").addEventListener("keydown", e => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      const v = parseBlindInput(el("invPkBlindInput").value);
+      if (!isFinite(v)) { showToast("盲注要填一个正数（支持 1e6 这种写法）。", "tech"); return; }
+      if (invPokerSetBlind(v)) el("invPkBlindInput").value = "";
+    });
+    on("invPkStart", () => invPokerStart());
+    on("invPkCall", () => invPokerAct("call"));
+    on("invPkRaise", () => invPokerAct("raise"));
+    on("invPkAllin", () => invPokerAct("allin"));
+    on("invPkFold", () => invPokerAct("fold"));
+    on("invCsBjStart", () => invCasinoBjStart());
+    on("invCsBjHit", () => invCasinoBjHit());
+    on("invCsBjStand", () => invCasinoBjStand());
+    on("invCsDiceSmall", () => invCasinoDice("small"));
+    on("invCsDiceBig", () => invCasinoDice("big"));
+    on("invCsDrawGo", () => invCasinoDraw());
+    el("invVwUps").addEventListener("click", e => {
+      const t = e.target && e.target.closest ? e.target.closest("[data-inv-vw-buy]") : null;
+      if (!t) return;
+      invVwBuy(t.dataset.invVwBuy);
+    });
     on("invTabLeap", () => switchInvPane("leap"));
     delegate("invGateTabs", "[data-inv-gate]", btn => switchInvGatePane(btn.dataset.invGate));
     delegate("invGateEnterBody", "[data-inv-enter]", () => requestInvEntry());
@@ -17124,6 +19565,9 @@
     // 所以「量出真实 dt → 切成小步补跑」就能让后台速度与前台完全一致。
     // 单步依旧推进 TICK_MS 那么长，保证捕获判定、诱饵掉落的随机粒度不被拉粗。
     function gameStep(dtSeconds) {
+      // V0.109：自动狩猎的提示汇总是节流的 —— 主循环每帧顺手检查一次，
+      //   这样哪怕玩家中途关掉自动狩猎，攒下的那一条也会按时刷出来（函数自己会早退，开销可忽略）。
+      autoHuntToastFlush();
       // 猎影窗口结束：猎犬抵达，强制结算一次捕获（窗口内不会被提前捕获）
       if (isHunting() && getHuntRemaining() <= 0) {
         capture();
@@ -17189,6 +19633,10 @@
 
       // 捕获概率同样跟着「进度条的真实状态」走：持续收割时进度恒为 100%，
       // 于是风险稳定停在满档值，不会再被「刚归零」的那一帧误判成 0 而漏掉判定。
+      // V0.109 保险丝（玩家反馈「挑衅猎犬在进度一半时被打断」）：猎影窗口内**绝不允许**随机捕获。
+      //   统计里 hunting 时 capturePerSecond 本来就是 0，但这里再加一道显式判断 ——
+      //   免得将来谁改了 stats 的口径（或加了缓存）又把这个 8 秒承诺悄悄破坏掉。
+      if (isHunting()) return true;
       const captureChance = stats.capturePerSecond * dtSeconds;
       if (save.progress > 0 && Math.random() < captureChance) {
         capture();
