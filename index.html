@@ -3000,6 +3000,40 @@
     .inv-auto-text { display: grid; gap: 2px; }
     .inv-auto-text small { color: var(--muted); }
     @media (max-width: 720px) { .inv-actions { grid-template-columns: 1fr; } }
+
+    /* ===== V0.123（作者要求）：反转世界成就弹窗重做 —— 照主宇宙那种「一行一条」的宽列表 =====
+       之前那个弹窗被挤压成细条、字竖着排 ✗：根因是卡片内部是 flex + 没给最小宽度，
+       在窄容器里每个子元素都被压到 1 个字宽 ✗。这里强制：弹窗够宽、卡片一行、文字正常换行。 */
+    .modal-box.achievement {
+      width: min(760px, 96vw) !important;
+      max-width: 96vw !important;
+      text-align: left;
+      max-height: 86vh;
+      overflow-y: auto;
+    }
+    .modal-box.achievement .big-icon, .modal-box.achievement h2 { text-align: center; }
+    .modal-box.achievement .inventory-note { text-align: left; line-height: 1.7; }
+    .modal-box.achievement .inv-achv-list { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+    .modal-box.achievement .inv-achv-card {
+      display: flex; flex-direction: row; align-items: center; flex-wrap: nowrap;
+      gap: 14px; width: 100%; min-width: 0; box-sizing: border-box;
+      border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px;
+      opacity: .72; background: rgba(255,255,255,.02);
+    }
+    .modal-box.achievement .inv-achv-card.on {
+      border-color: var(--gold); opacity: 1;
+      background: rgba(233,196,106,.06);
+      box-shadow: 0 0 0 1px rgba(233,196,106,.15) inset;
+    }
+    .modal-box.achievement .inv-achv-card .achv-ico { flex: 0 0 auto; font-size: 24px; line-height: 1; }
+    .modal-box.achievement .inv-achv-card .achv-mid { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .modal-box.achievement .inv-achv-card .achv-name { font-weight: 700; font-size: 14px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+    .modal-box.achievement .inv-achv-card .achv-got { font-size: 11px; color: var(--gold); font-weight: 400; }
+    .modal-box.achievement .inv-achv-card .achv-cond { font-size: 12.5px; color: var(--muted); line-height: 1.6; white-space: normal; word-break: break-word; }
+    .modal-box.achievement .inv-achv-card .achv-reward { font-size: 12.5px; color: var(--gold); white-space: normal; word-break: break-word; }
+    .modal-box.achievement .inv-achv-card .achv-flag { flex: 0 0 auto; font-size: 20px; color: var(--muted); }
+    .modal-box.achievement .inv-achv-card.on .achv-flag { color: var(--green); }
+    .modal-box.achievement .inv-achv-sum { font-size: 12.5px; color: var(--gold); margin: 6px 0 10px; }
   </style>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -3021,7 +3055,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.118</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.123</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -4104,6 +4138,8 @@
             <div class="inv-track" id="invTrack8" style="display: none;"><i id="invCap8Fill"></i><span class="inv-track-cap" id="invCap8Text">第八条时间耄耋 0%</span></div>
             <div class="inv-track" id="invTrack9" style="display: none;"><i id="invCap9Fill"></i><span class="inv-track-cap" id="invCap9Text">第九条时间耄耋 0%</span></div>
             <div class="inv-track" id="invTrack10" style="display: none;"><i id="invCap10Fill"></i><span class="inv-track-cap" id="invCap10Text">第十条时间耄耋 0%</span></div>
+            <!-- V0.123（作者要求）：第 11 条及以后**一直往下加**，由 JS 动态生成 -->
+            <div id="invHoundBars"></div>
             <!-- V0.105（作者要求）：精英时间耄耋的进度条（挑战后出现） -->
             <div class="inv-track" id="invTrackElite" style="display: none;">
               <i id="invEliteFill"></i>
@@ -4121,13 +4157,15 @@
               <button class="bulk-btn" data-inv-lv-buy="1">×1</button>
               <button class="bulk-btn" data-inv-lv-buy="10">×10</button>
               <button class="bulk-btn" data-inv-lv-buy="100">×100</button>
-              <button class="bulk-btn" data-inv-lv-buy="max">一键最大</button>
+              <button class="bulk-btn" data-inv-lv-buy="max">消耗所有尘埃</button>
             </div>
             <p class="inv-note">这是主宇宙的完全倒影：<b>被捕获不再是恩赐，而是等级 −1</b>。
               反转时间耄耋每 10 秒逼近一次（「静默信标」会拉长这个间隔），被抓到就掉一级；用「反转铸级」把等级换回来 —— 等级越高，凝析越快。
-              <b style="color: var(--red);">反转等级到 50 会引来第二条时间耄耋</b>（进度快 8 倍、强度 800%），
-              <b style="color: var(--red);">到 200 还有第三条</b>（再 ×8、一口 2 级）、<b style="color: var(--red);">400 第四条</b>（一口 8 级），
-              再到 <b style="color: var(--purple);">1000 / 2000 / 4000 / 10000 还有第 5~8 条</b>（属性 ×8、伤害 ×4 逐条递增）—— 每条进度条上都写明被对应时间耄耋捕获的概率。本局最高等级每 <b>50</b> 级叠一层<b>反转里程碑</b>（尘埃 +25% · 抵抗 +25%/层，无限叠）。
+              <b style="color: var(--red);">反转等级到 50 会引来第二条时间耄耋</b>（速度/强度 ×8），
+              <b style="color: var(--red);">到 200 是第三条</b>（再 ×8、一口 3 级）、<b style="color: var(--red);">400 第四条</b>（一口 9 级）。
+              之后每 <b>1K / 2K / 4K / 10K / 2W / 4W / 10W / 20W / 40W / 100W …</b> 都会再冒出一条（门槛按 ×2、×2、×2.5 循环）——
+              <b style="color: var(--purple);">没有上限，进度条会一直往下长</b>；第 n 条的速度/强度 = 8<sup>n−1</sup>，一口伤害 = 3<sup>n−2</sup> 级。
+              每条进度条上都写明被对应时间耄耋捕获的概率。本局最高等级每 <b>50</b> 级叠一层<b>反转里程碑</b>（尘埃 +25% · 抵抗 +25%/层，无限叠）。
               反转尘埃的上限是 <b>1EE10</b>；这里的一切只属于这一趟旅程，退出后再进来就从零开始。</p>
           </div>
         </div>
@@ -4579,9 +4617,11 @@
 
         <h3>◑ 反转等级与被捕获</h3>
         <p>反转时间耄耋每 <b>10 秒</b>逼近一次，被抓到就<b>掉一级</b>。用「<b>反转铸级</b>」花反转尘埃把等级买回来
-          —— 等级越高，凝析越快，铸级也越贵。铸级支持批量（×1 / ×10 / ×100 / 一键最大）。</p>
-        <p>等级越高，时间耄耋越多：<b>50 级第二条</b>、<b>200 级第三条</b>、<b>400 级第四条</b>，
-          再到 1000 / 2000 / 4000 / 10000 还有第 5~8 条 —— 属性 ×8、伤害 ×4 逐条递增，
+          —— 等级越高，凝析越快，铸级也越贵。铸级支持批量（×1 / ×10 / ×100 / 消耗所有尘埃）。</p>
+        <p>等级越高，时间耄耋越多：<b>50 级第二条</b>（速度/强度 ×8）、<b>200 级第三条</b>（再 ×8，一口 3 级）、
+          <b>400 级第四条</b>（一口 9 级），之后每 <b>1K / 2K / 4K / 10K / 2W / 4W / 10W / 20W / 40W / 100W …</b> 再冒出一条
+          —— 门槛按 <b>×2、×2、×2.5</b> 循环，<b>没有上限</b>，进度条会一直往下长。
+          第 n 条的速度/强度 = <b>8<sup>n−1</sup></b>，一口伤害 = <b>3<sup>n−2</sup></b> 级，
           每一条进度条上都写着被对应时间耄耋捕获的概率。所以<b>「衰减抑制器」科技是这里的保命符</b>（每 2 级 +1% 抵抗捕获）。</p>
 
         <h3>🏁 反转里程碑</h3>
@@ -4916,7 +4956,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.118";
+    const GAME_VERSION = "V0.123";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -7883,8 +7923,10 @@
           if (!isFinite(n0)) return lo;
           return Math.max(lo, Math.min(hi, n0));
         };
-        out.a = int(m.a, -99, 99);
-        out.b = int(m.b, -99, 99);
+        // ⚠️ V0.122 修（作者：退出重进坐标就回原点）—— 以前读档把坐标夹到 **±99** ✗，
+        //   而地图和走路都是 ±9999 ✓ → 走得远一点就被夹回去，看起来像"被重置到原点"✗。
+        out.a = int(m.a, -9999, 9999);
+        out.b = int(m.b, -9999, 9999);
         out.sta = int(m.sta, 0, 1);
         out.staAt = Math.max(0, Math.floor(Number(m.staAt) || 0));
         out.zoom = !!m.zoom;
@@ -9051,13 +9093,18 @@
       p0.sta = Math.max(0, p0.sta - st);
       p0.a = tA;
       p0.b = tB;
+      p0.apClaimed = true;   // V0.119：**走完这一格 = 本轮行动已用掉**，无论之前状态如何都禁止再「支付并领取」✓
       mapSelReset();
       const cell = mapRollCell();
       const m = getMapBonus();
       // V0.116：按概率踩到事件（在方舟接触之前判定，避免把"接触方舟"事件挤掉）
       if (Math.random() < MAP_EVENT_CHANCE) { try { mapTriggerEvent(); } catch (e) { } }
       // V0.113：如果正好落在方舟上 → 接触它（发专家科技 + 现实改写点数）
-      const arkHit = (typeof invArkContact === "function") ? invArkContact() : false;
+      let arkHit = (typeof invArkContact === "function") ? invArkContact() : false;
+      // V0.122：确定性补判 —— 「确定移动」后只要站在方舟上就必须算接触（作者口径）
+      if (!arkHit && typeof invArkContact === "function") {
+        try { arkHit = invArkContact(); } catch (e) { }
+      }
       // V0.113（作者要求）：走完这一步**先不发奖** —— 面板右侧会显示「本回合结算：
       //   +X 基因点 + Y 基因修饰点」，等玩家点「确定」再发放并做多元宇宙重置。
       const rewardNote = "";
@@ -14119,6 +14166,11 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.123", "反转世界的成就弹窗重做：改成和主宇宙一样的宽列表（一行一条），不再被挤成竖排细条。"],
+      ["V0.122", "修复星图坐标：读档时坐标不再被夹到 ±99（以前走得远一点、重进就像被拉回原点）；方舟坐标改用 X/Y 显示，和星图坐标系对齐，不会再走错轴。"],
+      ["V0.121", "给所有「没有软上限」的科技效果加上软上限：超过阈值后改为对数增长，边际收益迅速趋近 0（科技等级 3000 / 解析倍率 1000 / 专家倍率 500）。"],
+      ["V0.120", "解析支持批量升级（×1 / ×10 / ×100 / 一键最大）；铸级的「一键最大」改名为「消耗所有尘埃」，语义更直观。"],
+      ["V0.119", "修复多元宇宙刷奖励：走完一格后本轮就锁死，「支付并领取」不可能再点第二次。"],
       ["V0.118", "修复「买了扭曲引擎、行动力不涨」——现在「支付并领取」会直接把行动力补满到上限。多元跃迁引擎重做：行动力上限 +20，取消独立的跃迁行动力，改成**跃迁一次扣 20 点行动力**。"],
       ["V0.117", "星图正式「有地方」了：四种生态（会随重置漂移）· 事件格（引力井 / 残片 / 畸变区 / 方舟残骸）· 方舟品质（普通 / 精良 / 稀有 / 史诗）。另外：跃迁改成独立的「跃迁行动力」、新增自动导航与手动坐标导航、修复后期凝析卡死与「铸级只要 1」、手机版可以导出存档了。"],
       ["V0.116", "星图生态（会漂移的四种区域）· 事件格 · 方舟品质 · 加成改为随重置次数增长。"],
@@ -15081,7 +15133,8 @@
       }
       setText("invArkStatus", invArkStatusText());
       setText("invArkLevel", invArkLevelText());
-      setText("invArkPos", a.pos ? ("(" + a.pos.a + ", " + a.pos.b + ")") : "—");
+      // V0.122：星图已改成 X/Y 坐标系 —— 方舟坐标也按 X（横向）/ Y（纵向）显示，避免玩家走错轴
+      setText("invArkPos", a.pos ? ("X: " + a.pos.b + "  Y: " + a.pos.a) : "—");
       setText("invArkPoints", formatNumber(a.points));
       setText("invRewritePoints", formatNumber(a.points));
       // V0.114：芯片已挪到**主宇宙**「科技点数」右边 —— 这里不再渲染（见 render 里那段）
@@ -15504,7 +15557,7 @@
         const curSta = mapStamina();
         const canGetAp = afford && hasClearedAllChallenges() && curSta < 1;
         const mvActionLabel = !hasClearedAllChallenges() ? "需先通关全部主线挑战"
-          : (curSta >= 1 ? "行动力还没花掉（去星图走一格）" : "支付并领取 1 点行动力");
+          : (getMapPos().apClaimed ? "本轮已领过 —— 点「确定」进入下一个大循环" : (curSta >= 1 ? "行动力还没花掉（去星图走一格）" : "支付并领取 1 点行动力"));
         setHTML("mvBody", `
           <p class="possibility-note">
             <b>老的多元宇宙系统已经不用了。</b>
@@ -15528,9 +15581,11 @@
       const cur = "";
       const afford = canAffordMultiverse();
       const curSta2 = mapStamina();
-      const canGetAp = afford && hasClearedAllChallenges() && curSta2 < 1;
+      // V0.119：本轮已经领过（apClaimed）→ 按钮也禁用，避免"看起来还能买"
+      const apClaimedNow = !!getMapPos().apClaimed;
+      const canGetAp = afford && hasClearedAllChallenges() && curSta2 < 1 && !apClaimedNow;
       const mvActionLabel = !hasClearedAllChallenges() ? "需先通关全部主线挑战"
-        : (curSta2 >= 1 ? "行动力还没花掉（去星图走一格）" : "支付并领取 1 点行动力");
+        : (apClaimedNow ? "本轮已领过 —— 点「确定」进入下一个大循环" : (curSta2 >= 1 ? "行动力还没花掉（去星图走一格）" : "支付并领取 1 点行动力"));
       setHTML("mvBody", `
         <p class="possibility-note">
           <b>老的多元宇宙系统已经不用了</b> —— 现在这里只发<b>行动力</b>：
@@ -18510,7 +18565,8 @@
       const def = INV_ARK_EXPERT_TECHS.filter(t => t.id === id)[0];
       if (!def) return 1;
       const lv = invArkExpertLv(id);
-      return Math.pow(1 + def.step, lv);
+      // V0.121：专家科技倍率软上限 500（之后每 ×10 只再涨 1 份）
+      return invSoftCap(Math.pow(1 + def.step, lv), 500);
     }
     function invArkPointsNow() { return invArkState().points; }
     // V0.115（作者要求）：尘埃上限的显示 ——
@@ -18677,8 +18733,18 @@
     //   （静默信标 400 级往后加得越多越没用）。现在**不再封顶**：等级多大，效果就多大。
     //   ⚠️ 里程碑原来那两条「软上限 ×1.01 / ×1.2」的福利随之悬空，已改成直接抬高**有效等级**：
     //      大里程碑 +2%/座、超级里程碑 +20%/座 —— 手感与旧版在软上限附近相当，但不再有天花板。
+    // ⚠️ V0.121（作者要求）：**软上限** —— 超过 cap 之后，多出来的部分改成「对数增长」，
+    //   也就是每多 10 倍只再加 1 份 cap，边际收益迅速趋近 0 ✓（不再让后期无限叠成一条直线增长 ✗）。
+    function invSoftCap(x, cap) {
+      const v = Math.max(0, Number(x) || 0);
+      const c = Math.max(1, Number(cap) || 1);
+      if (!isFinite(v)) return c;
+      if (v <= c) return v;
+      return c * (1 + Math.log10(v / c));   // log10：每 ×10 只 +1 份
+    }
     function invTechEffSoft(raw) {
-      const base = Math.max(0, raw || 0);
+      // V0.121：基础科技有效等级 3000 级前线性；之后 log10 缓慢增长 ✓
+      const base = invSoftCap(Math.max(0, raw || 0), 3000);
       return base * invMilestoneCapMult();
     }
     // V0.104：进阶科技放大对应基础科技的效果倍率 —— 有效等级 = 软上限(基础等级 ×（1 + 0.5 × 进阶等级）)
@@ -18818,6 +18884,34 @@
       { n: 10, unlock: 40000,  strength: 134217728,   speed: 134217728,   damage: 6561 }
     ];
     const INV_HOUND_NAMES = ["反转时间耄耋", "第二条时间耄耋", "第三条时间耄耋", "第四条时间耄耋", "第五条时间耄耋", "第六条时间耄耋", "第七条时间耄耋", "第八条时间耄耋", "第九条时间耄耋", "第十条时间耄耋"];
+    // ===== V0.123（作者口径）：进度条**一直往下加** —— 耄耋是无限序列，第 n 条的门槛/属性按公式算 =====
+    //   门槛：0 / 50 / 200 / 400 / 1K / 2K / 4K / 10K / 2W / 4W / 10W / 20W / 40W / 100W …
+    function invHoundThreshold(n) {
+      const k = Math.max(1, Math.floor(n));
+      if (k <= 1) return 0;
+      if (k === 2) return 50;
+      if (k === 3) return 200;
+      if (k === 4) return 400;
+      const i = k - 5, tier = Math.floor(i / 3), step = i % 3;
+      const base = Math.pow(10, 3 + tier);
+      return Math.round(base * (step === 0 ? 1 : step === 1 ? 2 : 4));
+    }
+    function invHoundIndexOf(level) {
+      let n = 1;
+      while (n < 5000 && level >= invHoundThreshold(n + 1)) n++;
+      return n;
+    }
+    function invHoundNameOf(n) {
+      return n <= INV_HOUND_NAMES.length ? INV_HOUND_NAMES[n - 1] : ("第 " + n + " 条时间耄耋");
+    }
+    function invHoundStatOf(n) {
+      const strength = Math.pow(8, Math.max(0, n - 1));
+      return { strength: strength, speed: strength, damage: Math.pow(3, Math.max(0, n - 2)) };
+    }
+    // 进度字段名：1 号沿用老字段 progress，其余用 progress{n}
+    function invHoundProgKey(n) { return n === 1 ? "progress" : ("progress" + n); }
+    function invHoundFillIdOf(n) { return n === 1 ? "invCapFill" : ("invCap" + n + "Fill"); }
+    function invHoundTextIdOf(n) { return n === 1 ? "invCapText" : ("invCap" + n + "Text"); }
     function invHoundNameOfStrength(s) {
       if (s === INV_HOUND1_STRENGTH) return INV_HOUND_NAMES[0];
       if (s === INV_HOUND2_STRENGTH) return INV_HOUND_NAMES[1];
@@ -18960,13 +19054,8 @@
       if (el.specials.indexOf("rage") >= 0) el.speedMult *= 1.1;
     }
     function invHoundCount() {
-      const lv2 = invLevelNow();
-      let n = 1;
-      if (lv2 >= INV_HOUND2_UNLOCK_LEVEL) n++;
-      if (lv2 >= INV_HOUND3_UNLOCK_LEVEL) n++;
-      if (lv2 >= INV_HOUND4_UNLOCK_LEVEL) n++;
-      INV_HOUND_EXTRA.forEach(h => { if (lv2 >= h.unlock) n++; });   // V0.105：第 5~8 条
-      return n;
+      // V0.123：按公式算，不再固定 10 条
+      return invHoundIndexOf(invLevelNow());
     }
     // V0.105（作者要求）：解析 —— 解锁第二条时间耄耋后永久解锁（掉回 50 级以下也保留）。
     //   从第二条时间耄耋起，每被追逐 1 秒积攒数据点：两条 1 点/秒、三条 2 点、四条 4 点…翻倍递增。
@@ -19008,7 +19097,8 @@
     const INV_PARSE_STEP = { dust: 1.10, shield: 1.12, weak: 0.93, slow: 0.96 };
     function invParseMult(id) {
       const step = INV_PARSE_STEP[id] || 1;
-      return Math.pow(step, invParseLv(id));
+      // V0.121：解析倍率软上限 1000（之后每 ×10 只再涨 1 份）
+      return invSoftCap(Math.pow(step, invParseLv(id)), 1000);
     }
     function invParseDustMult() { return invParseMult("dust"); }
     // 护盾协议：**乘在抵抗总量上**（复利），同时自带 +10%/级的底子 ——
@@ -19029,13 +19119,26 @@
       const def = INV_PARSE_DEFS.filter(d => d.id === id)[0];
       if (!def) return false;
       const P = invParseState();
-      const cost = invParseCost(def);
-      if (Math.floor(P.pts) < cost) { showToast(`数据点不足：${def.name}升到下一级需要 <b>${formatNumber(cost)}</b>（现有 ${formatNumber(Math.floor(P.pts))}）。`); return false; }
-      P.pts -= cost;
-      P.lv[id] = invParseLv(id) + 1;
+      // V0.119：按批量买（1 / 10 / 100 / 一键最大 = 买到买不动为止）
+      let want = invParseBatch === "max" ? 10000 : Math.max(1, Number(invParseBatch) || 1);
+      let done = 0, spent = 0;
+      for (let i = 0; i < want; i++) {
+        const cost = invParseCost(def);
+        if (Math.floor(P.pts) < cost) break;
+        P.pts -= cost;
+        spent += cost;
+        P.lv[id] = invParseLv(id) + 1;
+        done++;
+      }
+      if (done === 0) {
+        showToast(`数据点不足：${def.name}升到下一级需要 <b>${formatNumber(invParseCost(def))}</b>（现有 ${formatNumber(Math.floor(P.pts))}）。`);
+        return false;
+      }
       saveGame(true);
       renderInvWorld();
-      showToast(`🔬 解析：<b>${def.name}</b> → Lv.${formatNumber(P.lv[id])}（剩 ${formatNumber(Math.floor(P.pts))} 数据点）。`);
+      showToast(done > 1
+        ? `🔬 解析：<b>${def.name}</b> ×${formatNumber(done)} → Lv.${formatNumber(P.lv[id])}（花 ${formatNumber(spent)}，剩 ${formatNumber(Math.floor(P.pts))} 数据点）。`
+        : `🔬 解析：<b>${def.name}</b> → Lv.${formatNumber(P.lv[id])}（剩 ${formatNumber(Math.floor(P.pts))} 数据点）。`);
       return true;
     }
     function invTechResistPct() { return 0.005 * invTechEffLv("dampener"); }
@@ -19774,6 +19877,25 @@
         invWorld.progress4 = 0;   // 等级掉下 400：第四条时间耄耋暂时消失
       }
       // V0.105（作者要求）：第 5~8 条时间耄耋 —— 1000 / 2000 / 4000 / 10000 级现身，属性 ×8、伤害 ×4 逐条递增
+      // V0.123：第 11 条及以后（无限序列）—— 通用循环，属性和门槛都按公式算
+      {
+        const N = invHoundIndexOf(lv);
+        for (let n = 11; n <= N; n++) {
+          const key = "progress" + n;
+          const st = invHoundStatOf(n);
+          invWorld[key] = (invWorld[key] || 0) + dt * st.speed * invHoundSpeedMult() / invCapSec();
+          if (invWorld[key] >= 1) {
+            let z = 0;
+            while (invWorld[key] >= 1 && z < 200) {
+              invWorld[key] -= 1;
+              invCapture(z > 0, st.strength, st.damage);
+              z++;
+            }
+            if (invWorld[key] >= 1) invWorld[key] = 0;
+            if (z > 1) showToast(`◑ 补帧结算：一口气被<b>${invHoundNameOf(n)}</b>啃了 <b>${formatNumber(z)}</b> 口，当前 Lv.${formatNumber(invLevelNow())}。`);
+          }
+        }
+      }
       INV_HOUND_EXTRA.forEach(h => {
         const key = "progress" + h.n;
         if (lv >= h.unlock) {
@@ -20058,6 +20180,30 @@
           setText("invCap4Text", `第四条时间耄耋 ${Math.floor(pr4 * 100)}% · 还有 ${Math.max(0, (1 - pr4) * invCapSec() / INV_HOUND4_SPEED_MULT).toFixed(3)} 秒 · 被捕获概率 ${(invCaptureChance(INV_HOUND4_STRENGTH) * 100).toFixed(1)}% · 一口 ${INV_HOUND4_DAMAGE} 级`);
         }
       }
+      // V0.123：第 11 条及以后的进度条 —— 条数变了才重建 DOM，其余每帧只更新宽度/文字
+      try {
+        const N = invHoundIndexOf(lv);
+        const box = el("invHoundBars");
+        if (box) {
+          const sig = "n" + N;
+          if (box.dataset.sig !== sig) {
+            box.dataset.sig = sig;
+            let html = "";
+            for (let n = 11; n <= N; n++) {
+              html += '<div class="inv-track" id="invTrack' + n + '"><i id="invCap' + n + 'Fill"></i><span class="inv-track-cap" id="invCap' + n + 'Text">' + invHoundNameOf(n) + ' 0%</span></div>';
+            }
+            setHTML("invHoundBars", html);
+          }
+          for (let n = 11; n <= N; n++) {
+            const pr = Math.max(0, Math.min(1, invWorld["progress" + n] || 0));
+            setInvTrackWidth("invCap" + n + "Fill", pr * 100);
+            const st = invHoundStatOf(n);
+            const leftMs = Math.max(0, (1 - pr) * invCapSec() / (st.speed * invHoundSpeedMult()) * 1000);
+            const leftTxt = leftMs >= 10 ? (leftMs / 1000).toFixed(2) + " 秒" : leftMs.toFixed(1) + " 毫秒";
+            setText("invCap" + n + "Text", `${invHoundNameOf(n)} ${Math.floor(pr * 100)}% · 还有 ${leftTxt} · 被捕获概率 ${(invCaptureChance(st.strength) * 100).toFixed(1)}% · 一口 ${formatNumber(st.damage)} 级`);
+          }
+        }
+      } catch (e) { }
       // V0.105：第 5~8 条时间耄耋的进度条（表驱动；毫秒级倒计时专门格式化）
       INV_HOUND_EXTRA.forEach(h => {
         const tr = el("invTrack" + h.n);
@@ -20296,6 +20442,8 @@
         `</div>` + status + ptsLine);
     }
     // V0.105：解析子页 —— 数据点商店
+    // V0.119（作者要求）：解析也支持批量（×1 / ×10 / ×100 / 一键最大）
+    let invParseBatch = 1;   // 1 / 10 / 100 / "max"
     function renderInvParsePane() {
       const box = el("invLeapSubParse");
       if (!box) return;
@@ -20311,6 +20459,13 @@
         `当前 <b>${formatNumber(nH)}</b> 条时间耄耋 → <b>${formatNumber(rate)}</b> 点 / 秒（两条 1、三条 2、四条 4、五条 8…翻倍递增）。` +
         `解锁后掉回 50 级以下也保留；数据点在本趟旅程里花，退出即清。</p>` +
         `<div class="inspire-card"><div class="inspire-row"><span>当前数据点</span><b>${formatNumber(Math.floor(P.pts))}</b></div></div>` +
+        `<div class="bulk-bar" style="margin-top: 10px;">
+          <span class="bulk-bar-label">升级批量</span>
+          <button class="bulk-btn ${invParseBatch === 1 ? "active" : ""}" data-parse-batch="1">×1</button>
+          <button class="bulk-btn ${invParseBatch === 10 ? "active" : ""}" data-parse-batch="10">×10</button>
+          <button class="bulk-btn ${invParseBatch === 100 ? "active" : ""}" data-parse-batch="100">×100</button>
+          <button class="bulk-btn ${invParseBatch === "max" ? "active" : ""}" data-parse-batch="max">一键最大</button>
+        </div>` +
         INV_PARSE_DEFS.map(def => {
           const lv = invParseLv(def.id);
           const cost = invParseCost(def);
@@ -21799,6 +21954,12 @@
     delegate("invLeapSubTabs", "[data-leap-sub]", btn => switchInvLeapSub(btn.dataset.leapSub));
     delegate("invLeapSubInspire", "[data-inspire-use]", () => invInspireConfirm());
     delegate("invLeapSubParse", "[data-inv-parse]", btn => invParseBuy(btn.dataset.invParse));
+    // V0.119：切换解析的升级批量
+    delegate("invLeapSubParse", "[data-parse-batch]", btn => {
+      const v = btn.dataset.parseBatch;
+      invParseBatch = v === "max" ? "max" : (Number(v) || 1);
+      renderInvParsePane();
+    });
     delegate("invEliteBody", "[data-elite-fight]", () => invEliteChallenge());
     on("invTabElite", () => switchInvPane("elite"));
     delegate("invLeapList", "[data-leap-select]", btn => invLeapSelect(btn.dataset.leapSelect));
