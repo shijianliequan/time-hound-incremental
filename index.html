@@ -3021,7 +3021,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.116</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.117</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -3882,8 +3882,8 @@
           <div class="map-card" style="padding:8px 12px;">
             <h4>🧭 手动坐标导航（优先级更高）</h4>
             <div style="display:flex; gap:6px; align-items:center; font-size:12px; flex-wrap:wrap;">
-              行 <input type="number" id="mapNavA" style="width:72px;" placeholder="0">
-              列 <input type="number" id="mapNavB" style="width:72px;" placeholder="0">
+              X <input type="number" id="mapNavX" style="width:72px;" placeholder="0">
+              Y <input type="number" id="mapNavY" style="width:72px;" placeholder="0">
               <button class="secondary-button" id="mapNavGoBtn" style="width:auto;flex:0 0 auto;">出发</button>
               <button class="secondary-button" id="mapNavStopBtn" style="width:auto;flex:0 0 auto;">取消</button>
             </div>
@@ -4102,6 +4102,8 @@
             <div class="inv-track" id="invTrack6" style="display: none;"><i id="invCap6Fill"></i><span class="inv-track-cap" id="invCap6Text">第六条时间耄耋 0%</span></div>
             <div class="inv-track" id="invTrack7" style="display: none;"><i id="invCap7Fill"></i><span class="inv-track-cap" id="invCap7Text">第七条时间耄耋 0%</span></div>
             <div class="inv-track" id="invTrack8" style="display: none;"><i id="invCap8Fill"></i><span class="inv-track-cap" id="invCap8Text">第八条时间耄耋 0%</span></div>
+            <div class="inv-track" id="invTrack9" style="display: none;"><i id="invCap9Fill"></i><span class="inv-track-cap" id="invCap9Text">第九条时间耄耋 0%</span></div>
+            <div class="inv-track" id="invTrack10" style="display: none;"><i id="invCap10Fill"></i><span class="inv-track-cap" id="invCap10Text">第十条时间耄耋 0%</span></div>
             <!-- V0.105（作者要求）：精英时间耄耋的进度条（挑战后出现） -->
             <div class="inv-track" id="invTrackElite" style="display: none;">
               <i id="invEliteFill"></i>
@@ -4914,7 +4916,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.116";
+    const GAME_VERSION = "V0.117";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -5697,7 +5699,7 @@
         name: "百万尘埃",
         icon: "☰",
         description: "手上持有 1,000,000 时间尘埃。",
-        reward: { dust: 0.05 },
+        unlock: "解锁自动化 · 多元宇宙重置",     // V0.116：奖励是自动化，不是属性加成
         check: () => bigCmp(save.dust, 1e6) >= 0,
         progress: () => `${formatNumber(bigMin(save.dust, 1e6))} / 1.00M`
       },
@@ -5716,7 +5718,7 @@
         name: "循环自动化",
         icon: "⚙",
         description: "累计被时间猎犬捕获 10 次。",
-        reward: { dust: 0.05 },
+        unlock: "解锁自动化 · 多元宇宙重置",     // V0.116：奖励是自动化，不是属性加成
         unlock: "解锁「自动收获」",
         check: () => save.captures >= 10,
         progress: () => `${Math.min(save.captures, 10)} / 10 次`
@@ -5735,7 +5737,7 @@
         name: "时光旅人",
         icon: "⏱",
         description: "本存档累计在线游玩 1 小时。",
-        reward: { dust: 0.05 },
+        unlock: "解锁自动化 · 多元宇宙重置",     // V0.116：奖励是自动化，不是属性加成
         check: () => (save.playMs || 0) >= 3600 * 1000,
         progress: () => `${formatPlayTime(Math.min(save.playMs || 0, 3600 * 1000))} / 1 小时`
       },
@@ -5848,7 +5850,7 @@
         name: "永恒收藏家",
         icon: "◈",
         description: "集齐全部永恒部件。",
-        reward: { dust: 0.05 },
+        unlock: "解锁自动化 · 多元宇宙重置",     // V0.116：奖励是自动化，不是属性加成
         unlock: "解锁「自动装备」：部件一强化就自动上身，不用再手动点",
         check: () => getOwnedPartCount() >= getPartTotal(),
         progress: () => `${Math.min(getOwnedPartCount(), getPartTotal())} / ${getPartTotal()} 个`
@@ -5896,7 +5898,7 @@
         name: "基因初植",
         icon: "🧬",
         description: "植入第一条基因。",
-        reward: { dust: 0.05 },
+        unlock: "解锁自动化 · 多元宇宙重置",     // V0.116：奖励是自动化，不是属性加成
         check: () => (save.possibility.genes || []).length >= 1,
         progress: () => `${Math.min((save.possibility.genes || []).length, 1)} / 1 条`
       },
@@ -6730,6 +6732,7 @@
       // V0.116：两个多元宇宙相关的自动化
       { key: "mvreset", name: "多元宇宙重置", desc: "行动力花完、结算已备好、主线挑战全通时，自动领奖并进入下一个大循环。" },
       { key: "autonav", name: "自动导航", desc: "有行动力且星图上有未接触的方舟时，自动朝最近的方舟开路（危险区域会照样走）。" },
+
       {
         key: "harvest", name: "自动收获",
         desc: "时间进度走到你设定的「收割时机」（上方滑动条，默认 130%）就替你结算一次，随后进度归零重新开始——和手动收获完全同一套规则，只是不用点按钮。结算收益可以在本源商店用「自动收获效率」逐级放大。开启后进度条会自己一圈圈走，不会再因为忘了点收获而空转。单圈耗时不足 1 秒时自动切换为「持续收割」：进度条停在满格不再归零，尘埃按当前速度连续入账，总收益不变。开启条件：达成成就「循环自动化」。"
@@ -6759,8 +6762,8 @@
         desc: "每秒检查一次诱饵库存：只要有存货就自动投入转盘，把诱饵之力全部换成诱饵等级，不用再一枚枚手动点。消耗顺序是【从最高品质开始】——品质越高单枚之力越强，先把好的转掉。为了不打断你，自动转盘会省略转盘动画，只在事件提示里报一句结果；想看着指针转，把它关掉手动抽即可。开启条件：达成成就「诱饵收藏家」。"
       },
       {
-        key: "shop", name: "自动升级悖论商店",
-        desc: "第 5 次进入多元宇宙后，由「多元宇宙里程碑」解锁。每秒自动巡检一次本源商店：挑衅冷却、自动收获效率、猎影加速三件套各买 1 级，剩下的本源再持续投进<b>「命运扭曲」</b>（一次买满当前买得起的级数）——买不起或已满级就跳过，不弹提示、不打扰。开启后攒下的本源会被持续投进商店，不再留着做别的事（比如手动冲「猎影加速」的某一个挡位）。开启条件：多元宇宙里程碑第 5 次。"
+        key: "shop", name: "自动升级悖论商店（含自动解锁时间惯性）",
+        desc: "第 5 次进入多元宇宙后，由「多元宇宙里程碑」解锁。每秒自动巡检一次本源商店：挑衅冷却、自动收获效率、猎影加速三件套各买 1 级，剩下的本源再持续投进<b>「命运扭曲」</b>（一次买满当前买得起的级数）——买不起或已满级就跳过，不弹提示、不打扰。开启后攒下的本源会被持续投进商店，不再留着做别的事（比如手动冲「猎影加速」的某一个挡位）。开启条件：多元宇宙里程碑第 5 次。<b>另外时间本源够 50,000 时，会顺手把「时间惯性」也自动解锁。</b>",
       }
     ];
 
@@ -6773,7 +6776,7 @@
       name: "方舟收藏家",
       icon: "🚀",
       description: "累计接触 5 艘方舟 —— 解锁「自动化 · 多元宇宙重置」。",
-      reward: { dust: 0.05 },
+      unlock: "解锁自动化 · 多元宇宙重置",     // V0.116：奖励是自动化，不是属性加成
       check: () => Math.max(0, Math.floor(Number(save.arkContactsTotal) || 0)) >= 5,
       progress: () => {
         const n = Math.max(0, Math.floor(Number(save.arkContactsTotal) || 0));
@@ -7887,6 +7890,7 @@
         out.zoom = !!m.zoom;
         out.apClaimed = !!m.apClaimed;   // V0.114：本轮是否已经领过行动力
         out.apDebt = Math.max(0, Math.min(99, Math.floor(Number(m.apDebt) || 0)));   // V0.116：畸变区欠账
+        out.warpSta = Math.max(0, Math.min(99, Math.floor(Number(m.warpSta) || 0))); // V0.116：跃迁行动力（独立）
         out.manualNav = (m.manualNav && typeof m.manualNav === "object")
           ? { a: Math.max(-9999, Math.min(9999, Math.floor(Number(m.manualNav.a) || 0))),
               b: Math.max(-9999, Math.min(9999, Math.floor(Number(m.manualNav.b) || 0))) }
@@ -8656,6 +8660,14 @@
     const MAP_STAMINA_MAX = 1;         // 行动力上限基数（扭曲引擎每级 +1）
     // V0.115（作者要求）：「扭曲引擎」把每次多元宇宙能移动的点数 +1/级
     function mapStaminaMax() { return MAP_STAMINA_MAX + invRwLv("engine"); }
+    function setMapEventChance(v) { MAP_EVENT_CHANCE = Math.max(0, Math.min(1, Number(v) || 0)); }   // V0.116：单测用
+    // V0.116（作者要求）：**跃迁行动力** —— 与普通行动力完全独立；买了跃迁引擎后每个多元宇宙周期补 1 点
+    function mapWarpStaminaMax() { return invRwLv("warp") > 0 ? 1 : 0; }
+    function mapWarpStamina() {
+      const p0 = getMapPos();
+      p0.warpSta = Math.max(0, Math.min(mapWarpStaminaMax(), Math.floor(Number(p0.warpSta) || 0)));
+      return p0.warpSta;
+    }
     const MAP_CELL_ROLL_BASE = 10;     // 随机词条：每格距离 +10% 打底（再乘 0.6~1.4 的随机系数）
     // V0.112（作者更正）：星图加成打的是**主宇宙**的属性，和反转世界无关 ——
     //   ↑ 尘埃收益 · ↓ 时间流速 · → 碎片爆率 · ← 本源收益（各 +25%/格，线性无上限）
@@ -8685,6 +8697,8 @@
       mapStamina();
       const before = p0.sta;
       p0.sta = Math.min(mapStaminaMax(), p0.sta + 1);
+      // V0.116：跃迁行动力跟着周期一起补
+      p0.warpSta = mapWarpStaminaMax();
       // V0.116：畸变区欠下的行动力，在这一周期补扣
       const debt = Math.max(0, Math.floor(p0.apDebt || 0));
       if (debt > 0) {
@@ -8744,7 +8758,7 @@
       return cache[key];
     }
     // V0.116：事件格 —— 落地时按概率触发（残骸只在解锁方舟后才出现；畸变区可欠账到下一周期）
-    const MAP_EVENT_CHANCE = 0.12;
+    let MAP_EVENT_CHANCE = 0.12;   // V0.116：改成 let（单测里可临时置 0 关闭事件，避免随机污染断言）
     function mapTriggerEvent() {
       const p0 = getMapPos();
       const arkOK = (typeof invArkUnlocked === "function") && invArkUnlocked();
@@ -8850,12 +8864,13 @@
     function mapWarpStep(dir) {
       const BLOCK = mapZoomLv() >= 2 ? 400 : 20;
       const p0 = getMapPos();
-      if (mapStamina() <= 0) { showToast("🌀 没有行动力了 —— 跃迁也要花 1 点。", "tech"); return false; }
+      // V0.116（作者要求）：跃迁用的是**跃迁行动力**，和普通行动力（那 5 点）完全独立
+      if (mapWarpStamina() <= 0) { showToast("🌀 没有<b>跃迁行动力</b>了（它和普通行动力是分开的）。", "tech"); return false; }
       const da = dir === "up" ? BLOCK : dir === "down" ? -BLOCK : 0;
       const db = dir === "right" ? BLOCK : dir === "left" ? -BLOCK : 0;
       if (!da && !db) return false;
       if (Math.abs(p0.a + da) > 9999 || Math.abs(p0.b + db) > 9999) { showToast("🌀 太远了（±9999）。", "tech"); return false; }
-      p0.sta = Math.max(0, p0.sta - 1);
+      p0.warpSta = Math.max(0, mapWarpStamina() - 1);
       p0.a += da; p0.b += db;
       p0.cells = p0.cells || {};
       mapSelReset();
@@ -8889,9 +8904,9 @@
       const dA = ark.a - p0.a, dB = ark.b - p0.b;
       if (!dA && !dB) return false;
       const dist = Math.abs(dA) + Math.abs(dB);
-      if (invRwLv("warp") > 0 && dist > 20) {
+      if (invRwLv("warp") > 0 && dist > 20 && mapWarpStamina() > 0) {
         const step = Math.min(20, Math.max(Math.abs(dA), Math.abs(dB)));
-        p0.sta = Math.max(0, p0.sta - 1);
+        p0.warpSta = Math.max(0, mapWarpStamina() - 1);      // V0.116：跃迁消耗独立行动力
         if (Math.abs(dA) >= Math.abs(dB)) p0.a += Math.sign(dA) * step; else p0.b += Math.sign(dB) * step;
       } else {
         p0.sta = Math.max(0, p0.sta - 1);
@@ -8924,9 +8939,9 @@
       const dA = p0.manualNav.a - p0.a, dB = p0.manualNav.b - p0.b;
       if (!dA && !dB) { p0.manualNav = null; showToast("🧭 已到达目标坐标。", "tech"); saveGame(true); renderPossibility(); return false; }
       const dist = Math.abs(dA) + Math.abs(dB);
-      if (invRwLv("warp") > 0 && dist > 20) {
+      if (invRwLv("warp") > 0 && dist > 20 && mapWarpStamina() > 0) {
         const step = Math.min(20, Math.max(Math.abs(dA), Math.abs(dB)));
-        p0.sta = Math.max(0, p0.sta - 1);
+        p0.warpSta = Math.max(0, mapWarpStamina() - 1);      // V0.116：跃迁消耗独立行动力
         if (Math.abs(dA) >= Math.abs(dB)) p0.a += Math.sign(dA) * step; else p0.b += Math.sign(dB) * step;
       } else {
         p0.sta = Math.max(0, p0.sta - 1);
@@ -9683,6 +9698,8 @@
       p.pending = null;
       // V0.114：新一轮可以再领行动力
       getMapPos().apClaimed = false;
+      // V0.116：跃迁行动力每周期补满（和普通行动力独立）
+      getMapPos().warpSta = mapWarpStaminaMax();
       // V0.116：生态每次重置都缓慢演化（漂移 / 扩张 / 收缩 / 消散 / 新生）
       try { if (mapBiomes().length === 0) mapInitBiomes(); else mapEvolveBiomes(); } catch (e) { }
       // V0.113（作者要求）：解锁看**当前回合** —— 新回合要重新打到 1K 级；
@@ -9711,7 +9728,10 @@
         mapP0.pendingReward = { gene: geneGain, mod: modGain };   // 重置口径：不带 fromPurchase，下次重置可以再更新
       }
       // 同时发放 1 点行动力（固定上限 1）
-      mapP0.sta = Math.min(mapStaminaMax(), Math.max(0, Math.floor(mapP0.sta || 0)) + 1);
+      // ⚠️ V0.116 修（作者：能走一格、点领取、再走一格 —— 无限免费循环）——
+      //   以前每次多元宇宙重置都会**白送 1 点行动力** ✗，于是「走→领奖→重置」可以无限循环、完全不用付 1E1000 ✗。
+      //   现在重置**不再发行动力**：想走就必须自己「支付并领取」✓（和最初的设计一致）。
+      mapP0.sta = 0;
       p.universe = { name: choice.name, mods: choice.mods };
       p.tabUnlocked = true;
       // V0.68：选定一个宇宙之后，**其余候选全部消散**（不能接着挑剩下的）。
@@ -10352,6 +10372,39 @@
     }
     function downloadSaveText(text) {
       if (!text) return false;
+      // ⚠️ V0.116 修（作者：手机版无法导出存档）——
+      //   手机浏览器 / WebView 里 <a download> 经常被吞掉 ✗。现在分三档：
+      //   ① 手机 + 支持系统分享 → 走 navigator.share（能"保存到文件"/发给自己）；
+      //   ② 手机但没有分享 → **新窗口**打开纯文本页（长按全选复制，或菜单里保存页面）；
+      //   ③ 桌面 → 原来的 Blob 下载。
+      const ua = (navigator && navigator.userAgent) || "";
+      const isMobile = /Android|iPhone|iPad|iPod|Mobile|HarmonyOS/i.test(ua) ||
+        (typeof window !== "undefined" && "ontouchstart" in window && window.innerWidth < 900);
+      if (isMobile) {
+        if (navigator.share) {
+          try {
+            navigator.share({ title: saveFileName(), text: text }).then(
+              () => { try { showToast("✅ 已通过系统分享导出（保存到文件 / 发给自己）。", "tech"); } catch (e) { } },
+              () => { }
+            );
+            return true;
+          } catch (e) { }
+        }
+        try {
+          const w = window.open("", "_blank");
+          if (w && w.document) {
+            w.document.write("<meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
+              "<title>" + saveFileName() + "</title>" +
+              "<body style='margin:12px;font-family:monospace;'><p style='font-size:13px;color:#555;'>" +
+              "长按全选复制这段文本，或用浏览器菜单「保存页面 / 下载」。<b>改动任何一个字符都会导致载入失败。</b></p>" +
+              "<pre style='white-space:pre-wrap;word-break:break-all;font-size:11px;'>" +
+              String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</pre></body>");
+            w.document.close();
+            try { showToast("📄 已在新窗口打开存档文本：长按复制，或用浏览器菜单保存。", "tech"); } catch (e) { }
+            return true;
+          }
+        } catch (e) { }
+      }
       if (typeof URL === "undefined" || !URL.createObjectURL) return false;
       try {
         const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
@@ -11338,6 +11391,8 @@
       if (kind === "shop") return isAutoShopUnlocked();
       // V0.116：自动导航挂在反转世界科技「自动导航系统」上（不是成就）
       if (kind === "autonav") { try { return invRwLv("autonav") > 0; } catch (e) { return false; } }
+      // V0.116：自动解锁时间惯性 —— 和「自动升级悖论商店」同一门槛
+
       const id = AUTO_UNLOCK[kind];
       return !!(id && save.achievements[id]);
     }
@@ -14063,6 +14118,7 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.117", "星图正式「有地方」了：四种生态（会随重置漂移）· 事件格（引力井 / 残片 / 畸变区 / 方舟残骸）· 方舟品质（普通 / 精良 / 稀有 / 史诗）。另外：跃迁改成独立的「跃迁行动力」、新增自动导航与手动坐标导航、修复后期凝析卡死与「铸级只要 1」、手机版可以导出存档了。"],
       ["V0.116", "星图生态（会漂移的四种区域）· 事件格 · 方舟品质 · 加成改为随重置次数增长。"],
       ["V0.115", "新增九款现实改写科技 · 突破反转铸级 1E308 上限 · 数字显示可自选位数与单/双 E。"],
       ["V0.114", "多元宇宙星图定稿（20×20 分区 · 行动力 · 结算卡）· 赌神结算修复 · 方舟与专家科技 · 改写现实科技。"],
@@ -14676,7 +14732,7 @@
         (unlockedCount < AUTO_ROWS.length
           ? `<br><span style="color: var(--muted);">未解锁的项达成对应成就后会直接出现。` +
             `自动收获：累计被捕获 10 次 · 自动升级：任一升级达到 Lv.${AUTO_UPGRADE_UNLOCK_LEVEL} · ` +
-            `自动悖论：成就「多元宇宙旅人」 · 自动升级悖论商店：多元宇宙里程碑第 ${MILESTONE_SHOP_AUTO_ENTRIES} 次。</span>`
+            `自动悖论：成就「多元宇宙旅人」 · 自动升级悖论商店（含自动解锁时间惯性）：多元宇宙里程碑第 ${MILESTONE_SHOP_AUTO_ENTRIES} 次。</span>`
           : ""));
 
       // 未解锁的自动化整行不渲染
@@ -15271,9 +15327,10 @@
         }
       }
       setHTML("mapGrid", cells.join(""));
-      setText("mapPosText", "区 (" + secX + ", " + secY + ") · 坐标 (" + cur.a + ", " + cur.b + ") · 本区内 (" +
-        (cur.a - baseA) + ", " + (cur.b - baseB) + ") · 勘测半径 " + VR +
-        (VR >= 10 ? "（全貌）" : ""));
+      // V0.116（作者要求）：坐标系改成 **X.Y**（X = 横向/列、Y = 纵向/行），并把当前坐标放在最前面
+      setText("mapPosText", "📍 当前坐标  X: " + cur.b + "   Y: " + cur.a +
+        "　·　区 (" + secX + ", " + secY + ") · 本区内 X:" + (cur.b - baseB) + " Y:" + (cur.a - baseA) +
+        " · 勘测半径 " + VR + (VR >= 10 ? "（全貌）" : ""));
       setHTML("mapNowBonus", "<b>当前格加成</b>：" + mapBonusText() +
         '<br><span style="color:var(--muted);font-size:11.5px;">（越往外走，这一方向的加成越高，理论上不封顶）</span>' +
         "<br>" + mapCellText());
@@ -15308,8 +15365,11 @@
              (rwNow.mod > 0 ? (rwNow.gene ? " + " : "") + formatNumber(bigOf(rwNow.modObj || 0)) + " 基因修饰点" : ""))
           : "";
         const staMax = mapStaminaMax();
+        const warpMax = mapWarpStaminaMax();
+        const warpNow = mapWarpStamina();
         setText("mapStaText", "行动力 " + sta + " / " + staMax +
-          (sta >= staMax ? ("（可走 " + staMax + " 格）") : "（空了 —— 下次多元宇宙重置时补满）") + plain);
+          (sta >= staMax ? ("（可走 " + staMax + " 格）") : "（空了 —— 下次多元宇宙重置时补满）") +
+          (warpMax > 0 ? "　·　跃迁行动力 " + warpNow + " / " + warpMax : "") + plain);
       }
       // V0.113：缩放仪按钮（买过才出现）
       // V0.115：三段缩放按钮 + 自动导航
@@ -15323,7 +15383,7 @@
       }
       if (zOut) {
         zOut.style.display = zoomOwned ? "" : "none";
-        zOut.disabled = zLv <= 0;
+        zOut.disabled = false;      // V0.116：**永不禁用**（以前禁用到 0 档后容易卡住 ✗）
         zOut.title = zLv <= 0 ? "已经是最细的小地图" : "缩小一档（看得更近）";
       }
       if (zHome) {
@@ -17460,7 +17520,9 @@
       el("settingsModal").classList.add("show");
     });
     // V0.109：提示框开关的勾选（事件代理 —— 清单是动态渲染的）
+    // V0.117（作者反馈：刷新后提示框选项会重置）——改完立刻落盘
     el("toastMuteList").addEventListener("change", e => {
+      try { saveGame(true); } catch (err) { }
       const t = e.target;
       if (!t || !t.dataset || !t.dataset.toastMute) return;
       setToastMute(t.dataset.toastMute, !t.checked);
@@ -17626,16 +17688,20 @@
       showToast("🔭 增大视角：第 " + next + " 档（每格 = " + (next >= 2 ? "400×400" : "20×20") + "）", "tech");
     });
     on("mapZoomOutBtn", () => {
-      // V0.116 修（作者：放大后不能缩小）—— 以前只减档，如果档位数据异常（比如被别处写成 true/false）
-      //   就会卡在原档；现在直接按当前档位算「下一档」，并且异常值一律回落。
-      const cur = mapZoomLv();
+      // V0.116 修（作者：放大后不能缩小）—— 三重保险：
+      //   ① 以「实际写进去的值」为准，不依赖旧档位；
+      //   ② 写完之后再读一次，如果还是没变（数据异常）→ **直接强制回 0 档**；
+      //   ③ 按钮本身永不禁用（见渲染处），任何情况都能点。
       const p0 = getMapPos();
-      const nextLv = Math.max(0, Math.min(mapZoomMaxLv(), cur - 1));
-      p0.zoom = nextLv;                       // 直接写数值，不再依赖旧值
+      const before = Math.floor(Number(p0.zoom) || 0);
+      const nextLv = Math.max(0, Math.min(mapZoomMaxLv(), before - 1));
+      p0.zoom = nextLv;
+      if (Math.floor(Number(getMapPos().zoom) || 0) >= before) p0.zoom = 0;   // 兜底：强制回最小
       mapSelReset();
       saveGame(true);
       renderPossibility();
-      showToast(nextLv === 0 ? "🔎 已回最小地图（第 0 档）" : ("🔎 缩小视角：第 " + nextLv + " 档"), "tech");
+      const now = mapZoomLv();
+      showToast(now === 0 ? "🔎 已回最小地图（第 0 档）" : ("🔎 缩小视角：第 " + now + " 档"), "tech");
     });
     on("mapZoomHomeBtn", () => { mapSetZoom(0); showToast("🏠 回到当前格子的小地图。", "tech"); });
     on("mapAutoNavBtn", () => mapAutoNavigate());
@@ -17643,10 +17709,11 @@
     // V0.116：右栏「返回当前格子」+ 手动坐标导航
     on("mapBackHomeBtn", () => { mapSetZoom(0); showToast("🏠 回到当前格子的小地图。", "tech"); });
     on("mapNavGoBtn", () => {
-      const a = Number((el("mapNavA") || {}).value);
-      const b = Number((el("mapNavB") || {}).value);
-      if (!isFinite(a) || !isFinite(b)) { showToast("请输入有效的行 / 列坐标。", "tech"); return; }
-      mapNavigateTo(a, b);
+      // V0.116：输入是 X（横向/列）/ Y（纵向/行）→ 内部存的是 (a = Y, b = X)
+      const x = Number((el("mapNavX") || {}).value);
+      const y = Number((el("mapNavY") || {}).value);
+      if (!isFinite(x) || !isFinite(y)) { showToast("请输入有效的 X / Y 坐标。", "tech"); return; }
+      mapNavigateTo(y, x);
     });
     on("mapNavStopBtn", () => {
       const p0 = getMapPos();
@@ -18087,6 +18154,14 @@
       // V0.96：自动升级悖论商店（里程碑第 5 次解锁）—— 买本源商店的级，与捕获/转盘无关
       if (isAutoUnlocked("shop") && save.auto.shop) autoShopStep();
       // V0.115：自动化多元宇宙重置 —— 本轮结算已备好、行动力花完 → 自动领奖 + 重置
+      // V0.116（作者要求）：自动解锁时间惯性**并进「自动升级悖论商店」**，不单独占一行
+      if (isAutoUnlocked("shop") && save.auto.shop && !save.inertiaUnlocked &&
+          bigCmp(save.origin, INERTIA_UNLOCK_COST) >= 0) {
+        if (unlockInertia()) {
+          showToast("♾ <b>自动解锁时间惯性</b>：已用 " + formatNumber(INERTIA_UNLOCK_COST) + " 本源解锁（当前 Lv." + getInertiaLevel() + "）。", "tech");
+          render();
+        }
+      }
       if (isAutoUnlocked("mvreset") && save.auto.mvreset) autoMvResetStep();
       // V0.116：自动导航（手动坐标导航优先级更高 —— 见 mapManualNav 检查）
       if (isAutoUnlocked("autonav") && save.auto.autonav) autoNavStep();
@@ -18724,21 +18799,25 @@
     const INV_HOUND3_UNLOCK_LEVEL = 200;
     const INV_HOUND3_STRENGTH = 64;      // 800% × 8 = 6400%
     const INV_HOUND3_SPEED_MULT = 64;    // 8×8 = 64 倍速（10s → 0.156s 一圈）
-    const INV_HOUND3_DAMAGE = 2;         // 每次命中掉 2 级
+    const INV_HOUND3_DAMAGE = 3;         // V0.117（作者口径）：第 3 条一口 3 级 = 3^(3-2)
     // V0.105（作者要求）：第四条时间耄耋 —— 反转等级 400 解锁，数值是第三条的 8 倍。
     const INV_HOUND4_UNLOCK_LEVEL = 400;
     const INV_HOUND4_STRENGTH = 512;     // 6400% × 8 = 51200%
     const INV_HOUND4_SPEED_MULT = 512;   // 64 × 8（10s → 0.0195s 一圈）
-    const INV_HOUND4_DAMAGE = 8;         // V0.105（作者改）：一口 8 级（原 16 回调为 8）
+    const INV_HOUND4_DAMAGE = 9;         // V0.117（作者口径）：一口 9 级 = 3^(4-2)
     // V0.105（作者要求）：第 5~8 条时间耄耋 —— 1000 / 2000 / 4000 / 10000 级登场，
     //   每一条属性 ×8、伤害 ×4 逐条递增（速度极快，靠补帧批处理消化）。
+    // V0.117（作者口径）：解锁门槛 1K / 2K / 4K / 10K / 2W / 4W / 10W…（按 ×2 ×2 ×2.5 循环）；
+    //   攻击伤害 = 3^(n-2)（第 3 条 3、第 4 条 9、第 5 条 27……）；**最多 10 条**
     const INV_HOUND_EXTRA = [
-      { n: 5, unlock: 1000,  strength: 4096,    speed: 4096,    damage: 32 },
-      { n: 6, unlock: 2000,  strength: 32768,   speed: 32768,   damage: 128 },
-      { n: 7, unlock: 4000,  strength: 262144,  speed: 262144,  damage: 512 },
-      { n: 8, unlock: 10000, strength: 2097152, speed: 2097152, damage: 2048 }
+      { n: 5,  unlock: 1000,   strength: 4096,        speed: 4096,        damage: 27 },
+      { n: 6,  unlock: 2000,   strength: 32768,       speed: 32768,       damage: 81 },
+      { n: 7,  unlock: 4000,   strength: 262144,      speed: 262144,      damage: 243 },
+      { n: 8,  unlock: 10000,  strength: 2097152,     speed: 2097152,     damage: 729 },
+      { n: 9,  unlock: 20000,  strength: 16777216,    speed: 16777216,    damage: 2187 },
+      { n: 10, unlock: 40000,  strength: 134217728,   speed: 134217728,   damage: 6561 }
     ];
-    const INV_HOUND_NAMES = ["反转时间耄耋", "第二条时间耄耋", "第三条时间耄耋", "第四条时间耄耋", "第五条时间耄耋", "第六条时间耄耋", "第七条时间耄耋", "第八条时间耄耋"];
+    const INV_HOUND_NAMES = ["反转时间耄耋", "第二条时间耄耋", "第三条时间耄耋", "第四条时间耄耋", "第五条时间耄耋", "第六条时间耄耋", "第七条时间耄耋", "第八条时间耄耋", "第九条时间耄耋", "第十条时间耄耋"];
     function invHoundNameOfStrength(s) {
       if (s === INV_HOUND1_STRENGTH) return INV_HOUND_NAMES[0];
       if (s === INV_HOUND2_STRENGTH) return INV_HOUND_NAMES[1];
@@ -19161,9 +19240,19 @@
     function invLevelNow() { return Math.max(0, Math.floor((invWorld && invWorld.level) || 0)); }
     // V0.104：手动与自动各吃各的科技乘区（mode 省略 = 手动）
     function invHarvestGain(mode) {
-      const base = INV_HARVEST_BASE + INV_HARVEST_PER_LEVEL * invLevelNow();
+      const base = Math.max(1, INV_HARVEST_BASE + INV_HARVEST_PER_LEVEL * invLevelNow());
       const mult = mode === "auto" ? invTechMult("auto", 0.12) : invTechMult("harvest", 0.10);
-      return base * mult * invInspireMult() * invLabDustMult() * invMilestoneDustMult() * invParseDustMult();   // V0.104：灵感 + 实验室 + V0.105 里程碑/解析乘区
+      // ⚠️⚠️ V0.116 修（作者：到这里游戏会停下来）——
+      //   以前这里是**普通数字连乘** ✗：后期各乘区（灵感 ×6790万、里程碑 ×72521、解析…）一相乘
+      //   就溢出成 Infinity / NaN ✗ → 凝析收益显示 +0、尘埃不再增长、铸级永远买不起 → 卡死 ✗。
+      //   现在改成**对数空间累加**再转大数 ✓：收益可以一直涨过 1EE10，永远不会溢出 ✓。
+      const parts = [base, mult, invInspireMult(), invLabDustMult(), invMilestoneDustMult(), invParseDustMult()];
+      let logSum = 0;
+      for (var i = 0; i < parts.length; i++) {
+        const x = Number(parts[i]);
+        logSum += Math.log10(x > 0 && isFinite(x) ? x : 1e-30);
+      }
+      return bigFromLog10(logSum);
     }
     function invLevelCost() {
       const lv = invLevelNow();
@@ -19172,11 +19261,21 @@
       //   （算出来是 Infinity，保险丝又把它压成 Number.MAX_VALUE = 1.79E308）→ 花费永远封顶 ✗。
       //   现在改成**对数空间**计算：costE = log10(基础价) + (等级−1)·log10(增长率) + 蓝图折扣，
       //   再转成大数（{m,e}）返回 —— 花费可以一路涨到 1EE10 甚至更远，铸级不再有天花板 ✓。
+      // ⚠️ V0.116 修（作者：后期铸级只要 1 了；折扣应是**每级乘法**、无限接近 0 但不是 0）——
+      //   根因有两层：① 蓝图折扣（−6%/级）的**生效等级**会被大里程碑不断放大；
+      //               ② 原实现最后有一道 Math.max(0, costE) 的夹子 ✗ → 指数被压成负的就被夹成 1 ✗。
+      //   现在：① 折扣保持**每级 ×0.94** 的乘法语义（对数相加 = 相乘 ✓）；
+      //        ② 指数**不再夹到 0** —— 成本可以 <1、无限接近 0，但数学上永远不是 0 ✓。
+      const forgeLv = Math.max(0, invTechEffLv("forge"));
+      const forgeDiscLog = forgeLv * Math.log10(0.94);      // 每级乘法：0.94^等级
       const costE = Math.log10(INV_LEVEL_COST_BASE) +
         Math.max(0, lv - 1) * Math.log10(INV_LEVEL_COST_GROWTH) +
-        invTechEffLv("forge") * Math.log10(0.94);          // V0.104：铸级蓝图 −6%/级
+        forgeDiscLog;
       if (!isFinite(costE)) return bigFromLog10(BIG_MAX_E);   // 极端值兜底
-      const c = bigFromLog10(Math.max(0, costE));
+      // V0.116：成本指数下限定在 −30（≈1E−30）——「无限接近 0 但不是 0」，同时保证大数表示不丢精度
+      const costE2 = Math.max(-30, costE);
+      // V0.116：允许负指数（成本 < 1，无限接近 0 但永不等于 0）
+      const c = bigFromLog10(costE2);
       // ⚠️ 抹掉浮点毛刺：Math.pow(10, frac) 会算出 1.2000000000000002 这种尾数 ✗，
       //   导致「尘埃 12 vs 花费 12.000000000000002」判成不够钱、铸级点不动 ✗。
       c.m = Math.round(c.m * 1e6) / 1e6;
@@ -19220,7 +19319,7 @@
       // V0.105（作者要求）：大里程碑的开局福利 —— 历史最高到过 500 之后，
       //   **每次开新局**开局直接获得「5000 次点击收益」的尘埃（恢复中的局不重复发）。
       if (!resuming && Math.max(0, Math.floor(save.invBestEver || 0)) >= INV_MILESTONE_BIG_STEP) {
-        const opener = bigOf(Math.floor(invHarvestGain("manual") * 5000));
+        const opener = bigMul(bigOf(invHarvestGain("manual")), 5000);   // V0.116：收益已是大数
         invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, opener));
         showToast(`💥 <b>大里程碑福利</b>：开局直接获得 <b>5000 次点击收益</b>的尘埃（+${formatNumber(opener)}）。`);
       }
@@ -20013,9 +20112,10 @@
       const lvBtn = el("invLevelBtn");
       if (lvBtn) {
         lvBtn.disabled = !can;
+        const costText = (cost && cost.e < 0) ? ("<0.01") : formatNumber(cost);   // V0.116：折扣后可能 <1
         setText("invLevelBtn", can
-          ? `反转铸级 Lv.${formatNumber(lv)} → Lv.${formatNumber(lv + 1)}（花费 ${formatNumber(cost)}）`
-          : `反转铸级（需要 ${formatNumber(cost)} 反转尘埃）`);
+          ? `反转铸级 Lv.${formatNumber(lv)} → Lv.${formatNumber(lv + 1)}（花费 ${costText}）`
+          : `反转铸级（需要 ${costText} 反转尘埃）`);
       }
       // V0.105：里程碑行（层数 / 下一层门槛 / 当前加成）
       const mCount = invMilestoneCount();
