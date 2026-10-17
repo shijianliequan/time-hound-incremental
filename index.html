@@ -3055,7 +3055,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.123</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.128</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -4082,7 +4082,7 @@
           <!-- V0.109：能源（进入反转世界即解锁，排在自动化右边；唯一跨局保留的东西） -->
           <button class="inv-tab" id="invTabEnergy" style="display: none;">⚡ 能源</button>
           <!-- V0.110（作者要求）：开启挑战后，在能源右边挂一个挑战页签 -->
-          <button class="inv-tab" id="invTabChal" style="display: none;">🎰 赌神</button>
+          <!-- V0.129：赛博赌场 / 赌神挑战与页签彻底删除 -->
           <button class="inv-tab" id="invTabBag" style="display: none;">科技</button>
           <button class="inv-tab" id="invTabLeap" style="display: none;">科技跃迁</button>
           <!-- V0.113（作者要求）：方舟 —— 反转等级 1000 解锁，页签在「科技跃迁」右边 -->
@@ -4188,7 +4188,8 @@
           <!-- V0.109：能源页分两个子页 —— 能源本体 / 虚拟世界 -->
           <div class="sub-tab-bar" id="invEnergySubTabs" style="margin-bottom: 10px;">
             <button class="sub-tab active" data-inv-energy-sub="energy" id="invEnergySubTabEnergy">⚡ 能源</button>
-            <button class="sub-tab" data-inv-energy-sub="vworld" id="invEnergySubTabVworld">🕹 虚拟世界</button>
+            <!-- V0.124：虚拟世界（赛博赌场）已下线，子页签不再显示 -->
+            <button class="sub-tab" data-inv-energy-sub="vworld" id="invEnergySubTabVworld" style="display: none !important;">🕹 虚拟世界</button>
             <button class="sub-tab" data-inv-energy-sub="vup" id="invEnergySubTabVup">⬆ 虚拟升级</button>
           </div>
 
@@ -4452,9 +4453,11 @@
               （1 级大约落在 1~2 格，10 级 1~20 格，100 级能到 1~200 格）。
             </p>
             <div class="inv-stat-row">
+              <div class="inv-stat"><div class="inv-label">可发射等级</div><div class="inv-big" id="invArkNextLevel">—</div></div>
               <div class="inv-stat"><div class="inv-label">方舟等级</div><div class="inv-big" id="invArkLevel">—</div></div>
               <div class="inv-stat"><div class="inv-label">坐标</div><div class="inv-big" id="invArkPos">—</div></div>
               <div class="inv-stat"><div class="inv-label">现实改写点数</div><div class="inv-big" id="invArkPoints">0</div></div>
+              <div class="inv-stat"><div class="inv-label">本周期剩余发射</div><div class="inv-big" id="invArkLeft">—</div></div>
             </div>
             <div class="cs-btn-row" style="margin-top: 10px;">
               <button class="primary-button" id="invArkLaunchBtn" style="flex: 0 0 auto; width: auto;">🚀 发射方舟</button>
@@ -4650,7 +4653,7 @@
         <p>只要待在反转世界里，能源就<b>每秒 +1</b>，而且<b>不吃任何加成</b>（等级、科技、里程碑全都不影响它）。
           它是这里<b>唯一跨局保留</b>的资源 —— 退出反转世界、甚至进宇宙重置，能源都原样留着。</p>
 
-        <h3>🎰 虚拟世界：赛博赌场</h3>
+        <h3 style="display: none;">🎰 虚拟世界：赛博赌场</h3>
         <p>在「能源 → 虚拟世界」里可以花能源<b>买时间</b>进场（每秒 2 点，1 / 5 / 15 分钟三档）。
           桌上有 21 点、猜大小、抽牌比大小、德州扑克。</p>
         <p>通关目标是<b>从 100 筹码赢到 10000</b>，达成一次发 <b>250 虚拟点数</b>（掉下来再冲上去可以反复领）。
@@ -4761,7 +4764,7 @@
 
   <!-- V0.110（作者要求）：反转世界专属成就 —— 右上角按钮打开，排布跟主宇宙一致 -->
   <div class="modal" id="invAchvModal">
-    <div class="modal-box achievement">
+    <div class="modal-box wide">
       <div class="big-icon">🏆</div>
       <h2>成就</h2>
       <p class="inventory-note">只记<b>反转世界</b>里的事（主宇宙那套成就完全独立）。成就永久保留 —— 退出反转世界、进宇宙重置都不清。</p>
@@ -4956,7 +4959,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.123";
+    const GAME_VERSION = "V0.128";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -9730,6 +9733,7 @@
     }
 
     function performMultiverseEntry(choice) {
+      lastCycleAt = Date.now();   // V0.127：每次真正重置都记冷却（连点/双击无效）
       const p = getPossibility();
       const modGain = getWipeModPoints();
       // V0.71：苦痛之路的回报 —— 本次进入宇宙的基因点数按倍率发放；
@@ -9918,7 +9922,10 @@
     // V0.113：老的候选选择变量（候选系统已删，但 confirmMultiverseEntry 还引用它，保留声明以免报错）
     let pendingMvChoiceIdx = -1;
     // V0.113（作者要求）：**先花掉行动力，才能进入下一个大循环**（不能攒着）
+    let lastCycleAt = 0;
     function enterNextCycle() {
+      // V0.127（作者：多元宇宙能反复点击）—— 1 秒冷却，连点/双击不会重复结算 ✓
+      if (Date.now() - lastCycleAt < 1000) return false;
       if (mapStamina() >= 1) {
         showToast("手里的<b>行动力还没花掉</b> —— 先去星图走一格，才能进入下一个大循环。", "tech");
         return false;
@@ -14166,6 +14173,7 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.128", "赛博赌场彻底下线，赌神改成隐藏的「内测成就」（只保留能源 ×1.5，新玩家无法获取）· 采样增幅器改为反转尘埃收益、虚空棱镜改为数据点收益（都带软上限）· 爆率改为「基础 2% + 掉落校准 0.5%/级」，封顶 100% · 修复里程碑子页打不开、多元宇宙可反复重置。"],
       ["V0.123", "反转世界的成就弹窗重做：改成和主宇宙一样的宽列表（一行一条），不再被挤成竖排细条。"],
       ["V0.122", "修复星图坐标：读档时坐标不再被夹到 ±99（以前走得远一点、重进就像被拉回原点）；方舟坐标改用 X/Y 显示，和星图坐标系对齐，不会再走错轴。"],
       ["V0.121", "给所有「没有软上限」的科技效果加上软上限：超过阈值后改为对数增长，边际收益迅速趋近 0（科技等级 3000 / 解析倍率 1000 / 专家倍率 500）。"],
@@ -14185,7 +14193,7 @@
       ["V0.107", "六处改动（部件平衡第一步：给「心」以外的三件补上成长曲线）。① <b>自动回归</b>新增「<b>打够 N 场就回归</b>」：自动化页「自动回归」那一行右侧多了一个场次输入框 —— 出战猎犬打满填写的场数后会立刻回展示柜、把等级换成永久全局加成，随后自动换上仓库里最强的一只继续出战（填 <b>0</b> = 关闭，沿用旧规则：只在寿命只剩 1 点时回归）。后期一场一个目标时把它设小一点，就不用再等寿命耗光才轮换；「寿命将尽必回归」的兜底照旧生效。② <b>基因实验室的「刷新清单」花费改成「每次都是上一次的 4 倍」</b>：第 1 次 <b>1</b> 点、第 2 次 4 点、第 3 次 16 点、第 4 次 64 点、第 5 次 256 点、第 6 次 1024 点……（前 3 次合计 21 点，之后指数上涨）。刷新按钮旁边会直接写清「下次刷新要多少点」；进入下一个宇宙照旧免费重抽、价格归 1。③ 修<b>「可能性」解锁时的高亮</b>：以前如果玩家早先点过这个页签（已读记录里躺着它），五个挑战再次全部完成时就只剩一句「已解锁」的提示、页签一动不动 —— 现在解锁那一刻会<b>强制把页签重新点亮一次</b>（「⚔ 挑战」页里的「🩸 苦痛挑战」子页签同样点亮），重复解锁的提示也改成「已重新点亮」。顺带修掉「苦痛挑战子页签解锁后一直闪、点进去也不灭」，并把「已读页签」记录上限从 24 条放宽到 200 条。④ <b>「🩸 苦痛之路」的入口提前</b>：以前要玩家自己先植入满 10 条基因，那个子页签才冒出来，很多人根本找不到它；现在<b>解锁「🧪 基因实验室」时它就会出现在同一排子页签里</b>（带「新」高亮），点进去写明还差几条基因、凑够 10 条自动变成可预约。⑤ <b>高级基因之间终于有区别了</b>：以前「超越」段的每级成长比例一律钉在 <b>×1.050</b>，档位再高也一模一样；现在按超越档位递增 —— 超越·1 = ×1.051 … 超越·25 = ×1.055 … 超越·99 = ×1.060，越高档每级涨得越快（仍然是严格递增、不会爆表）。⑥ <b>永恒部件第一批平衡（心不动）</b>：<b>牙 / 爪 / 沙漏</b>新增各自的<b>成长曲线</b> —— 除了原来的固定加成，这三件还会按你的<b>升级等级</b>复利放大（牙看尘埃升级、爪看速度升级、沙漏取两者平均），复利率由部件自身等级决定（满配时每级 ×1.008，约等于每 100 级升级 ×2.22）。标定实测：两条升级都到 300 级时，三件合计约为「心」的 11 倍，500 级时约 1.5 倍，约 540 级之后心反超 —— 「一个心顶其他三件」的后期差距被压平了；部件页与属性详情面板都能看到实时读数。"],
       ["V0.106", "两条小调 + 一次结算。① 基因实验室的「刷新清单」花费改为<b>对数增长</b>：第一次 <b>1</b> 点，之后 1、2、2、3、3、3、3、4…（原来按 2×2ⁿ 翻倍、还封顶在 4096 —— 基因点攒多之后刷新等于免费，玩家滚雪球太快）；基因植入的「每次翻倍」保持不变。② 本版把 V0.104 / V0.105 的积累一并发布：反转世界正式开放（进度持久化、科技点数、尖端实验室、灵感、科技跃迁、自动化养成、八条猎犬、精英猎犬、反转里程碑、解析、科技软上限）、基因去除等级上限并统一巨削成长、修复「猎犬刚开始吃不到保底」与「离线奖励后实验室加成缩水」等 —— 详细条目见下方 V0.104 / V0.105。"],
       ["V0.105", "两条新东西 + 一次总收编。① 反转世界迎来<b>第二条猎犬</b>：反转等级到 <b>50</b> 后主界面会多出第二条进度条 —— 基础周期同为 10 秒，但进度快 <b>8 倍</b>（无加成时 1.25 秒就扑一次），捕获强度 <b>800%</b>（第一条猎犬同步上调到 <b>400%</b>）；等级掉下 50 它会暂时消失、升回来再继续。被捕获概率改用新口径：<b>1 − 抵抗 ÷ 强度</b>（抵抗 ≥ 强度即完全免疫）—— 比如 400% 抵抗对 800% 的它 = 50% 被捕获概率；两条进度条上都会实时标出「被这条猎犬捕获的概率」。② 反转铸级加上批量：<b>×1 / ×10 / ×100 / 一键最大</b>，逐级按真实造价扣反转尘埃，买不动自动停。③ 总收编：反转世界的这一批更新（进度持久化、科技点数与尖端实验室、灵感、科技跃迁调整、自动化养成等）都从这一版起算。④ <b>反转里程碑</b>（三档，反转页底部有徽章轨道展示）：每 <b>50</b> 级一层（尘埃/抵抗 +25%，无限叠）；每 <b>500</b> 级一座<b>大里程碑</b>（尘埃/抵抗 +100%、基础科技软上限 ×1.01，并永久解锁「<b>开局直得 5000 次点击收益</b>」的福利 —— 此后每开新局白送一笔尘埃）；每 <b>5000</b> 级一座<b>超级里程碑</b>（尘埃/抵抗 +500%、软上限 ×1.2）。跨档弹提示，层数与软上限倍率实时显示。⑤ 反转世界三件事：<b>自动铸级改成一键最大</b>（每次巡检直接买满买得起的级数）；反转等级到 <b>200</b> 引来<b>第三条猎犬</b> —— 数值是第二条的 8 倍（6400% 强度、64 倍进度速度），而且一口啃掉 <b>2 级</b>；解锁第二条猎犬后，科技跃迁里会多出「<b>🔬 解析</b>」子页 —— 从第二条猎犬起，每被追逐 1 秒积攒<b>数据点</b>（两条 1 点/秒、三条 2 点、四条 4 点、五条 8 点…翻倍递增；解锁后掉回 50 级以下也保留），可在里面购买四种特殊升级：弱点图谱（被捕获概率 −2%/级）、尘埃共鸣（尘埃 +20%/级）、护盾协议（抵抗 +10%/级）、缓速力场（所有猎犬进度 −3%/级）。另外反转世界右上角现在有和主宇宙同款的数值条（反转尘埃 / 反转等级 / 被捕获 / 数据点 / 精英点数 —— 没解锁的不显示）。⑥ 猎犬队伍扩到八条：第四条（反转等级 <b>400</b>）一口啃 <b>8 级</b>；<b>1000 / 2000 / 4000 / 10000</b> 级还会陆续引来第 <b>5~8</b> 条 —— 每一条属性 ×8、伤害 ×4 逐条递增。⑦ 新增「<b>精英</b>」页（反转等级到 <b>500</b> 解锁，解锁即刷第一头）：加强过的<b>精英猎犬</b>数值<b>跟着你的成长走</b> —— 强度以你的总抵抗为基准浮动（0.8~1.6 倍）、速度与伤害随等级放大，档位沿用「普通 → 超越」，属性随机（更快 / 更疼 / 更强 / 带破甲·狂暴·侵蚀·汲取·硬壳等特殊能力）；页面给出<b>预估战力</b>与<b>限时倒计时</b>：挑战后它加入主界面最下面一条进度条，<b>承受 100 次攻击即可击败</b>（打完立刻刷下一头；超时它会逃走，下一头 10 分钟后再来），按等级获得<b>精英点数</b>。另外<b>基础科技的有效等级加了软上限</b>：超过 400 级的部分只按平方根计入 —— 后期抵抗不会无限膨胀，猎犬的等级压制依然打得出来。⑧ 新成就「<b>十全基因</b>」：同时持有 <b>10</b> 条基因解锁（与 12 条满编的「基因满编」是两个档）。⑨ <b>基因强化去掉等级上限</b>：以前除「部件软上限」外，其余基因都会在「倍率封顶 1e9」反推出的等级上满级、把强化锁死；现在所有基因想强化多少级都行 —— 作为补偿，成长比例统一巨削为「每级 = 1 + min(+5%, (品质倍率−1) × 一成)」：普通 ≈ ×1.002/级、神话 ≈ ×1.028/级、超越段一律封顶 ×1.05（原来的指数级涨幅不再存在）。⑩ 修复「<b>猎犬刚开始吃不到保底</b>」：兜底反解的下限从 0.01 放宽到 1e-6（弱猎犬 + 高入侵数时压不下去的问题），并且保底线现在会记住解算时的参考战力 —— 战败腰斩 / 换犬 / 加成变化后自动重织，保底永远按当前战力解算。"],
-      ["V0.104", "① 基因抽档加入「低档逐步淘汰」（作者反馈：幸运拉到极高还能抽到普通）。规则与转盘同思路：以焦点为尺，焦点下方 6 档以内原样、再远按 6 档宽的带线性递减、12 档之外直接绝迹 —— 普通最先消失（幸运约 6 级起变少、14 级左右绝迹），之后优秀 / 稀有 / 史诗 / 传说 / 神话依次被淘汰；到「超越·99」焦点时基础六档早已全部抽不到，最低可抽档位一路升到「超越·88」附近。基因幸运面板新增实时读数（已淘汰多少个低档、最低可抽档位是谁）；早期完全不受影响（幸运 0~2 级一个都淘汰不掉）。实验室的货物品质同步吃这套淘汰（神话保底，不再上架普通货）。② 反转世界四项调整：进场改为<b>最高优先级</b> —— 战斗 / 猎影 / 转盘进行中也能随时进入；进去后外面的一切<b>真正暂停</b>，猎影 8 秒窗口、猎影冷却、自动狩猎 / 自动悖论 / 自动重织的倒计时在退场时全部按暂停时长顺延，回来时从按下暂停的那一刻原样继续；右上角的主宇宙资源刻度在反转世界里不再显示（那些不是反转世界的资源）；反转世界内的「永恒背包」子页更名为<b>「科技」</b>；左上角标题在反转世界里换成「时间科技增量 / 在时间猎犬发现你之前，收集尽可能多的反转尘埃」。③ 反转世界新增「<b>基础科技</b>」：「深度凝析」每次有 <b>1%</b> 概率爆出一项基础科技（手动与自动都算；共八项，掉落等级 = 当前反转等级）；八项科技全部被动持续生效、目前没有上限 —— 凝析矩阵（手动凝析 +10%/级）、自动核心（自动凝析 +12%/级）、被动采集器（被动凝析 +15%/级）、铸级蓝图（铸级花费 −6%/级）、静默信标（猎犬逼近间隔 +10%/级）、衰减抑制器（每 2 级 +1% 概率抵抗被捕获，200 级 = 100%、可超 100%）、采样增幅器（爆率 +0.2%/级）、回响电容（按损失等级返还反转尘埃）。同种科技高等级自动替换低等级，被消耗的那份按「等级 × 6」折算成反转尘埃（新件不够高时消耗的是新件）；「科技」页里可以查看八项科技当前等级与掉落概率。④ 反转世界观感补完：右下角提示框（toast）在反转世界里也翻成<b>白底黑字</b>；顺带把从顶栏能打开的弹窗（设置 / 教程 / 更新日志）一并翻白 —— 它们以前都是硬编码深色底 + 跟随主题的文字色，进反转模式后成了「深底深字」等于看不见。⑤ 反转世界三项体验调整：「深度凝析」普通点击不再弹提示框（读数就在面板上，只有爆出科技才提示）；「科技」页签在拿到第一件基础科技之前隐藏，首次获得时挂「新」高亮、看过即熄灭；反转等级（本局最高）达到 <b>20</b> 解锁新页签「<b>科技跃迁</b>」—— 第一个子页面「科技爆炸」可以把基础科技丢进去：一次只能选择一个目标，整件 1:1 折算成对应「进阶科技」的进度（每级 20 点），基础件归零、升级后进度清零从头再来；进阶科技每级把对应基础科技的效果倍率 +50%。⑥ 反转世界两处修正（作者要求）：科技页「只解锁不回收」—— 拿到过第一件基础科技后，科技跃迁把它丢光（归零）也不会让页签黑回去；科技跃迁的进度成本改成<b>首级 20 点、此后每级 +10%（向下取整）</b>，一次丢入溢出的经验会<b>顺延到下一级</b>（不再清零）；并且「科技爆炸」从标题改成了<b>子页签按钮</b>（方便以后往这排续新的子页面）。⑨ 反转世界正式开放：入口不再挂「开发中」—— 条件仍是历史最高尘埃 1E30080 + 苦痛全通；「反转世界」页里新增两个子页：<b>「◑ 反转」</b>（进入反转世界）与<b>「🧪 尖端实验室」</b>（花科技点数买反转世界的永久加成：尘埃增幅 / 跃迁校准 / 掉落校准 / 抑制外壳）。新货币<b>「科技点数」</b>：<b>主动退出</b>反转世界时按「本次最高反转等级 − 上次结算过的等级」发放（比如上次结了 100 级，这次到 200 级 = +100 点；没超过就没有）；<b>关掉网页不算退出</b> —— 进度会存档，下次打开直接回到反转世界继续（外面照旧暂停），只有主动点「退出反转世界」（带二次确认）才会清空进度、从零重来。⑧ 灵感：任意一件进阶科技到 <b>5 级</b>，科技跃迁里会多出一个新子页<b>「✨ 灵感」</b>—— 把<b>当前全部反转等级</b>一次献祭，换一个反转尘埃倍率（每 1 级 +10%）；倍率<b>持续整局有效、不衰减</b>（直到退出反转世界），献祭后等级清零，<b>下一次必须用更高的等级</b>才能再换。⑦ 反转世界的「自动化」变成养成线：自动凝析 / 自动铸级都要先用<b>反转尘埃解锁</b>（50 / 200），解锁后还能继续花尘提升效率 —— 每级 +0.2 次/秒，<b>最高 3 次/秒</b>；效率按帧结算，一秒三次也是实打实的。"],
+      ["V0.104", "① 基因抽档加入「低档逐步淘汰」（作者反馈：幸运拉到极高还能抽到普通）。规则与转盘同思路：以焦点为尺，焦点下方 6 档以内原样、再远按 6 档宽的带线性递减、12 档之外直接绝迹 —— 普通最先消失（幸运约 6 级起变少、14 级左右绝迹），之后优秀 / 稀有 / 史诗 / 传说 / 神话依次被淘汰；到「超越·99」焦点时基础六档早已全部抽不到，最低可抽档位一路升到「超越·88」附近。基因幸运面板新增实时读数（已淘汰多少个低档、最低可抽档位是谁）；早期完全不受影响（幸运 0~2 级一个都淘汰不掉）。实验室的货物品质同步吃这套淘汰（神话保底，不再上架普通货）。② 反转世界四项调整：进场改为<b>最高优先级</b> —— 战斗 / 猎影 / 转盘进行中也能随时进入；进去后外面的一切<b>真正暂停</b>，猎影 8 秒窗口、猎影冷却、自动狩猎 / 自动悖论 / 自动重织的倒计时在退场时全部按暂停时长顺延，回来时从按下暂停的那一刻原样继续；右上角的主宇宙资源刻度在反转世界里不再显示（那些不是反转世界的资源）；反转世界内的「永恒背包」子页更名为<b>「科技」</b>；左上角标题在反转世界里换成「时间科技增量 / 在时间猎犬发现你之前，收集尽可能多的反转尘埃」。③ 反转世界新增「<b>基础科技</b>」：「深度凝析」每次有 <b>1%</b> 概率爆出一项基础科技（手动与自动都算；共八项，掉落等级 = 当前反转等级）；八项科技全部被动持续生效、目前没有上限 —— 凝析矩阵（手动凝析 +10%/级）、自动核心（自动凝析 +12%/级）、被动采集器（被动凝析 +15%/级）、铸级蓝图（铸级花费 −6%/级）、静默信标（猎犬逼近间隔 +10%/级）、衰减抑制器（每 2 级 +1% 概率抵抗被捕获，200 级 = 100%、可超 100%）、采样增幅器（反转尘埃收益 +5%/级）、回响电容（按损失等级返还反转尘埃）。同种科技高等级自动替换低等级，被消耗的那份按「等级 × 6」折算成反转尘埃（新件不够高时消耗的是新件）；「科技」页里可以查看八项科技当前等级与掉落概率。④ 反转世界观感补完：右下角提示框（toast）在反转世界里也翻成<b>白底黑字</b>；顺带把从顶栏能打开的弹窗（设置 / 教程 / 更新日志）一并翻白 —— 它们以前都是硬编码深色底 + 跟随主题的文字色，进反转模式后成了「深底深字」等于看不见。⑤ 反转世界三项体验调整：「深度凝析」普通点击不再弹提示框（读数就在面板上，只有爆出科技才提示）；「科技」页签在拿到第一件基础科技之前隐藏，首次获得时挂「新」高亮、看过即熄灭；反转等级（本局最高）达到 <b>20</b> 解锁新页签「<b>科技跃迁</b>」—— 第一个子页面「科技爆炸」可以把基础科技丢进去：一次只能选择一个目标，整件 1:1 折算成对应「进阶科技」的进度（每级 20 点），基础件归零、升级后进度清零从头再来；进阶科技每级把对应基础科技的效果倍率 +50%。⑥ 反转世界两处修正（作者要求）：科技页「只解锁不回收」—— 拿到过第一件基础科技后，科技跃迁把它丢光（归零）也不会让页签黑回去；科技跃迁的进度成本改成<b>首级 20 点、此后每级 +10%（向下取整）</b>，一次丢入溢出的经验会<b>顺延到下一级</b>（不再清零）；并且「科技爆炸」从标题改成了<b>子页签按钮</b>（方便以后往这排续新的子页面）。⑨ 反转世界正式开放：入口不再挂「开发中」—— 条件仍是历史最高尘埃 1E30080 + 苦痛全通；「反转世界」页里新增两个子页：<b>「◑ 反转」</b>（进入反转世界）与<b>「🧪 尖端实验室」</b>（花科技点数买反转世界的永久加成：尘埃增幅 / 跃迁校准 / 掉落校准 / 抑制外壳）。新货币<b>「科技点数」</b>：<b>主动退出</b>反转世界时按「本次最高反转等级 − 上次结算过的等级」发放（比如上次结了 100 级，这次到 200 级 = +100 点；没超过就没有）；<b>关掉网页不算退出</b> —— 进度会存档，下次打开直接回到反转世界继续（外面照旧暂停），只有主动点「退出反转世界」（带二次确认）才会清空进度、从零重来。⑧ 灵感：任意一件进阶科技到 <b>5 级</b>，科技跃迁里会多出一个新子页<b>「✨ 灵感」</b>—— 把<b>当前全部反转等级</b>一次献祭，换一个反转尘埃倍率（每 1 级 +10%）；倍率<b>持续整局有效、不衰减</b>（直到退出反转世界），献祭后等级清零，<b>下一次必须用更高的等级</b>才能再换。⑦ 反转世界的「自动化」变成养成线：自动凝析 / 自动铸级都要先用<b>反转尘埃解锁</b>（50 / 200），解锁后还能继续花尘提升效率 —— 每级 +0.2 次/秒，<b>最高 3 次/秒</b>；效率按帧结算，一秒三次也是实打实的。"],
       ["V0.103", "排行榜暂时下线。入口按钮已移除，游戏不再上传或拉取任何排行榜数据（此前已部署的服务端也加了总开关，默认一律拒收，不接收任何数据）。之前上传过的排名保留在服务端 —— 身份、4 小时冷却、版本门这些代码全部原地保留，之后想重新开放只需翻两个开关就能原样复活。"],
       ["V0.102", "两条修正。① 排行榜身份与 4 小时冷却改「设备级」保存：以前它们只存在存档里 —— 清空存档（或导入一份老档）就能把上传冷却和「我是谁」一起重置，服务端还会把你当成新玩家、在榜上多出一条记录。现在清档不再影响身份与冷却（时间戳取「设备与存档的较大值」，导入老档也倒不回冷却）。② 服务端加「一个昵称只占一行」：自定义昵称按名字去重，同名旧行会被清掉、只留最新的一条（换设备 / 清档 / 旧数据留下的副本一并清理）；默认名「无名猎手」不参与去重，仍是一人一条。匹配这份更新，服务端已同步升级 —— 部署一次即可全部生效。"],
       ["V0.101", "四条修正。① 修「自动战斗卡死」：自动狩猎遇到「四条时间线一条都打不过」时会静默空转（以前只会悄悄等着）。现在三层兜底 —— 先换仓库里打得过的更强猎犬、够门槛就回归、谁都不够就打不过时自动重织时间线（20 秒节流），保证永远转得下去。② 修超越展示柜排版错乱：软上限警告与「只列 20 只」说明以前被拼进了卡片网格里、占了第一行两个格子，把第一张卡挤到旁边；现在统一收进顶部汇总框。③ 修「先挑衅猎犬、8 秒内开挑战或发动超越悖论会继承保险箱」：重置现在会连同保险箱一起清零、并打断进行中的猎影。④ 修苦痛挑战「累计本源」进度把 log10 直接拼成「1E0.06」的怪文案，改为正常数值；排行榜全链路收紧（只收最新版成绩、每 4 小时一次、在线时长有物理上限）。"],
@@ -15133,6 +15141,15 @@
       }
       setText("invArkStatus", invArkStatusText());
       setText("invArkLevel", invArkLevelText());
+      // V0.130（作者要求）：显示「当前可以发射几级方舟」+ 本周期还能发几次
+      try {
+        const runBest = Math.max(0, Math.floor((invWorld && invWorld.best) || 0));
+        const nextLv = Math.max(1, Math.floor(runBest / INV_ARK_LEVEL_PER));
+        setText("invArkNextLevel", "Lv." + formatNumber(nextLv));
+        const capL = 1 + invRwLv("beacon");
+        const usedL = Math.max(0, Math.floor(a.cycleLaunches || 0));
+        setText("invArkLeft", Math.max(0, capL - usedL) + " / " + capL);
+      } catch (e) { }
       // V0.122：星图已改成 X/Y 坐标系 —— 方舟坐标也按 X（横向）/ Y（纵向）显示，避免玩家走错轴
       setText("invArkPos", a.pos ? ("X: " + a.pos.b + "  Y: " + a.pos.a) : "—");
       setText("invArkPoints", formatNumber(a.points));
@@ -16264,7 +16281,9 @@
       setTabLocked("subTabLab", !isLabUnlocked(), "🧪 基因实验室");
       setTabLocked("subTabPain", !painTabShow, "🩸 苦痛之路");
       // 当前停留的子页如果还没解锁，退回多元宇宙
-      const subOk = { multiverse: true, gene: true, lab: isLabUnlocked(), pain: painTabShow };
+      // ⚠️ V0.127 修（作者：里程碑子页打不开、一点就被踹回多元宇宙）——
+      //   subOk 里漏了 milestone ✗，导致每次渲染都判定"当前子页未解锁"→ 强制切回 multiverse ✗。
+      const subOk = { multiverse: true, gene: true, lab: isLabUnlocked(), pain: painTabShow, milestone: true };
       if (!subOk[possSubTab]) switchPossibilitySub("multiverse", true);
       renderPossibilityMultiverse();
       renderPossibilityGene();
@@ -18384,7 +18403,7 @@
     //   · 共八项，掉落等级 = 当前反转等级；
     //   · 全部被动持续生效；同种科技高等级自动替换低等级，被消耗的那份折算成反转尘埃；
     //   · 目前先不加软上限（等级能堆多高就多高）。
-    const INV_TECH_DROP_CHANCE = 0.01;        // 手动凝析的基础爆率 1%
+    const INV_TECH_DROP_CHANCE = 0.02;        // V0.125：基础爆率 1% → 2%（补偿取消的采样增幅器加成）
     const INV_TECH_REFUND_PER_LEVEL = 6;      // 被消耗的科技：每级折算 6 反转尘埃
     const INV_TECH_DEFS = [
       { id: "harvest",  icon: "🧪", name: "凝析矩阵",   adv: "超导矩阵",   desc: "手动深度凝析收益 +10% / 级" },
@@ -18393,7 +18412,8 @@
       { id: "forge",    icon: "🔧", name: "铸级蓝图",   adv: "完美蓝图",   desc: "反转铸级花费 −6% / 级（复利，最低 1）" },
       { id: "beacon",   icon: "📡", name: "静默信标",   adv: "深渊信标",   desc: "反转时间耄耋逼近间隔 +10% / 级" },
       { id: "dampener", icon: "🛡", name: "衰减抑制器", adv: "永固抑制器", desc: "每 2 级 +1% 概率抵抗被捕获（200 级 = 100%，可超 100%）" },
-      { id: "sampler",  icon: "🧲", name: "采样增幅器", adv: "超采样阵列", desc: "科技掉落几率 +0.2% / 级（基础 1%）" },
+      // V0.125（作者要求）：采样增幅器**不再加爆率**，改为「反转尘埃收益」+ 软上限
+      { id: "sampler",  icon: "🧲", name: "采样增幅器", adv: "超采样阵列", desc: "反转尘埃收益 +5% / 级（300 级后收益递减）" },
       { id: "echo",     icon: "🔔", name: "回响电容",   adv: "共鸣回廊",   desc: "被捕获时按损失等级返还 6 × 等级 反转尘埃" }
     ];
     // V0.104（作者要求）：科技跃迁 —— 反转等级（本局最高）到 INV_LEAP_UNLOCK_LEVEL 解锁，
@@ -18438,7 +18458,8 @@
       { id: "lens",    icon: "🔎", name: "因果透镜",   desc: "解析数据点 ×1.25 / 级",      step: 0.25 },
       { id: "forge",   icon: "🔨", name: "悖论熔炉",   desc: "反转铸级花费 ×0.95 / 级",    step: -0.05 },
       { id: "loom",    icon: "🧵", name: "维度织机",   desc: "被动凝析 ×1.25 / 级",        step: 0.25 },
-      { id: "prism",   icon: "🔷", name: "虚空棱镜",   desc: "基础科技爆率 ×1.15 / 级",    step: 0.15 },
+      // V0.125（作者要求）：虚空棱镜**不再加爆率**，改为「数据点获取」+ 软上限
+      { id: "prism",   icon: "🔷", name: "虚空棱镜",   desc: "数据点获取 +15% / 级（200 级后收益递减）", step: 0.15 },
       { id: "compass", icon: "🧭", name: "星图罗盘",   desc: "格位词条幅度 ×1.20 / 级",    step: 0.20 },
       { id: "battery", icon: "🔋", name: "万象电池",   desc: "自动化效率 ×1.10 / 级",      step: 0.10 }
     ];
@@ -18693,7 +18714,7 @@
     const INV_LAB_DEFS = [
       { id: "dust",   icon: "🌫", name: "尘埃增幅", desc: "反转尘埃收益 +25% / 级",              base: 2, growth: 1.6 },
       { id: "leap",   icon: "⚡", name: "跃迁校准", desc: "科技爆炸的升级成本 −5% / 级（复利）",   base: 4, growth: 1.8 },
-      { id: "drop",   icon: "🧲", name: "掉落校准", desc: "科技掉落几率 +0.2% / 级",             base: 3, growth: 1.8 },
+      { id: "drop",   icon: "🧲", name: "掉落校准", desc: "科技掉落几率 +0.5% / 级（总爆率封顶 100%）", base: 3, growth: 1.8 },
       { id: "resist", icon: "🛡", name: "抑制外壳", desc: "捕获抵抗 +5% / 级（与其余来源叠加）", base: 4, growth: 1.8 }
     ];
     function invLabLv(id) {
@@ -18702,7 +18723,7 @@
     }
     function invLabCost(def) { return Math.ceil(def.base * Math.pow(def.growth, invLabLv(def.id))); }
     function invLabDustMult() { return 1 + 0.25 * invLabLv("dust"); }
-    function invLabDropBonus() { return 0.002 * invLabLv("drop"); }
+    function invLabDropBonus() { return 0.005 * invLabLv("drop"); }   // V0.125：0.2% → 0.5%/级，封顶仍由 invTechDropChance 的 min(1,…) 保证
     function invLabResistBonus() { return 0.05 * invLabLv("resist"); }
     function invLabBuy(id) {
       const def = INV_LAB_DEFS.filter(d => d.id === id)[0];
@@ -19209,7 +19230,9 @@
     }
     function invTechDropChance() {
       // V0.113：专家科技「虚空棱镜」放大爆率（封顶 1）
-      return Math.min(1, (INV_TECH_DROP_CHANCE + 0.002 * invTechEffLv("sampler") + invLabDropBonus()) * invArkExpertMult("prism"));
+      // V0.125（作者要求）：爆率只由「基础值 + 掉落校准」构成；采样增幅器 / 虚空棱镜不再参与。
+      //   **封顶 100%**（作者口径：到 100% 后不能再加）——
+      return Math.min(1, INV_TECH_DROP_CHANCE + invLabDropBonus());
     }
 
     let invActive = false;             // 会话级开关（不落盘）：在不在反转世界里
@@ -19349,7 +19372,9 @@
       //   以前这里是**普通数字连乘** ✗：后期各乘区（灵感 ×6790万、里程碑 ×72521、解析…）一相乘
       //   就溢出成 Infinity / NaN ✗ → 凝析收益显示 +0、尘埃不再增长、铸级永远买不起 → 卡死 ✗。
       //   现在改成**对数空间累加**再转大数 ✓：收益可以一直涨过 1EE10，永远不会溢出 ✓。
-      const parts = [base, mult, invInspireMult(), invLabDustMult(), invMilestoneDustMult(), invParseDustMult()];
+      // V0.125：采样增幅器（反转尘埃收益 +5%/级，300 级后按软上限递减）
+      const samplerMult = 1 + 0.05 * invSoftCap(invTechEffLv("sampler"), 300);
+      const parts = [base, mult, invInspireMult(), invLabDustMult(), invMilestoneDustMult(), invParseDustMult(), samplerMult];
       let logSum = 0;
       for (var i = 0; i < parts.length; i++) {
         const x = Number(parts[i]);
@@ -19374,9 +19399,16 @@
       const costE = Math.log10(INV_LEVEL_COST_BASE) +
         Math.max(0, lv - 1) * Math.log10(INV_LEVEL_COST_GROWTH) +
         forgeDiscLog;
-      if (!isFinite(costE)) return bigFromLog10(BIG_MAX_E);   // 极端值兜底
+      // ⚠️ V0.128.2 修（作者：9.0E6 时造价还不到 E10000，9.2E6 突然变 1EE308 —— 断崖 ✗）——
+      //   这是上面那句兜底造成的 ✗：只要 costE 出现 NaN/Infinity，直接返回 BIG_MAX_E（1EE308）。
+      //   现在兜底改成**按等级算的有限值**（不带折扣），保证造价连续、可读 ✓。
+      let costE2 = costE;
+      if (!isFinite(costE2)) {
+        costE2 = Math.log10(INV_LEVEL_COST_BASE) + Math.max(0, lv - 1) * Math.log10(INV_LEVEL_COST_GROWTH);
+      }
+      if (!isFinite(costE2)) costE2 = 0;
       // V0.116：成本指数下限定在 −30（≈1E−30）——「无限接近 0 但不是 0」，同时保证大数表示不丢精度
-      const costE2 = Math.max(-30, costE);
+      costE2 = Math.max(-30, costE2);
       // V0.116：允许负指数（成本 < 1，无限接近 0 但永不等于 0）
       const c = bigFromLog10(costE2);
       // ⚠️ 抹掉浮点毛刺：Math.pow(10, frac) 会算出 1.2000000000000002 这种尾数 ✗，
@@ -19801,10 +19833,22 @@
       //   它直接记在主存档上：退出反转世界、进宇宙重置都不会清掉它（它是唯一跨局保留的东西）。
       // V0.110：能源速率 = 基础 1/秒 × 成就奖励（「赌神」→ ×1.5）
       save.invEnergy = Math.max(0, (Number(save.invEnergy) || 0)) + INV_ENERGY_PER_SEC * invEnergyRateMult() * dt;
-      invCasinoTick(dt);   // V0.109：赌场倒计时（只在赌场界面开着时走字）
+      // V0.124：赌场已下线（invCasinoTick 不再调用）
       const lv = invLevelNow();
       // 被动凝析：每秒 +（1 + 等级）—— V0.104：被动采集器再加成
-      invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, bigMul(bigOf((1 + lv) * invTechMult("passive", 0.15) * invInspireMult() * invLabDustMult() * invMilestoneDustMult() * invParseDustMult() * invArkExpertMult("anchor")), dt)));
+      // ⚠️ V0.128.1 修（作者：Lv.9.21e6 时被动凝析 +0）——
+      //   和凝析按钮同一个毛病：这里是**普通数字连乘** ✗，后期各乘区一乘就溢出成 Infinity/NaN ✗ → 读数变 +0 ✗。
+      //   改成**对数空间**累加，再转大数 ✓（收入可以一路涨过 1EE10，永不溢出）。
+      {
+        const parts = [Math.max(1, 1 + lv), invTechMult("passive", 0.15), invInspireMult(), invLabDustMult(), invMilestoneDustMult(), invParseDustMult(), invArkExpertMult("anchor")];
+        let logSum = 0;
+        for (let i = 0; i < parts.length; i++) {
+          const x = Number(parts[i]);
+          logSum += Math.log10(x > 0 && isFinite(x) ? x : 1e-30);
+        }
+        const gainPerSec = bigFromLog10(logSum);
+        invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, bigMul(gainPerSec, dt)));
+      }
       // 捕获逼近：反转时间耄耋每 INV_CAPTURE_SEC 秒到访一次（V0.104：静默信标拉长间隔）
       invWorld.progress += dt * invHoundSpeedMult() / invCapSec();
       if (invWorld.progress >= 1) {
@@ -20288,7 +20332,7 @@
         energyTab.classList.toggle("new-glow", onEn && !invWorld.energySeen);
       }
       // V0.110：挑战进行中 → 在「能源」右边挂出挑战页签
-      const chalTab = el("invTabChal");
+      // V0.129：赌神页签已删除（元素都不存在了）
       if (chalTab) {
         const running = invChalRunState().running;
         chalTab.style.display = running ? "" : "none";
@@ -20481,7 +20525,9 @@
     let invEnergySub = "energy";   // 会话级：能源页里的哪个子页（energy | vworld）
     function switchInvEnergySub(name) {
       // V0.110：挑战并进虚拟世界、成就搬到右上角 → 这里回到三页
-      invEnergySub = (name === "vworld" || name === "vup") ? name : "energy";
+      // V0.124：虚拟世界（赛博赌场）已下线 —— 任何入口强制回能源页
+      if (name === "vworld") name = "energy";
+      invEnergySub = (name === "vup") ? name : "energy";
       const panes = { energy: el("invEnergySubEnergy"), vworld: el("invEnergySubVworld"), vup: el("invEnergySubVup") };
       const tabs = { energy: el("invEnergySubTabEnergy"), vworld: el("invEnergySubTabVworld"), vup: el("invEnergySubTabVup") };
       Object.keys(panes).forEach(k => {
@@ -20617,8 +20663,13 @@
     //   只放「反转世界」里的成就（主宇宙那套成就完全独立）。第一条：赌神。
     //   奖励用 reward 文本 + 真实的数值钩子（见 invEnergyRateMult 等）。
     const INV_ACHV_DEFS = [
-      { id: "gambler", icon: "🎰", name: "赌神", cond: "完成虚拟挑战「赌神」",
-        reward: "能源获取 ×1.5", check: () => invChalState().gamblerCleared }
+      // V0.124（作者要求）：赛博赌场已彻底下线 —— 原「赌神」改成**隐藏的内测成就**：
+      //   · 只有老版本拿过的人才有（check 只认老存档里的 gamblerCleared）；
+      //   · 新玩家没有任何途径获取；
+      //   · 没拿到时**连列表都不显示**（见渲染处的 hidden 判断）；
+      //   · 效果只剩「能源获取 ×1.5」。
+      { id: "gambler", icon: "🧪", name: "内测成就", cond: "参与过早期内测（赛博赌场）",
+        reward: "能源获取 ×1.5", hidden: true, check: () => invChalState().gamblerCleared }
     ];
     function invAchvOn(id) {
       if (!save.invAchv || typeof save.invAchv !== "object") save.invAchv = {};
@@ -21589,18 +21640,21 @@
       const list = el("invAchvList");
       if (!list) return;
       setText("invAchvSum", "已达成 " + invAchvCount() + " / " + INV_ACHV_DEFS.length +
-        (invAchvOn("gambler") ? "　·　赌神奖励已生效：能源 ×" + INV_ACHV_GAMBLER_ENERGY_MULT.toFixed(2) : ""));
-      setHTML("invAchvList", INV_ACHV_DEFS.map(d => {
+        (invAchvOn("gambler") ? "　·　内测成就奖励已生效：能源 ×" + INV_ACHV_GAMBLER_ENERGY_MULT.toFixed(2) : ""));
+      // V0.124：hidden 成就（内测成就）—— **没拿到就不显示** ✓
+      // V0.129（作者要求）：反转成就改用**主宇宙同款**卡片结构（.achievement / icon / body / status）✓
+      setHTML("invAchvList", INV_ACHV_DEFS.filter(d => !(d.hidden && !invAchvOn(d.id))).map(d => {
         const on = invAchvOn(d.id);
-        return '<div class="inv-achv-card' + (on ? " on" : "") + '">' +
-          '<div class="achv-ico">' + d.icon + '</div>' +
-          '<div class="achv-mid">' +
-            '<div class="achv-name">' + d.name + (on ? '　<span class="achv-got">已达成</span>' : '') + '</div>' +
-            '<div class="achv-cond">条件：' + d.cond + '</div>' +
-            '<div class="achv-reward">奖励：' + d.reward + '</div>' +
-          '</div>' +
-          '<div class="achv-flag">' + (on ? "✓" : "—") + '</div>' +
-          '</div>';
+        return `
+          <div class="achievement ${on ? "done" : ""}">
+            <div class="achievement-icon">${d.icon}</div>
+            <div class="achievement-body">
+              <h3>${d.name}</h3>
+              <p>${d.cond}</p>
+              <span class="achievement-reward">${on ? "已获得 " : "奖励 "}${d.reward}</span>
+            </div>
+            <div class="achievement-status">${on ? "已达成" : "未达成"}</div>
+          </div>`;
       }).join(""));
     }
     // V0.110：虚拟挑战页渲染
@@ -21837,7 +21891,7 @@
           `<div class="inv-tech-desc">${d.desc}${invLeapLevel(d.id) > 0 ? ` · 进阶加成 <b style="color: var(--gold);">×${(1 + INV_LEAP_BONUS_PER_LEVEL * invLeapLevel(d.id)).toFixed(2)}</b>` : ""}</div></div>`;
       }).join("") +
         `<div class="inv-tech-note">「深度凝析」每次（手动与自动都算）有 <b>${(invTechDropChance() * 100).toFixed(1)}%</b> 概率爆出基础科技` +
-        `（基础 ${(INV_TECH_DROP_CHANCE * 100).toFixed(0)}%，采样增幅器 +0.2%/级）；掉落等级 = 当前反转等级；` +
+        `（基础 ${(INV_TECH_DROP_CHANCE * 100).toFixed(0)}%，掉落校准 +0.5%/级，封顶 100%）；掉落等级 = 当前反转等级；` +
         `同种科技<b>高等级自动替换低等级</b>，被消耗的那份按「等级 × ${INV_TECH_REFUND_PER_LEVEL}」折算成反转尘埃。` +
         `八项科技全部<b>持续生效</b>，而且<b>有效等级没有上限</b>（等级多大效果就多大 —— 反转里程碑还会把它再抬高）。</div>`);
     }
@@ -21846,13 +21900,6 @@
     on("invTabAuto", () => switchInvPane("auto"));
     on("invTabBag", () => switchInvPane("bag"));
     on("invTabEnergy", () => switchInvPane("energy"));   // V0.109：能源页
-    on("invTabChal", () => {                              // V0.110：跳回进行中的挑战
-      switchInvPane("energy");
-      switchInvEnergySub("vworld");
-      const sc = invCasinoSession();
-      if (sc && !sc.open && invChalRunState().running) { sc.open = true; sc.mode = "challenge"; }
-      renderInvWorld();
-    });
     // V0.109：虚拟世界 —— 子页签与加点按钮（都在动态/新增节点上，用代理）
     el("invEnergySubTabs").addEventListener("click", e => {
       const t = e.target && e.target.closest ? e.target.closest("[data-inv-energy-sub]") : null;
