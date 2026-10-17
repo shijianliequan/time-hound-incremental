@@ -3055,7 +3055,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.130</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.132</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -4047,6 +4047,24 @@
               来源：接触<b>🚀 方舟</b>时随机获得一项（方舟等级越高，给的等级越高）。
             </p>
             <div class="inv-vw-games" id="invGateExpertList"></div>
+            <!-- V0.132（作者要求）：迭代子页（暂无内容，先占位） -->
+            <div class="sub-tab-bar" style="margin: 14px 0 10px; display: flex; gap: 8px;">
+              <button class="sub-tab active" id="invArkSubExpert">🧪 专家科技</button>
+              <button class="sub-tab" id="invArkSubIter">♻ 迭代</button>
+            </div>
+            <div id="invArkIterPane" style="display: none;">
+              <p class="inv-note" style="line-height: 1.9;">
+                我们放射的方舟会在虚空中<b>自我迭代升级</b>，锻造出全新的科技。
+                <br><span style="color: var(--muted);">（暂无）</span>
+              </p>
+            </div>
+            <!-- V0.131：专家科技解析进度条（每获得 1 级专家科技 = 1 点经验） -->
+            <div id="invArkParseWrap" style="margin-top: 14px; display: none;">
+              <div class="inv-track" style="height: 42px; border-radius: 12px;">
+                <i id="invArkParseFill" style="width: 0;"></i>
+                <span class="inv-track-cap" id="invArkParseText" style="font-size: 15px; font-weight: 700; letter-spacing: .3px; line-height: 1.35; padding: 0 12px;">科技解析 0%</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -4959,7 +4977,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.130";
+    const GAME_VERSION = "V0.132";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -9669,6 +9687,11 @@
       const keepInvTechBase = save.invTechBase;
       const keepInvLab = save.invLab;
       const keepInvBestEver = save.invBestEver;
+      // V0.131 修（作者：换宇宙后「方舟收藏家」进度被清零 / 刷新后提示框勾选被取消）——
+      //   多元宇宙重置会把 save 整个重建成默认值，只挑一部分字段带回 ✗，
+      //   而 arkContactsTotal（成就计数）和 toastMute（提示框开关）**不在带回名单里** ✗ → 每次重置就被清空 ✓。
+      const keepArkContactsTotal = Math.max(0, Math.floor(Number(save.arkContactsTotal) || 0));
+      const keepToastMute = Object.assign({}, save.toastMute || {});
 
       save = normalizeBigFields(structuredCloneSafe(DEFAULT_SAVE));
       save.possibility = p;
@@ -9676,6 +9699,8 @@
       //   运行时的猎影状态也要一起打断，免得旧循环的 8 秒窗口跨进新循环。
       hunt = null;
       save.achievements = keepAchievements;
+      save.arkContactsTotal = keepArkContactsTotal;   // V0.131：成就进度跨重置保留 ✓
+      save.toastMute = keepToastMute;                 // V0.131：提示框开关跨重置保留 ✓
       save.auto = keepAuto;
       save.numberMode = keepNumberMode;
       save.playMs = keepPlayMs;
@@ -14202,6 +14227,8 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.132", "专家科技解析进度条改为显示「当前涨幅 → 下一级涨幅」；方舟页新增「♻ 迭代」子页（先占位：方舟会在虚空中自我迭代升级，锻造全新科技 · 暂无）；修复自动狩猎打完一场就停（退出反转世界时把自动化计时器也顺延了，挂多久就要再等多久）。"],
+      ["V0.131", "新增「专家科技解析」：每获得 1 级专家科技 = 1 点解析经验，进度条满了升 1 级；每级解析让反转铸级的**每级涨幅**衰减 1%（×1.40 → 最低 ×1.05）。顺便修好：换宇宙后方舟收藏家进度被清零、刷新后提示框勾选被取消（两者都是多元宇宙重置时没把字段带回）。"],
       ["V0.130", "修一个反复弹窗的 BUG（作者反馈：反转世界里老是跳出「出现一次异常（主循环）：chalTab is not defined」）。上一版把「🎰 赌神」页签连同按钮一起下线了，但「挑战进行中就显示这个页签」的一小段代码忘了删 —— 变量 chalTab 已经不存在，于是<b>每次重绘反转世界都会抛一次 ReferenceError</b>（被主循环的防护网接住、弹一次异常提示，游戏本身照常继续）。现在把这段死代码删干净了；顺手做了一次全链路冒烟测试（主宇宙各页签 → 进反转世界各页签 → 能源子页 → 主循环跑帧 → 退出），没有再发现其它「元素删了但代码还在引用」的残留。"],
       ["V0.129", "修一个玩家反馈的 BUG：星图走完一格后点「<b>确定</b>」，<b>会结算两到三次</b>。本该「领一次奖励 + 重置一次」就结束，但重置流程末尾有一段旧逻辑 ——「没有待领取账目就按重置口径补一份」；而玩家点确定的顺序恰好是「<b>先领奖（把账清空）→ 再重置</b>」，于是重置时账面又是空的、就又被补出一份新的「本回合结算」：<b>结算卡重新亮起 → 再点一次又能领一遍 → 又重置一次</b>，反复如此（实测能连点两三次甚至更多，每一轮都真的把进度清空一次）。现在改成 <b>重置完成 = 本轮账目清零</b>：可领的奖励只由「支付 1E1000 领取行动力」那一步产生，重置本身绝不再生成新账。已用自动化脚本对「点一次 / 隔一秒连点两次」做了验证 —— 一次点击只结算一次，重置后结算卡不再出现，隔秒连点也不会重复到账。"],
       ["V0.128", "赛博赌场彻底下线，赌神改成隐藏的「内测成就」（只保留能源 ×1.5，新玩家无法获取）· 采样增幅器改为反转尘埃收益、虚空棱镜改为数据点收益（都带软上限）· 爆率改为「基础 2% + 掉落校准 0.5%/级」，封顶 100% · 修复里程碑子页打不开、多元宇宙可反复重置。"],
@@ -15117,6 +15144,22 @@
         }).join(""));
       }
         setText("invRewritePoints", formatNumber(arkState0.points));   // V0.113：门外也要显示正确点数
+      // V0.131：专家科技解析进度条
+      try {
+        const wrap = el("invArkParseWrap");
+        if (wrap) {
+          wrap.style.display = "";
+          const lvP = invArkParseLv(), xpP = invArkParseXp(), needP = invArkParseNeed(lvP);
+          const pctP = Math.max(0, Math.min(100, Math.floor((xpP / Math.max(1, needP)) * 100)));
+          setInvTrackWidth("invArkParseFill", pctP);
+    {
+      const nowG = invArkParseCostGrowth();
+      const nextG = 1 + Math.max(0, INV_LEVEL_COST_GROWTH - 1) / (1 + 0.01 * (lvP + 1));
+      setText("invArkParseText", "🔬 科技解析 Lv." + formatNumber(lvP) + "　" + formatNumber(xpP) + " / " + formatNumber(needP) +
+        " 经验　→　铸级每级涨幅 ×" + nowG.toFixed(3) + " → ×" + nextG.toFixed(3));
+    }
+        }
+      } catch (e) { }
       const exList0 = el("invGateExpertList");
         if (exList0) {
           setHTML("invGateExpertList", INV_ARK_EXPERT_TECHS.map(t => {
@@ -16769,13 +16812,17 @@
     // V0.98：silent = 自动商店专用 —— 不弹提示、不整页 render（常规刷新会跟上），只回报买了几级。
     function boostLuck(times, silent) {
       const free = isFreeParadoxUpgrade();
-      let totalCost = 0, boosted = 0, budget = bigOf(save.origin);
+      // V0.131.2 修（作者：命运扭曲忽然跳到 67 后就不动了）——
+      //   totalCost 原来是普通数字 0，却用 += 累加 Big 花费 → 一旦真的扣费就变成 NaN，
+      //   随后 save.origin 被写成 NaN，之后所有购买判定都失败、等级永远卡住。
+      //   改成用 Big 累加（免费模式下不扣费，但同样保持类型正确）。
+      let totalCost = bigOf(0), boosted = 0, budget = bigOf(save.origin);
       for (let i = 0; i < times; i++) {
         if (save.luckBoost + boosted >= BOOST_MAX_LEVEL) break;
         const cost = getBoostCost(save.luckBoost + boosted);
         if (bigCmp(budget, cost) < 0) break;
         budget = bigSub(budget, cost);
-        totalCost += cost;
+        totalCost = bigAdd(totalCost, cost);
         boosted++;
       }
       if (boosted <= 0) {
@@ -16783,6 +16830,8 @@
         return 0;
       }
       if (!free) save.origin = bigSub(save.origin, totalCost);
+      // 兜底：origin 若被历史 BUG 写坏成 NaN，拉回 0，避免永久卡死
+      if (!save.origin || !isFinite(Number(save.origin.e)) || !isFinite(Number(save.origin.m))) save.origin = bigOf(0);
       save.luckBoost += boosted;
       saveGame(true);
       if (silent) return boosted;
@@ -17627,10 +17676,11 @@
     // V0.109：提示框开关的勾选（事件代理 —— 清单是动态渲染的）
     // V0.117（作者反馈：刷新后提示框选项会重置）——改完立刻落盘
     el("toastMuteList").addEventListener("change", e => {
-      try { saveGame(true); } catch (err) { }
       const t = e.target;
       if (!t || !t.dataset || !t.dataset.toastMute) return;
+      // V0.131 修：原来是「先落盘、后改状态」✗ —— 存进去的还是旧值 ✗；改成先改再存 ✓
       setToastMute(t.dataset.toastMute, !t.checked);
+      try { saveGame(true); } catch (err) { }
     });
     on("settingsClose", () => el("settingsModal").classList.remove("show"));
     // ⚠️ V0.96 修的三个坑：`on(id, fn)` 是把监听器直接挂在 click 上，所以 fn 会收到**事件对象**。
@@ -17842,7 +17892,20 @@
         if (!ok2) showToast("重置没成功（看看是不是还没通关全部主线挑战）。", "tech");
       });
     });
-    on("subTabMilestone", () => switchPossibilitySub("milestone"));   // V0.115：里程碑子页
+    on("subTabMilestone", () => switchPossibilitySub("milestone"));
+    // V0.132：方舟页「专家科技 / 迭代」子页切换
+    {
+      const toggleArkSub = (which) => {
+        const ex = el("invArkSubExpert"), it = el("invArkSubIter");
+        const exPane = el("invGateExpertList"), itPane = el("invArkIterPane");
+        if (ex) ex.classList.toggle("active", which === "expert");
+        if (it) it.classList.toggle("active", which === "iter");
+        if (exPane) exPane.style.display = which === "expert" ? "" : "none";
+        if (itPane) itPane.style.display = which === "iter" ? "" : "none";
+      };
+      on("invArkSubExpert", () => toggleArkSub("expert"));
+      on("invArkSubIter", () => toggleArkSub("iter"));
+    }   // V0.115：里程碑子页
     on("subTabGene", () => switchPossibilitySub("gene"));
     on("subTabLab", () => switchPossibilitySub("lab"));
     on("subTabPain", () => switchPossibilitySub("pain"));
@@ -18496,7 +18559,7 @@
     ];
     function invArkState() {
       if (!save.invArk || typeof save.invArk !== "object" || Array.isArray(save.invArk)) {
-        save.invArk = { unlocked: false, launches: 0, pos: null, level: 0, contacted: false, seen: false, expert: {}, points: 0 };
+        save.invArk = { unlocked: false, launches: 0, pos: null, level: 0, contacted: false, seen: false, expert: {}, points: 0, parse: { xp: 0, lv: 0 } };
       }
       const a = save.invArk;
       a.unlocked = !!a.unlocked;
@@ -18505,6 +18568,14 @@
       a.launches = Math.max(0, Math.floor(a.launches || 0));
       a.level = Math.max(0, Math.floor(a.level || 0));
       a.points = Math.max(0, Math.floor(a.points || 0));
+      // V0.131：专家科技解析（每获得 1 级专家科技 → 1 点经验；满了升 1 级解析）
+      if (!a.parse || typeof a.parse !== "object") a.parse = { xp: 0, lv: 0 };
+      a.parse.xp = Math.max(0, Math.floor(Number(a.parse.xp) || 0));
+      a.parse.lv = Math.max(0, Math.floor(Number(a.parse.lv) || 0));
+      {
+        let need = invArkParseNeed(a.parse.lv), guardN = 0;
+        while (a.parse.xp >= need && guardN++ < 1000) { a.parse.xp -= need; a.parse.lv++; need = invArkParseNeed(a.parse.lv); }
+      }
       if (!a.expert || typeof a.expert !== "object") a.expert = {};
       Object.keys(a.expert).forEach(k => {
         const v = a.expert[k];
@@ -18613,6 +18684,30 @@
       return false;
     }
     function invArkExpertLv(id) { return Math.max(0, Math.floor(invArkState().expert[id] || 0)); }
+    // ===== V0.131（作者要求）：专家科技解析 =====
+    //   每获得 1 级专家科技 → +1 经验；进度条满了升 1 级「解析」；
+    //   每级解析让**反转铸级造价的每级增幅**衰减 1%（1.4 → 最低 1.05）✓
+    function invArkParseNeed(lv) { return 10 + Math.max(0, Math.floor(lv)) * 10; }   // 10 / 20 / 30 …
+    function invArkParseLv() { return Math.max(0, Math.floor(invArkState().parse.lv || 0)); }
+    function invArkParseXp() { return Math.max(0, Math.floor(invArkState().parse.xp || 0)); }
+    function invArkParseCostGrowth() {
+      // V0.131.1（作者要求）：改成**无等级上限**的渐近衰减 ——
+      //   growth = 1 + (原增幅 − 1) / (1 + 0.01 × 解析等级)
+      //   等级 0 → ×1.40、10 → ×1.327、25 → ×1.229、50 → ×1.156、100 → ×1.084、500 → ×1.018…
+      //   **永不等于 1.00，但可以无限逼近**，解析等级本身也没有任何上限 ✓
+      const base = Math.max(0, INV_LEVEL_COST_GROWTH - 1);   // 0.4
+      return 1 + base / (1 + 0.01 * invArkParseLv());
+    }
+    function invArkParseAddXp(n) {
+      const a = invArkState();
+      a.parse.xp = Math.max(0, Math.floor(a.parse.xp || 0)) + Math.max(0, Math.floor(n || 0));
+      let guardN = 0;
+      while (a.parse.xp >= invArkParseNeed(a.parse.lv) && guardN++ < 1000) {
+        a.parse.xp -= invArkParseNeed(a.parse.lv);
+        a.parse.lv++;
+        try { showToast("🔬 <b>科技解析</b>升到 Lv." + a.parse.lv + " —— 反转铸级每级增幅衰减到 ×" + invArkParseCostGrowth().toFixed(2), "tech"); } catch (e) { }
+      }
+    }
     function invArkExpertMult(id) {
       const def = INV_ARK_EXPERT_TECHS.filter(t => t.id === id)[0];
       if (!def) return 1;
@@ -18715,6 +18810,7 @@
       const rar = ARK_RARITY.filter(r => r.id === a.rarity)[0] || ARK_RARITY[0];
       const gain = Math.max(1, Math.floor((lv / 200) + 1) * rar.mult);
       a.expert[tech.id] = Math.max(0, Math.floor(a.expert[tech.id] || 0)) + gain;
+      invArkParseAddXp(gain);   // V0.131：每获得 1 级专家科技 = 1 点解析经验
       // ② 现实改写点数
       const pts = Math.max(1, Math.floor((lv / INV_ARK_POINTS_PER) * rar.mult));
       a.points += pts;
@@ -19427,8 +19523,10 @@
       //        ② 指数**不再夹到 0** —— 成本可以 <1、无限接近 0，但数学上永远不是 0 ✓。
       const forgeLv = Math.max(0, invTechEffLv("forge"));
       const forgeDiscLog = forgeLv * Math.log10(0.94);      // 每级乘法：0.94^等级
+      // V0.131：解析等级越高，造价的每级增幅越小（1.4 → 最低 1.05）
+      const growthNow = (typeof invArkParseCostGrowth === "function") ? invArkParseCostGrowth() : INV_LEVEL_COST_GROWTH;
       const costE = Math.log10(INV_LEVEL_COST_BASE) +
-        Math.max(0, lv - 1) * Math.log10(INV_LEVEL_COST_GROWTH) +
+        Math.max(0, lv - 1) * Math.log10(growthNow) +
         forgeDiscLog;
       // ⚠️ V0.128.2 修（作者：9.0E6 时造价还不到 E10000，9.2E6 突然变 1EE308 —— 断崖 ✗）——
       //   这是上面那句兜底造成的 ✗：只要 costE 出现 NaN/Infinity，直接返回 BIG_MAX_E（1EE308）。
@@ -19532,9 +19630,11 @@
       if (pausedMs > 0) {
         if (hunt && typeof hunt.startAt === "number") hunt.startAt += pausedMs;
         if (save.huntCooldownUntil > 0) save.huntCooldownUntil += pausedMs;
-        if (autoHuntNextAt > 0) autoHuntNextAt += pausedMs;
-        if (autoParadoxNextAt > 0) autoParadoxNextAt += pausedMs;
-        if (lastAutoReweaveAt > 0) lastAutoReweaveAt += pausedMs;
+        // ⚠️ V0.131.3 修（作者：自动狩猎能打过却停住）——
+        //   原来把「自动狩猎 / 自动悖论 / 自动重织」的下一次时刻也整体后移了暂停时长 ✗，
+        //   在反转世界待 3 小时 → 回来自动狩猎要再等 3 小时才动 ✗，看起来就是"停了"。
+        //   这三个是**自动化**，不该跟着暂停时钟走 —— 退出后应当立刻恢复节拍 ✓。
+        if (save.huntCooldownUntil > 0) { /* 手动狩猎冷却仍按暂停顺延 */ }
         saveGame(true);
       }
       render();
@@ -19827,7 +19927,8 @@
       const chance = Math.max(0, Math.min(1, (1 - resistPct / s) * invParseChanceFactor()));
       if (chance <= 0) {
         if (!quiet) {
-          showToast(`◑ ${houndName}扑了上来，但<b>完全啃不动</b>（抵抗 ${(resistPct * 100).toFixed(1)}% ≥ 强度 ${(s * 100).toFixed(0)}%）。`);
+          // V0.132.1：大数走计数法（作者：右下角提示里的 821823.3% 太生硬）
+          showToast(`◑ ${houndName}扑了上来，但<b>完全啃不动</b>（抵抗 ${formatNumber(resistPct * 100)}% ≥ 强度 ${formatNumber(s * 100)}%）。`);
         }
         return;
       }
