@@ -3055,7 +3055,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.132</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.142</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -3597,6 +3597,10 @@
             <button class="primary-button purple-button" id="paradoxButton" style="max-width:420px; margin: 10px auto 0; display:block;">
               超越悖论
             </button>
+            <label style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;font-size:12.5px;color:var(--muted);cursor:pointer;">
+              <input type="checkbox" id="skipWheelAnimChk" onchange="window.__wheelSkipToggle && window.__wheelSkipToggle(this.checked)">
+              跳过转盘动画（直接出结果，设置会保存）
+            </label>
 
             <table class="odds-table">
               <thead>
@@ -3948,7 +3952,7 @@
                 <button class="secondary-button" id="mapZoomInBtn" style="display: none; flex: 0 0 auto; width: auto;">🔭 增大视角</button>
                 <button class="secondary-button" id="mapZoomOutBtn" style="display: none; flex: 0 0 auto; width: auto;">🔎 缩小视角</button>
                 <button class="secondary-button" id="mapZoomHomeBtn" style="display: none; flex: 0 0 auto; width: auto;">🏠 返回当前格子</button>
-                <button class="secondary-button" id="mapAutoNavBtn" style="display: none; flex: 0 0 auto; width: auto;">🧭 自动导航</button>
+                <!-- V0.135（作者要求）：星图里不再放自动导航，只保留「自动化」页里的那个 -->
                 <!-- V0.116（作者要求）：跳过这一回合的行动，直接去重置 -->
                 <button class="secondary-button" id="mapSkipBtn" style="flex: 0 0 auto; width: auto;">⏭ 原地不动</button>
               </div>
@@ -4048,16 +4052,6 @@
             </p>
             <div class="inv-vw-games" id="invGateExpertList"></div>
             <!-- V0.132（作者要求）：迭代子页（暂无内容，先占位） -->
-            <div class="sub-tab-bar" style="margin: 14px 0 10px; display: flex; gap: 8px;">
-              <button class="sub-tab active" id="invArkSubExpert">🧪 专家科技</button>
-              <button class="sub-tab" id="invArkSubIter">♻ 迭代</button>
-            </div>
-            <div id="invArkIterPane" style="display: none;">
-              <p class="inv-note" style="line-height: 1.9;">
-                我们放射的方舟会在虚空中<b>自我迭代升级</b>，锻造出全新的科技。
-                <br><span style="color: var(--muted);">（暂无）</span>
-              </p>
-            </div>
             <!-- V0.131：专家科技解析进度条（每获得 1 级专家科技 = 1 点经验） -->
             <div id="invArkParseWrap" style="margin-top: 14px; display: none;">
               <div class="inv-track" style="height: 42px; border-radius: 12px;">
@@ -4165,6 +4159,7 @@
             </div>
             <!-- V0.105（作者要求）：反转里程碑 —— 本局最高每 50 级一层 -->
             <div class="inv-milestone" id="invMilestoneLine">🏁 反转里程碑：每 50 级一层</div>
+            <div class="inv-milestone" id="invMilestoneSum" style="margin-top: 6px; font-size: 12.5px; line-height: 1.8;">加成总计：—</div>
             <div class="inv-actions">
               <button class="secondary-button" id="invHarvestBtn">深度凝析（+6）</button>
               <button class="primary-button" id="invLevelBtn">反转铸级（花费 12）</button>
@@ -4454,6 +4449,13 @@
         </div>
 
         <div class="inv-pane" id="invPaneArk">
+          <!-- V0.137（作者要求）：迭代是方舟页里的子页面（专家科技右侧） -->
+          <div class="sub-tab-bar" style="margin: 0 0 10px; display: flex; gap: 8px;">
+            <button class="sub-tab active" id="invArkSubExpert" title="管理方舟发射与获得的专家科技等级">🚀 发射</button>
+            <button class="sub-tab" id="invArkSubIter" title="5×5 方舟蓝图管理">♻ 迭代</button>
+            <button class="sub-tab" id="invArkSubBattle" onclick="window.__arkBattleTab && window.__arkBattleTab()" title="消耗一次传说方舟发射机会，进行太空战">⚔ 战斗</button>
+          </div>
+          <div id="invArkShipPane">
           <div class="panel">
             <div class="section-title">
               <h2 style="color: var(--purple); margin: 0;">🚀 方舟</h2>
@@ -4475,7 +4477,6 @@
               <div class="inv-stat"><div class="inv-label">方舟等级</div><div class="inv-big" id="invArkLevel">—</div></div>
               <div class="inv-stat"><div class="inv-label">坐标</div><div class="inv-big" id="invArkPos">—</div></div>
               <div class="inv-stat"><div class="inv-label">现实改写点数</div><div class="inv-big" id="invArkPoints">0</div></div>
-              <div class="inv-stat"><div class="inv-label">本周期剩余发射</div><div class="inv-big" id="invArkLeft">—</div></div>
             </div>
             <div class="cs-btn-row" style="margin-top: 10px;">
               <button class="primary-button" id="invArkLaunchBtn" style="flex: 0 0 auto; width: auto;">🚀 发射方舟</button>
@@ -4488,6 +4489,89 @@
             <div class="inv-vw-games" id="invArkExpertList"></div>
           </div>
         </div>
+          <div id="invArkBattlePane" style="display: none;">
+            <div class="inv-note" style="line-height: 1.8; margin-bottom: 8px;">
+              组装好蓝图后，可<b>消耗一次传说方舟发射机会</b>进行太空战：敌人从<b>四个方向</b>来袭，
+              先扣<b>护盾</b>，护盾破了就按来袭方向打对应位置的部件。
+            </div>
+            <div style="display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap; margin-bottom: 10px;">
+              <div id="invArkBattleStage" style="position: relative; flex: 1 1 420px; height: 460px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: rgba(120,160,255,.05);">
+                <div id="invArkBattleShips" style="position: absolute; inset: 0;"></div>
+                <div id="invArkBattleFx" style="position: absolute; inset: 0; pointer-events: none;"></div>
+              </div>
+              <div id="invArkBattleLog" style="flex: 0 0 250px; min-width: 220px; max-width: 300px; height: 460px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; font-size: 12px; line-height: 1.75; background: rgba(0,0,0,.02);">
+                <div style="color: var(--muted);">战斗日志会显示在这里</div>
+              </div>
+            </div>
+            <div class="inv-note" style="line-height: 1.8; margin-bottom: 8px;">
+              使用预设：
+              <select id="invArkBattleSlot" style="padding: 4px 8px; border-radius: 8px; background: var(--panel-light); color: inherit; border: 1px solid var(--line);">
+                <option value="0">当前蓝图</option>
+                <option value="1">预设 1</option><option value="2">预设 2</option><option value="3">预设 3</option>
+                <option value="4">预设 4</option><option value="5">预设 5</option><option value="6">预设 6</option>
+                <option value="7">预设 7</option><option value="8">预设 8</option><option value="9">预设 9</option>
+              </select>
+            </div>
+            <div id="invArkBattleStats" class="inv-note" style="line-height: 1.8; margin-bottom: 8px;"></div>
+            <div class="inv-note" style="line-height: 1.9; margin-bottom: 8px; font-size: 12.5px;">
+              <b>🎁 方舟零件包</b>：赢下战斗获得，<b>不会随退出反转世界重置</b>。
+              <span id="invArkPackSummary">—</span>
+              <button class="secondary-button" id="invArkPackOpen" onclick="window.__arkPackOpen && window.__arkPackOpen()" style="padding: 4px 10px; width: auto; margin-left: 6px;">📦 打开 1 个</button>
+              <button class="primary-button" id="invArkPackOpenAll" onclick="window.__arkPackOpenAll && window.__arkPackOpenAll()" style="padding: 4px 10px; width: auto; margin-left: 6px;">📦📦 一键全开（显示汇总）</button>
+              <span id="invArkT1Row" style="display:none; margin-left:12px;">
+                <b style="color:#a78bfa;">🧪 T1 科技包</b>
+                <button class="secondary-button" onclick="window.__arkPackOpenT1 && window.__arkPackOpenT1()" style="padding: 4px 10px; width: auto; margin-left: 6px;">打开 1 个 T1</button>
+                <button class="primary-button" onclick="window.__arkPackOpenAllT1 && window.__arkPackOpenAllT1()" style="padding: 4px 10px; width: auto; margin-left: 6px;">🧪🧪 一键全开 T1</button>
+              </span>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="primary-button" id="invArkBattleStart" onclick="window.__arkBattleStart && window.__arkBattleStart()" style="padding: 8px 16px; width: auto;">⚔ 开始战斗（本回合传说方舟出击）</button>
+              <button class="secondary-button" id="invArkBattleStop" onclick="window.__arkBattleStop && window.__arkBattleStop()" style="padding: 8px 16px; width: auto;">撤退</button>
+            </div>
+          </div>
+          <div id="invArkIterPane" style="display: none;">
+                <p class="inv-note" style="line-height: 1.8; margin-bottom: 10px;">
+                  我们放射的方舟会在<b>虚空中自我迭代升级</b>，锻造出全新的科技 —— 累计发射 <b id="invArkIterLaunches">0</b> 艘即可解锁<b style="color:#f5a623;">传说方舟</b>抽取资格。
+                </p>
+                <div id="invArkIterEnergyWrap" style="margin-bottom: 10px;">
+                <div class="inv-track" style="height: 24px; border-radius: 10px;">
+                  <i id="invArkIterEnergyFill" style="width: 0;"></i>
+                  <span class="inv-track-cap" id="invArkIterEnergyText" style="font-size: 12.5px; font-weight: 700;">能源 0 / 0</span>
+                </div>
+              </div>
+              <div class="inv-note" style="margin-bottom: 8px; font-size: 12.5px;">
+                <b>供能优先级</b>（数字越小越优先：核心被打爆时，靠前的部件保持满效率）
+                <div id="invArkPowerOrder" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;"></div>
+              </div>
+              <div id="invArkIterFilter" class="inv-note" style="margin-bottom: 8px; font-size: 12px; line-height: 2;"></div>
+              <div id="invArkIterPalette" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;"></div>
+                <div style="display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 10px;">
+                  <div id="invArkIterGrid" style="display: grid; grid-template-columns: repeat(7, 46px); gap: 4px;"></div>
+                  <div id="invArkPartCard" style="flex: 1 1 240px; min-width: 240px; max-width: 420px; min-height: 168px; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: rgba(120,160,255,.04); font-size: 13px; line-height: 1.9;">选择零件后在这里看属性</div>
+                </div>
+                <div id="invArkIterStats" class="inv-note" style="line-height: 1.8; margin-bottom: 8px;"></div>
+              <div class="inv-note" style="margin: 8px 0; font-size: 12.5px;">
+                <b>设计图分享</b>（导出后会生成 ARK1: 开头的分享码）
+                <textarea id="invArkShare" placeholder="导出后复制这里的码发给朋友；粘贴别人的码后点导入" style="width:100%;height:56px;margin-top:6px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--panel-light);color:inherit;font-size:12px;resize:vertical;"></textarea>
+                <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">
+                  <button class="secondary-button" onclick="window.__arkExport && window.__arkExport()" style="padding:4px 10px;width:auto;">📤 导出设计图</button>
+                  <button class="secondary-button" onclick="window.__arkImport && window.__arkImport()" style="padding:4px 10px;width:auto;">📥 导入设计图</button>
+                </div>
+              </div>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button class="secondary-button" id="invArkIterClear" style="padding: 6px 12px;">清空蓝图</button>
+                  <button class="secondary-button" id="invArkIterFill" style="padding: 6px 12px;">铺满框架</button>
+                  <span style="display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span style="color: var(--muted); font-size: 12px;">预设</span>
+                    <select id="invArkIterSlot" style="padding: 6px 8px; border-radius: 8px; background: var(--panel-light); color: inherit; border: 1px solid var(--line);">
+                      <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                    </select>
+                    <button class="secondary-button" id="invArkIterSavePreset" onclick="window.__arkPresetSave && window.__arkPresetSave()" style="padding: 6px 12px; width: auto;">💾 保存到该预设</button>
+                    <button class="secondary-button" id="invArkIterLoadPreset" onclick="window.__arkPresetLoad && window.__arkPresetLoad()" style="padding: 6px 12px; width: auto;">📥 载入该预设</button>
+                  </span>
+                </div>
+          </div>
+        </div><!-- /invPaneArk -->
 
         <div class="inv-pane" id="invPaneElite">
           <div class="panel">
@@ -4525,7 +4609,7 @@
             <div class="leap-sub-pane" id="invLeapSubParse"></div>
           </div>
         </div>
-      </div>
+          </div>
     </section>
 
 
@@ -4977,7 +5061,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.132";
+    const GAME_VERSION = "V0.142";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -8979,6 +9063,14 @@
       }
       p0.cells = p0.cells || {};
       mapRollCell();
+      // ⚠️ V0.136 修（作者：自动导航走到方舟上不会自动拾取）——
+      //   autoNavStep 是**直接改坐标**的 ✗，不像「确定移动」那样会调用 invArkContact() ✗，
+      //   所以它踩到方舟等于没踩 ✗。这里补一次接触判定 ✓（和手动走格完全同一套逻辑）。
+      try {
+        if (typeof invArkContact === "function" && invArkContact()) {
+          // invArkContact 内部会弹奖励提示；这里只补一次重绘
+        }
+      } catch (e) { }
       saveGame(true);
       renderPossibility();
       return true;
@@ -9056,6 +9148,8 @@
       if (steps > 0) {
         p0.cells = p0.cells || {};
         mapSelReset(); mapRollCell();
+        // V0.136：一键自动导航同样要判定方舟接触（否则站上去也不会拾取）
+        try { if (typeof invArkContact === "function") invArkContact(); } catch (e) { }
         saveGame(true); renderPossibility();
         showToast("🧭 <b>自动导航</b>：朝方舟前进了 <b>" + steps + "</b> 步（消耗行动力 " + steps +
           "），现在坐标 <b>(" + p0.a + ", " + p0.b + ")</b>，还差 <b>" +
@@ -9691,7 +9785,9 @@
       //   多元宇宙重置会把 save 整个重建成默认值，只挑一部分字段带回 ✗，
       //   而 arkContactsTotal（成就计数）和 toastMute（提示框开关）**不在带回名单里** ✗ → 每次重置就被清空 ✓。
       const keepArkContactsTotal = Math.max(0, Math.floor(Number(save.arkContactsTotal) || 0));
+      const keepInvPermAuto = Object.assign({}, save.invPermAuto || {});   // V0.134：永久自动化跨重置保留
       const keepToastMute = Object.assign({}, save.toastMute || {});
+      const keepSkipWheelAnim = !!save.skipWheelAnim;   // V0.140：跳过转盘动画的偏好要跨重置保留
 
       save = normalizeBigFields(structuredCloneSafe(DEFAULT_SAVE));
       save.possibility = p;
@@ -9700,7 +9796,9 @@
       hunt = null;
       save.achievements = keepAchievements;
       save.arkContactsTotal = keepArkContactsTotal;   // V0.131：成就进度跨重置保留 ✓
+      save.invPermAuto = { level: Math.max(0, Math.floor(Number(keepInvPermAuto.level) || 0)), harvest: Math.max(0, Math.floor(Number(keepInvPermAuto.harvest) || 0)) };   // V0.134
       save.toastMute = keepToastMute;                 // V0.131：提示框开关跨重置保留 ✓
+      save.skipWheelAnim = keepSkipWheelAnim;         // V0.140
       save.auto = keepAuto;
       save.numberMode = keepNumberMode;
       save.playMs = keepPlayMs;
@@ -10045,7 +10143,20 @@
       // V0.108：价格读数一律走 formatNumber —— 超过百万就用计数法（2^n 涨起来很快）
       return Number.isFinite(c) ? formatCount(c) : "∞";
     }
-    function addGene() {
+    function addGene(times) {
+      const n = Math.max(1, Math.floor(Number(times) || 1));
+      if (n > 1) {
+        let got = 0;
+        for (let i = 0; i < n; i++) {
+          const before = (getPossibility().genes || []).length;
+          addGene(1);
+          if ((getPossibility().genes || []).length <= before) break;   // 点数不足 / 满上限 → 停
+          got++;
+        }
+        if (got > 1) { try { showToast("🧬 连抽结束：本次共植入 <b>" + got + "</b> 条基因。", "purple"); } catch (e) { } }
+        render();
+        return;
+      }
       const p = getPossibility();
       const cost = getGeneImplantCost();
       if (bigCmp(p.genePoints, cost) < 0) {
@@ -12372,7 +12483,8 @@
       // V0.105 修复（玩家反馈「猎犬刚开始就吃不到保底」）：原来下限 0.01 + 只留 3 位小数 ——
       //   弱猎犬 + 高入侵数时，要把它压到「打得过」需要比 0.01 还小的 scale，被硬顶回 0.01，保底线就失效了。
       //   现在下限放到 1e-6、保留 6 位小数，兜底反解一定压得下去。
-      const clampScale = v => Number(Math.max(1e-6, Math.min(ENEMY_STAT_MAX, Number.isFinite(v) ? v : ENEMY_STAT_MAX)).toFixed(6));
+      // V0.142（作者）：下限从 1e-6 提到 0.02 —— 面板不再出现「敌人强度 x0.00」，敌人至少是 0.02 档
+      const clampScale = v => Number(Math.max(0.02, Math.min(ENEMY_STAT_MAX, Number.isFinite(v) ? v : ENEMY_STAT_MAX)).toFixed(6));
       const scaleFor = d => clampScale((0.5 + d * 0.28) * spread);
       // 枚举 1..10 档，留下所有「确定性战力 < 强度上限」的档位
       const ok = [];
@@ -12751,6 +12863,15 @@
     function battleTick() {
       const b = activeBattle;
       if (!b || b.over) return;
+      // V0.142（作者）：墙钟兜底 —— 攻击力为 0 / 数值退化时回合数永远不涨，会永久僵持；
+      //   超过 60 秒按「攻击力高的一方获胜」强制结束
+      b.startAt = b.startAt || Date.now();
+      if (Date.now() - b.startAt > 60000) {
+        const myAtk = Math.max(1, Number(b.hound && b.hound.atk) || 1);
+        const enAtk = Math.max(1, Number(b.enemy && b.enemy.atk) || 1);
+        endBattle(myAtk >= enAtk, "超时自动判定");
+        return;
+      }
       b.tickCount++;
       // 猎影加速：只作用在自动狩猎发起的战斗上（手动战斗 speed = 1，节奏不变）。
       // 闸门累积与行动预算同步乘以倍率，等价于「一个 tick 里连跑 speed 次结算」，
@@ -13228,9 +13349,19 @@
       if (wheelSig !== wheelSignature()) buildWheel();
     }
 
+    function wheelSkipAnim() { return !!(save && save.skipWheelAnim); }
+    window.__wheelSkipToggle = (v) => {
+      try { save.skipWheelAnim = !!v; saveGame(true); } catch (e) { }
+    };
+    function renderWheelSkipChk() {
+      const c = el("skipWheelAnimChk");
+      if (c) c.checked = wheelSkipAnim();
+    }
     function spinWheel(targetTier, onDone) {
       if (wheelSpinning) return;
       wheelSpinning = true;
+      const SKIP = wheelSkipAnim();
+      const dur = SKIP ? 0 : WHEEL_SPIN_MS;
       el("wheelOuter").classList.add("spinning");
 
       buildWheel();
@@ -13253,7 +13384,7 @@
       g.style.transition = "none";
       g.style.transform = "rotate(0deg)";
       void g.getBoundingClientRect();
-      g.style.transition = `transform ${WHEEL_SPIN_MS}ms cubic-bezier(0.15,0.9,0.2,1)`;
+      g.style.transition = SKIP ? "none" : `transform ${dur}ms cubic-bezier(0.15,0.9,0.2,1)`;
       g.style.transform = `rotate(${target}deg)`;
       wheelRotation = target;
 
@@ -13268,10 +13399,18 @@
         }
         wheelSig = wheelSignature();
         if (onDone) onDone();
-      }, WHEEL_SPIN_MS + 120);
+      }, SKIP ? 0 : WHEEL_SPIN_MS + 120);
     }
 
     function render() {
+      // V0.141：不管从哪条路离开反转世界，只要还在战斗中，就让传说方舟立刻坠落
+      try {
+        if (!invActive && typeof ARK_BTL !== "undefined" && ARK_BTL && ARK_BTL.on && !ARK_BTL.over) {
+          arkBtlStop();
+          arkBtlCrash();
+        }
+      } catch (e) { }
+      try { renderWheelSkipChk(); } catch (e) { }
       // V0.115：主宇宙也刷新门页（子页签显隐 / 专家列表 / 改写列表），刷新后不会再消失
       try { renderInvArkPane(); } catch (e) { }
       // V0.114（作者要求）：现实改写点数芯片挂在**主宇宙**「科技点数」右边 —— 解锁后一直在
@@ -14227,6 +14366,16 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.142", "修复蓝图操作两处硬伤：① 点格子会同时触发「放置」和「拆除」两次（扩容刚标记就被取消、零件放不稳）—— 已去掉重复监听，点一下只做一次；② 拆除零件时会把地图上所有同名零件一起删掉 —— 改成只拆与点击格相连的那一块。另外：战斗中退出反转世界必定让传说方舟坠落；无方舟可顶替时残骸落在 0~150 距离并自动避让玩家与其它方舟。"],
+      ["V0.141", "补齐两件 T1 零件：① 嵌套式装甲（0.5 能耗 / 耐久 30）可叠在已有零件上，该格受伤时先扣装甲；② 基础扩容可把贴着船体的空格标记为扩容区，该格零件耗能 ×1.5（例：0.5 + 0.5×1.5 = 1.25）。预设与设计图分享现在会一并保存嵌套/扩容信息。战场双方新增实时总耐久 / 总护盾 / 总电力显示。"],
+      ["V0.140", "方舟零件系统重做：重复零件改为「+1 经验」，满经验升级（每级 +100% 基础值，加法结算）——护盾加护盾容量、武器加伤害、结构加耐久、研究室加结算收益、能源核心加能源；零件分科研/护盾/能量/武器/结构五类。战斗每 10 轮出现精英耄耋战舰（35~50 格、必带精英科技）。零件包支持一键全开并在右侧日志汇总。苦痛之路预约后立即重置本轮（不计次数）。"],
+      ["V0.139", "方舟解锁改为「本回合最高等级 ≥ 1000」（不再一进反转世界就能发射）；星图悬停坐标改为 X/Y；预设改为 1~9 号槽位（下拉保存/载入）；战斗可按预设开战；迭代页点零件显示详细资料；新增开发者「方舟战斗测试」快捷键。"],
+      ["V0.138", "反转里程碑下方新增「加成总计」一行：分别列出基础/大/超级里程碑的层（座）数与各自给的尘埃、抵抗、科技有效等级加成，并给出合计倍率。"],
+      ["V0.137", "① 两个自动成就改成「累计发射 3 艘 / 5 艘方舟」解锁；② 「♻ 迭代」从独立页签移回方舟页，作为「🧪 专家科技」右侧的子页面；③ 软上限整体上调：科技有效等级 3000→30000、解析倍率 1000→100000、专家倍率 500→5000，缓解「一千多级就升不动」。"],
+      ["V0.136", "修复「自动导航走到方舟上不会自动拾取」—— autoNavStep 是直接改坐标的，不走「确定移动」那条链路，所以少了方舟接触判定；现在每走一步都会补一次 invArkContact()，一键自动导航同样处理。"],
+      ["V0.135", "星图页去掉「🧭 自动导航」按钮（只保留自动化页里的那个）；修复自动回归后狩猎卡死 —— 原来换犬时会指回刚回归的那只，导致下一拍又判它该回归、来回空转，现在会排除它，没可换的就清空出战位让系统重新挑。"],
+      ["V0.134", "反转世界成就补齐（5 个）：第一次迭代 / 虚空远航（累计发射 10 艘）/ 自动铸级大师 / 自动凝析大师 / 深潜者。其中两个大师成就给**永久**奖励：自动铸级 10 级、自动凝析 10 级（跨局、跨多元宇宙重置都保留，写进 save.invPermAuto）。"],
+      ["V0.133", "方舟「♻ 迭代」上线（试验版）：5×5 蓝图编辑器，可放置研究室(1×2)、小型护盾、能源核心、小型武器室、结构框架；房间数受能源核心限制（每个 +3 间）；蓝图完成后 + 累计发射 10 艘，即可解锁「传说方舟」抽取资格（传说方舟为 5×5 特殊方舟）。战斗部分暂未实现。"],
       ["V0.132", "专家科技解析进度条改为显示「当前涨幅 → 下一级涨幅」；方舟页新增「♻ 迭代」子页（先占位：方舟会在虚空中自我迭代升级，锻造全新科技 · 暂无）；修复自动狩猎打完一场就停（退出反转世界时把自动化计时器也顺延了，挂多久就要再等多久）。"],
       ["V0.131", "新增「专家科技解析」：每获得 1 级专家科技 = 1 点解析经验，进度条满了升 1 级；每级解析让反转铸级的**每级涨幅**衰减 1%（×1.40 → 最低 ×1.05）。顺便修好：换宇宙后方舟收藏家进度被清零、刷新后提示框勾选被取消（两者都是多元宇宙重置时没把字段带回）。"],
       ["V0.130", "修一个反复弹窗的 BUG（作者反馈：反转世界里老是跳出「出现一次异常（主循环）：chalTab is not defined」）。上一版把「🎰 赌神」页签连同按钮一起下线了，但「挑战进行中就显示这个页签」的一小段代码忘了删 —— 变量 chalTab 已经不存在，于是<b>每次重绘反转世界都会抛一次 ReferenceError</b>（被主循环的防护网接住、弹一次异常提示，游戏本身照常继续）。现在把这段死代码删干净了；顺手做了一次全链路冒烟测试（主宇宙各页签 → 进反转世界各页签 → 能源子页 → 主循环跑帧 → 退出），没有再发现其它「元素删了但代码还在引用」的残留。"],
@@ -15220,24 +15369,32 @@
         const runBest = Math.max(0, Math.floor((invWorld && invWorld.best) || 0));
         const nextLv = Math.max(1, Math.floor(runBest / INV_ARK_LEVEL_PER));
         setText("invArkNextLevel", "Lv." + formatNumber(nextLv));
-        const capL = 1 + invRwLv("beacon");
-        const usedL = Math.max(0, Math.floor(a.cycleLaunches || 0));
-        setText("invArkLeft", Math.max(0, capL - usedL) + " / " + capL);
+        // V0.138：本周期剩余发射读数已按作者要求删除
       } catch (e) { }
       // V0.122：星图已改成 X/Y 坐标系 —— 方舟坐标也按 X（横向）/ Y（纵向）显示，避免玩家走错轴
-      setText("invArkPos", a.pos ? ("X: " + a.pos.b + "  Y: " + a.pos.a) : "—");
+      // V0.138（作者）：一次性列出**所有**未接触方舟的位置
+      {
+        const pending = Array.isArray(a.list) ? a.list.filter(x => !x.contacted) : [];
+        if (pending.length > 1) {
+          setHTML("invArkPos", pending.map((x, i) => "X: " + x.pos.b + "  Y: " + x.pos.a).join("　|　"));
+        } else {
+          setText("invArkPos", a.pos ? ("X: " + a.pos.b + "  Y: " + a.pos.a) : "—");
+        }
+      }
       setText("invArkPoints", formatNumber(a.points));
       setText("invRewritePoints", formatNumber(a.points));
       // V0.114：芯片已挪到**主宇宙**「科技点数」右边 —— 这里不再渲染（见 render 里那段）
       const btn = el("invArkLaunchBtn");
       if (btn) {
-        btn.disabled = !invArkUnlocked() || (!!a.pos && !a.contacted);
-        btn.textContent = (!a.pos || a.contacted) ? "🚀 发射方舟" : "🚀 方舟航行中（先接触）";
+        // V0.139（作者）：**不再要求先接触** —— 只受「本次进入已发射」限制
+        btn.disabled = !invArkUnlocked() || !!(invWorld && invWorld.arkLaunchedRun);
+        // V0.139（作者）：不再要求先接触 —— 本次进本局发过就只能等重进，否则随时可发
+        btn.textContent = (invWorld && invWorld.arkLaunchedRun) ? "🚀 本次已发射（退出重进可再发）" : "🚀 发射方舟";
       }
       setText("invArkHint", !invArkUnlocked()
         ? ("<b>本回合</b>反转等级到 <b>" + INV_ARK_UNLOCK_LEVEL + "</b> 解锁（本回合最高 Lv." + formatNumber(Math.max(0, Math.floor(invWorld.best || 0))) + "）")
         : (a.pos && !a.contacted
-          ? ("去星图上的 <b>(" + a.pos.a + ", " + a.pos.b + ")</b> 站上去接触它")
+          ? ("星图上还有方舟：<b>X:" + a.pos.b + " Y:" + a.pos.a + "</b>（不接触也能继续发射）")
           : "发射后会给你一个坐标，到星图上找 🚀"));
       const list = el("invArkExpertList");
       if (list) {
@@ -15279,8 +15436,78 @@
       { id: "normal", name: "普通", color: "#c9d1dc", weight: 55, mult: 1 },
       { id: "fine",   name: "精良", color: "#58d5e8", weight: 30, mult: 1.5 },
       { id: "rare",   name: "稀有", color: "#3b82f6", weight: 12, mult: 2.2 },
-      { id: "epic",   name: "史诗", color: "#a855f7", weight: 3, mult: 3.2 }
+      { id: "epic",   name: "史诗", color: "#a855f7", weight: 3, mult: 3.2 },
+      // V0.133（作者要求）：传说方舟 —— 需累计发射 ≥ 10 艘 + 组装好 5×5 蓝图才会进入抽取池
+      { id: "legend", name: "传说", color: "#f5a623", weight: 0, mult: 6.0, requireBlueprint: true }
     ];
+    // ===== V0.133：方舟迭代（5×5 蓝图）=====
+    //   模块：研究室(lab) 1×2 · 小型护盾(shield) 1×1 · 能源核心(core) 1×1 · 小型武器室(weapon) 1×1 · 结构框架(frame) 1×1
+    // V0.142：画布 7×7，中间 5×5 是本体；外圈空格靠「基础扩容」逐格解锁
+    const ARK_ITER_SIZE = 7;
+    const ARK_BASE_MIN = 1, ARK_BASE_MAX = 5;
+    function arkIsBaseCell(i) { const r = Math.floor(i / ARK_ITER_SIZE), c = i % ARK_ITER_SIZE; return r >= ARK_BASE_MIN && r <= ARK_BASE_MAX && c >= ARK_BASE_MIN && c <= ARK_BASE_MAX; }
+    function arkMigrateGrid(arr) {
+      if (!Array.isArray(arr)) return null;
+      if (arr.length === ARK_ITER_SIZE * ARK_ITER_SIZE) return arr.slice();
+      if (arr.length === 25) {
+        const out = new Array(ARK_ITER_SIZE * ARK_ITER_SIZE).fill(null);
+        for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) out[(r + 1) * ARK_ITER_SIZE + (c + 1)] = arr[r * 5 + c];
+        return out;
+      }
+      return null;
+    }
+    const ARK_ITER_MODULES = [
+      { id: "lab",    name: "研究室",     icon: "🔬", w: 2, h: 1, color: "#58d5e8", tier: "T0", type: "科研" },
+      // V0.140：T1 新部件（零件包小概率开出）
+      { id: "repair",  name: "维修机器人", icon: "🔧", w: 2, h: 2, color: "#34d399", tier: "T1", type: "特殊" },
+      { id: "battery", name: "护盾电池",   icon: "🔋", w: 1, h: 1, color: "#38bdf8", tier: "T1", type: "护盾" },
+      { id: "missile", name: "动能导弹",   icon: "🚀", w: 3, h: 1, color: "#f87171", tier: "T1", type: "武器" },
+      { id: "nest",    name: "嵌套式装甲", icon: "🛡️", w: 1, h: 1, color: "#a78bfa", tier: "T1", type: "装甲" },
+      { id: "expand",  name: "基础扩容",   icon: "🔲", w: 1, h: 1, color: "#fbbf24", tier: "T1", type: "特殊" },
+      { id: "shield", name: "小型护盾",   icon: "🛡", w: 1, h: 1, color: "#3b82f6", tier: "T0", type: "护盾" },
+      { id: "core",   name: "能源核心",   icon: "⚡", w: 1, h: 1, color: "#f5c542", tier: "T0", type: "能源" },
+      { id: "weapon", name: "小型武器室", icon: "🔫", w: 1, h: 1, color: "#ef4444", tier: "T0", type: "武器" },
+      { id: "frame",  name: "结构框架",   icon: "▦", w: 1, h: 1, color: "#6b7280", tier: "T0", type: "结构" }
+    ];
+    const ARK_ITER_LEGEND_LAUNCHES = 10;   // 累计发射多少艘解锁「传说」抽取资格
+    const ARK_ITER_CORE_CAP = 5;           // V0.138：每个能源核心提供 5 点能源（原来 3）
+    function invArkIterState() {
+      if (!save.invArkIter || typeof save.invArkIter !== "object") save.invArkIter = {};
+      const st = save.invArkIter;
+      if (!Array.isArray(st.presets)) st.presets = new Array(10).fill(null);
+      // V0.141：嵌套装甲（overlay）与扩容区（expand）
+      if (!Array.isArray(st.overlay) || st.overlay.length !== ARK_ITER_SIZE * ARK_ITER_SIZE) st.overlay = new Array(ARK_ITER_SIZE * ARK_ITER_SIZE).fill(null);
+      if (!Array.isArray(st.expand) || st.expand.length !== ARK_ITER_SIZE * ARK_ITER_SIZE) st.expand = new Array(ARK_ITER_SIZE * ARK_ITER_SIZE).fill(false);
+      // 兼容旧的单预设
+      if (Array.isArray(st.preset) && st.preset.length === ARK_ITER_SIZE * ARK_ITER_SIZE && !st.presets[1]) st.presets[1] = st.preset.slice();
+      {
+        const mg = arkMigrateGrid(st.grid);
+        if (mg) st.grid = mg;
+      }
+      if (!Array.isArray(st.grid) || st.grid.length !== ARK_ITER_SIZE * ARK_ITER_SIZE) {
+        st.grid = new Array(ARK_ITER_SIZE * ARK_ITER_SIZE).fill(null);
+      }
+      st.grid = st.grid.map(x => (typeof x === "string" && ARK_ITER_MODULES.some(m => m.id === x)) ? x : null);
+      return st;
+    }
+    function invArkIterStats() {
+      const st = invArkIterState();
+      let lab = 0, shield = 0, core = 0, weapon = 0, frame = 0;
+      st.grid.forEach(x => { if (x === "lab") lab++; else if (x === "shield") shield++; else if (x === "core") core++; else if (x === "weapon") weapon++; else if (x === "frame") frame++; });
+      // 研究室是 1×2（两格），格数 / 2 才是间数
+      const labs = Math.floor(lab / 2);
+      // V0.138（作者要求）：按「能源」计 —— 结构框架只花 0.5 能源，每个能源核心提供 5 点能源
+      // V0.139（作者）：结构框架 0 能耗；研究室战斗中不耗电（只有安装/布置时占位）
+      let rooms = 0;
+      st.grid.forEach((cell, i) => { if (cell) rooms += arkPartEnergy(cell) * (st.expand && st.expand[i] ? 1.5 : 1); });
+      const cap = Math.max(0, core * arkEnergyCap());
+      const valid = labs >= 1 && shield >= 1 && core >= 1 && weapon >= 1 && rooms <= cap;
+      return { labs: labs, shields: shield, cores: core, weapons: weapon, frames: frame, rooms: rooms, cap: cap, valid: valid };
+    }
+    function invArkIterLegendReady() {
+      const launches = Math.max(0, Math.floor(Number(invArkState().launches) || 0));
+      return launches >= ARK_ITER_LEGEND_LAUNCHES && invArkIterStats().valid;
+    }
     function mapBiomes() {
       const p0 = getMapPos();
       if (!Array.isArray(p0.biomes)) p0.biomes = [];
@@ -15469,7 +15696,7 @@
             : ((!a && !b) ? "◆"
             // V0.115：数字 = **离多元宇宙中心 (0,0) 的曼哈顿距离**（加成强度就按它算）✓
             : (far2 ? "·" : (Math.abs(a) + Math.abs(b))))));
-          cells.push('<div class="' + cls.join(" ") + '" title="(' + a + ", " + b + ')">' + label + "</div>");
+          cells.push('<div class="' + cls.join(" ") + '" title="X: ' + b + '  Y: ' + a + '">' + label + "</div>");
         }
       }
       setHTML("mapGrid", cells.join(""));
@@ -15517,7 +15744,7 @@
       }
       // V0.113：缩放仪按钮（买过才出现）
       // V0.115：三段缩放按钮 + 自动导航
-      const zIn = el("mapZoomInBtn"), zOut = el("mapZoomOutBtn"), zHome = el("mapZoomHomeBtn"), zNav = el("mapAutoNavBtn");
+      const zIn = el("mapZoomInBtn"), zOut = el("mapZoomOutBtn"), zHome = el("mapZoomHomeBtn");
       const zoomOwned = invRwLv("zoom") > 0;
       const zLv = mapZoomLv(), zMax = mapZoomMaxLv();
       if (zIn) {
@@ -15534,12 +15761,7 @@
         zHome.style.display = (zoomOwned && zLv > 0) ? "" : "none";
         zHome.title = "回到「你所在的那一格」的小地图";
       }
-      if (zNav) {
-        const canNav = invRwLv("autonav") > 0;
-        zNav.style.display = canNav ? "" : "none";
-        zNav.disabled = !canNav || mapStamina() <= 0 || !(getArkPosSafe() && !isArkContactedSafe());
-        zNav.title = "朝最近的方舟自动开路（消耗行动力；>20 格会自动跃迁）";
-      }
+      // V0.138 修：星图的 zNav（自动导航按钮）已删除，这里残留的引用一并去掉（曾抛 zNav is not defined）
       const okBtn = el("mapConfirmBtn"), noBtn = el("mapCancelBtn");
       if (okBtn) {
         okBtn.disabled = !mapCanConfirm();
@@ -15766,6 +15988,7 @@
         <div class="gene-points">基因点数：<b>${formatCount(p.genePoints)}</b> · 基因修饰点数：<b style="color: var(--cyan);">${formatCount(mp)}</b></div>
         <div class="mv-actions">
           <button class="primary-button" data-gene-add="1" ${canAdd ? "" : "disabled"}>植入基因（${geneImplantCostText()} 点）</button>
+          <button class="secondary-button" data-gene-add="10" style="width:auto;padding:8px 14px;" ${canAdd ? "" : "disabled"}>连抽 ×10</button>
           ${canAdd ? "" : `<span class="mv-cost">${genes.length >= GENE_MAX ? `已达上限 ${GENE_MAX} 条` : `基因点数不足（需要 ${geneImplantCostText()} 点）`}</span>`}
           <span class="mv-cost">每植入一次，价格翻倍；进入下一个宇宙会回到 1 点。</span>
         </div>
@@ -16217,6 +16440,15 @@
       p.pain = { picks: [], pending: picks.slice(), geneMult: mult, active: false, everUnlocked: true };
       painSelection.clear();
       saveGame(true);
+      // V0.139（作者）：预约苦痛后**立刻强制重置一次多元宇宙**，让苦痛与回报落在同一轮，
+      //   避免「先吃 debuff、下一轮才有回报」的错位；这次重置不计入多元宇宙次数。
+      try {
+        const runsBefore = Math.max(0, Math.floor(Number(save.multiverseRuns) || 0));
+        performMultiverseEntry(picks.slice());
+        // 还原次数（performMultiverseEntry 内部若自增，这里抵消）
+        if (Number(save.multiverseRuns) > runsBefore) save.multiverseRuns = runsBefore;
+        saveGame(true);
+      } catch (e) { }
       logEvent("🩸", `预约苦痛之路：<b>${formatNumber(picks.length)}</b> 条苦痛，将在下一次多元宇宙重置时生效`, "red");
       showToast(`苦痛已预约（<b>${formatNumber(picks.length)}</b> 条）：<b>下一次进入多元宇宙</b>时开始生效，届时回报 <b>×${mult}</b> 基因点数`);
       render();
@@ -17859,7 +18091,7 @@
       showToast(now === 0 ? "🔎 已回最小地图（第 0 档）" : ("🔎 缩小视角：第 " + now + " 档"), "tech");
     });
     on("mapZoomHomeBtn", () => { mapSetZoom(0); showToast("🏠 回到当前格子的小地图。", "tech"); });
-    on("mapAutoNavBtn", () => mapAutoNavigate());
+    // V0.135：星图的自动导航按钮已移除（自动化页里仍有）
     // V0.116（作者要求）：「⏭ 原地不动」= 放弃这次行动，直接去做多元宇宙重置
     // V0.116：右栏「返回当前格子」+ 手动坐标导航
     on("mapBackHomeBtn", () => { mapSetZoom(0); showToast("🏠 回到当前格子的小地图。", "tech"); });
@@ -17893,19 +18125,1133 @@
       });
     });
     on("subTabMilestone", () => switchPossibilitySub("milestone"));
-    // V0.132：方舟页「专家科技 / 迭代」子页切换
+    // ===== V0.133：方舟迭代蓝图（5×5）=====
+    const ARK_POWER_DEFAULT = ["weapon", "shield", "core", "lab", "frame"];
+    function arkPowerOrder() {
+      const st = invArkIterState();
+      if (!Array.isArray(st.powerOrder) || !st.powerOrder.length) st.powerOrder = ARK_POWER_DEFAULT.slice();
+      // 补齐新零件
+      ARK_POWER_DEFAULT.forEach(id => { if (st.powerOrder.indexOf(id) < 0) st.powerOrder.push(id); });
+      st.powerOrder = st.powerOrder.filter(id => ARK_POWER_DEFAULT.indexOf(id) >= 0);
+      return st.powerOrder;
+    }
+    window.__arkFilter = (kind, val) => {
+      try {
+        const st = invArkIterState();
+        if (kind === "tier") st.palTier = val; else st.palType = val;
+        saveGame(true);
+        renderInvArkIter();
+      } catch (e) { }
+    };
+    window.__arkPowerRank = (id, val) => {
+      try {
+        const st = invArkIterState();
+        const arr = arkPowerOrder().slice();
+        const n = Math.max(1, Math.min(9, Math.floor(Number(val) || 1)));
+        const from = arr.indexOf(id);
+        if (from >= 0) arr.splice(from, 1);
+        arr.splice(Math.min(n - 1, arr.length), 0, id);
+        st.powerOrder = arr;
+        saveGame(true);
+        renderInvArkIter();
+      } catch (e) { }
+    };
+    function renderArkPowerOrder() {
+      const box = el("invArkPowerOrder");
+      if (!box) return;
+      const arr = arkPowerOrder();
+      setHTML("invArkPowerOrder", arr.map((id, i) => {
+        const m = ARK_ITER_MODULES.filter(x => x.id === id)[0] || { icon: "▦", name: id };
+        return '<span style="display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:8px;padding:2px 6px;">' +
+          m.icon + " " + m.name +
+          ' <input type="number" min="1" max="9" value="' + (i + 1) + '" onchange="window.__arkPowerRank && window.__arkPowerRank(\'' + id + '\', this.value)" style="width:44px;padding:2px 4px;border-radius:6px;border:1px solid var(--line);background:var(--panel-light);color:inherit;text-align:center;"></span>';
+      }).join(""));
+    }
+    window.__arkPowerPick = (v) => {
+      try {
+        const st = invArkIterState();
+        st.powerPriority = String(v || "weapon");
+        saveGame(true);
+        try { showToast("⚡ 供能优先级已设为：" + (ARK_ITER_MODULES.filter(x => x.id === st.powerPriority)[0] || {}).name, "tech"); } catch (e) { }
+      } catch (e) { }
+    };
+    window.__arkPlace = (i) => { try { invArkIterPlace(Number(i) || 0); } catch (e) { } };
+    window.__arkIterCell = (i) => { try { invArkIterSelCell = Number(i) || 0; renderInvArkIter(); } catch (e) { } };
+    window.__arkBattlePart = (k) => { try { invBattleSel = Number(k) || 0; renderInvArkBattle(); } catch (e) { } };
+    let invArkIterSel = "lab";
+    let invArkIterSelCell = -1;   // V0.138：当前查看资料的格子
+    // V0.139 修：ARK_PART_HP 必须在 renderInvArkIter 之前声明（否则 TDZ → ARK_PART_HP is not defined）
+    // V0.139（作者）：研究室/能源核心是易碎品，结构框架 = 最底层装甲（很耐打）
+    const ARK_PART_HP = { lab: 12, shield: 28, core: 10, weapon: 22, frame: 40, elite: 30,
+      repair: 26, battery: 18, missile: 20, nest: 30 };
+    // 零件耐久（含零件等级加成：重复获得同名零件会升级）
+    // ===== V0.140：零件经验 / 等级 / 分类效果 =====
+    //   零件分类：科研(lab) 护盾(shield) 能量(core) 武器(weapon) 结构(frame)
+    const ARK_PART_CLASS = { lab: "科研", shield: "护盾", core: "能量", weapon: "武器", frame: "结构",
+      repair: "维修", battery: "护盾", missile: "武器", nest: "装甲", expand: "扩容" };
+    function arkPartExpNeed(lv) { return 3 + Math.floor(lv) * 2; }   // 0→1 需 3 点，之后每级 +2
+    function arkPartRaw(id) {
+      const st = arkPartsState();
+      let v = st[id];
+      // 兼容旧存档：以前直接存数字等级
+      if (typeof v === "number") { st[id] = { lv: Math.max(0, Math.floor(v)), exp: 0 }; v = st[id]; }
+      if (!v || typeof v !== "object") { st[id] = { lv: 0, exp: 0 }; v = st[id]; }
+      v.lv = Math.max(0, Math.floor(Number(v.lv) || 0));
+      v.exp = Math.max(0, Math.floor(Number(v.exp) || 0));
+      return v;
+    }
+    function arkPartLv(id) { return arkPartRaw(id).lv; }
+    function arkPartHp(id) {
+      const base = ARK_PART_HP[id] || 20;
+      // V0.140（作者）：只有**结构框架**靠升级提高耐久；护盾只加盾、武器只加伤害、核心只加能源、研究室只加结算
+      if (id !== "frame") return base;
+      return Math.round(base * (1 + arkPartLv(id)));
+    }
+    // 各类零件的等级效果（全部加法）
+    function arkShieldCap() { return 30 * (1 + arkPartLv("shield")); }          // 护盾：单件提供的护盾上限
+    function arkWeaponDmg() { return 4 * (1 + arkPartLv("weapon")); }           // 武器：单件伤害
+    function arkEnergyCap() { return ARK_ITER_CORE_CAP * (1 + arkPartLv("core")); }  // 能量：单核心提供的能源
+    function arkLabMul() { return 1 + arkPartLv("lab"); }
+    // 护盾电池：只提高护盾上限，不提供恢复
+    function arkBatteryCap() { return 20 * (1 + arkPartLv("battery")); }                        // 科研：结算收益倍率
+    // 获得一个零件：重复 → +1 经验，满了升级
+    // V0.141（作者）：战斗开始时锁定零件等级 —— 战斗中开包升级只影响「下一场」
+    function arkBtlLvSnap(id) {
+      if (ARK_BTL && ARK_BTL.lvSnap && (ARK_BTL.on || ARK_BTL.over)) return Math.max(0, Math.floor(ARK_BTL.lvSnap[id] || 0));
+      return arkPartLv(id);
+    }
+    function arkBtlPartHp(id) {
+      const base = ARK_PART_HP[id] || 20;
+      if (id !== "frame") return base;
+      return Math.round(base * (1 + arkBtlLvSnap(id)));
+    }
+    function arkBtlShieldCap() { return 30 * (1 + arkBtlLvSnap("shield")); }
+    function arkBtlWeaponDmg() { return 4 * (1 + arkBtlLvSnap("weapon")); }
+    function arkBtlBatteryCap() { return 20 * (1 + arkBtlLvSnap("battery")); }
+    function arkBtlEnergyCap() { return ARK_ITER_CORE_CAP * (1 + arkBtlLvSnap("core")); }
+
+    function arkPartGain(id) {
+      const v = arkPartRaw(id);
+      // V0.142（作者）：基础扩容刚获得就是 Lv.1（经验仍按 Lv.1 的需求走，不再出现「显示 1 级但按 0 级算」）
+      if (id === "expand" && v.lv === 0 && v.exp === 0) { v.lv = 1; }
+      v.exp += 1;
+      let up = 0;
+      while (v.exp >= arkPartExpNeed(v.lv) && v.lv < 20) { v.exp -= arkPartExpNeed(v.lv); v.lv += 1; up += 1; }
+      return { lv: v.lv, exp: v.exp, need: arkPartExpNeed(v.lv), up: up };
+    }
+    // V0.139：零件能耗唯一来源 —— 研究室战斗中不耗电、结构框架 0 耗能
+    function arkPartEnergy(id) {
+      // V0.140（作者）：研究室/结构框架 0 耗电；其余零件**升级后耗能也会提高**（每级 +1）
+      if (id === "lab" || id === "frame") return 0;
+      if (id === "expand") return 0;
+      const baseE = (id === "nest") ? 0.5 : (id === "battery") ? 0.5 : (id === "repair" ? 2 : (id === "missile" ? 3 : 1));
+      return baseE + arkPartLv(id) * baseE;
+    }
+    function arkPacks() { return Math.max(0, Math.floor(Number(save.invArkPacks) || 0)); }
+    function arkT1Packs() { return Math.max(0, Math.floor(Number(save.invArkT1Packs) || 0)); }
+    function arkT1Seen() { return !!save.invArkT1Seen; }
+    // V0.139（作者）：右侧战斗日志 —— 用来显示抽到的零件，替代刷屏 toast
+    const ARK_LOG = [];
+    function arkLogAdd(html) {
+      try {
+        ARK_LOG.unshift({ t: Date.now(), html: String(html) });
+        if (ARK_LOG.length > 60) ARK_LOG.length = 60;
+        renderArkBtlLog();
+      } catch (e) { }
+    }
+    function renderArkBtlLog() {
+      const box = el("invArkBattleLog");
+      if (!box) return;
+      if (!ARK_LOG.length) { setHTML("invArkBattleLog", '<div style="color: var(--muted);">战斗日志会显示在这里</div>'); return; }
+      setHTML("invArkBattleLog", ARK_LOG.map(x => '<div style="padding:3px 0;border-bottom:1px dashed var(--line);">' + x.html + '</div>').join(""));
+    }
+    function arkPartsState() { if (!save.invArkParts || typeof save.invArkParts !== "object") save.invArkParts = {}; return save.invArkParts; }
+    // V0.140：T1 新零件（小概率）
+    const ARK_T1_POOL = ["repair", "battery", "missile"];
+    const ARK_T0_POOL = ["lab", "core", "shield", "weapon", "frame"];
+    function arkPackRoll() {
+      if (Math.random() < 0.30) return ARK_T1_POOL[Math.floor(Math.random() * ARK_T1_POOL.length)];
+      return ARK_T0_POOL[Math.floor(Math.random() * ARK_T0_POOL.length)];
+    }
+    function renderInvArkIter() {
+      const pal = el("invArkIterPalette"), grid = el("invArkIterGrid");
+      if (!pal || !grid) return;
+      const st = invArkIterState(), S = invArkIterStats();
+      setText("invArkIterLaunches", String(Math.max(0, Math.floor(Number(invArkState().launches) || 0))));
+      // V0.139（作者）：能源条常驻显示（够不够一眼看出）
+      try {
+        const pct = S.cap > 0 ? Math.min(100, Math.round((S.rooms / S.cap) * 100)) : (S.rooms > 0 ? 100 : 0);
+        const fill = el("invArkIterEnergyFill");
+        if (fill) { fill.style.width = pct + "%"; fill.style.background = S.rooms > S.cap ? "var(--red)" : (S.rooms >= S.cap ? "var(--gold)" : "var(--green)"); }
+        setText("invArkIterEnergyText", "⚡ 战斗能耗 " + S.rooms + " / " + S.cap + (S.rooms > S.cap ? "（超载！）" : (S.rooms >= S.cap ? "（已满）" : "（充足）")));
+      } catch (e) { }
+      try { renderArkPowerOrder(); } catch (e) { }
+      // V0.141：分类筛选（T0/T1 + 类型）
+      try {
+        const stx = invArkIterState();
+        if (stx.palTier !== "T0" && stx.palTier !== "T1" && stx.palTier !== "全部") stx.palTier = "全部";
+        if (!stx.palType) stx.palType = "全部";
+        const tiers = ["全部", "T0", "T1"];
+        const types = ["全部", "武器", "护盾", "能源", "结构", "装甲", "科研", "特殊"];
+        const mk = (val, cur, kind) => '<button class="sub-tab' + (cur === val ? " active" : "") + '" onclick="window.__arkFilter && window.__arkFilter(\'' + kind + '\',\'' + val + '\')" style="padding:3px 9px;font-size:12px;">' + val + '</button>';
+        setHTML("invArkIterFilter",
+          "<b>科技等级</b> " + tiers.map(v => mk(v, stx.palTier, "tier")).join(" ") +
+          "<br><b>零件类型</b> " + types.map(v => mk(v, stx.palType, "type")).join(" "));
+      } catch (e) { }
+      const __st = invArkIterState();
+      const __list = ARK_ITER_MODULES.filter(m =>
+        (__st.palTier === "全部" || m.tier === __st.palTier) &&
+        (__st.palType === "全部" || m.type === __st.palType));
+      if (!__list.length) { setHTML("invArkIterPalette", '<span style="color:var(--muted);font-size:12px;">这个分类下还没有零件</span>'); }
+      setHTML("invArkIterPalette", __list.map(m => {
+        const on = invArkIterSel === m.id;
+        const lvBtn = arkPartLv(m.id);
+        return '<button class="sub-tab' + (on ? ' active' : '') + '" data-ark-mod="' + m.id + '" style="padding: 6px 10px;">' +
+          m.icon + ' ' + m.name + ' <span style="color:var(--muted);font-size:11px;">' + m.w + '×' + m.h +
+          ' · 能耗' + arkPartEnergy(m.id) + (lvBtn > 0 ? ' · Lv.' + lvBtn : '') + '</span></button>';
+      }).join(""));
+      const cells = [];
+      const __expandTool = (invArkIterSel === "expand");
+      const __expandLimit = Math.max(1, Math.max(1, arkPartLv("expand")));
+      const __expandUsed = (st.expand || []).filter(Boolean).length;
+      const __canAdd = __expandTool && __expandUsed < __expandLimit;
+      const __usable = (k) => arkIsBaseCell(k) || !!(st.expand && st.expand[k]);
+      const __adj = (k) => {
+        const r = Math.floor(k / ARK_ITER_SIZE), c = k % ARK_ITER_SIZE;
+        return [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].some(([rr,cc]) => rr>=0 && rr<ARK_ITER_SIZE && cc>=0 && cc<ARK_ITER_SIZE && __usable(rr*ARK_ITER_SIZE+cc));
+      };
+      for (let i = 0; i < ARK_ITER_SIZE * ARK_ITER_SIZE; i++) {
+        const id = st.grid[i];
+        const m = id ? ARK_ITER_MODULES.filter(x => x.id === id)[0] : null;
+        const isExp = !!(st.expand && st.expand[i]);
+        const usable = __usable(i);
+        const candidate = !usable && __adj(i) && __canAdd;
+        if (!usable && !candidate) { cells.push('<div style="width:46px;height:46px;"></div>'); continue; }
+        if (candidate && !st.grid[i]) {
+          cells.push('<div onclick="window.__arkPlace && window.__arkPlace(' + i + ')" title="点一下扩容这一格" style="width:46px;height:46px;border:1.5px dashed #fbbf24;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fbbf24;cursor:pointer;background:rgba(251,191,36,.08);">＋</div>');
+          continue;
+        }
+        const hasNest = !!(st.overlay && st.overlay[i] === "nest");
+        const bd = hasNest ? "2px solid #a78bfa" : (isExp ? "1.5px dashed #fbbf24" : "1px solid var(--line)");
+        const tail = hasNest ? '<span style="position:absolute;right:1px;bottom:0px;font-size:10px;">🛡️</span>' : '';
+        cells.push('<div data-ark-cell="' + i + '" onclick="window.__arkPlace && window.__arkPlace(' + i + ')" title="' + (m ? m.name : (isExp ? "扩容区" : "空")) + (hasNest ? "（嵌套装甲）" : "") + '" style="position:relative;width:46px;height:46px;border:' + bd + ';border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;background:' + (m ? m.color + '33' : (isExp ? 'rgba(251,191,36,.12)' : 'transparent')) + ';">' + (m ? m.icon : "") + tail + '</div>');
+      }
+      setHTML("invArkIterGrid", cells.join(""));
+      invArkIterSelCell = (typeof invArkIterSelCell === "number") ? invArkIterSelCell : -1;
+      // V0.139（作者）：右侧属性卡 —— 选中零件 / 点中格子时显示详细属性
+      try {
+        const cardId = (invArkIterSelCell >= 0 && st.grid[invArkIterSelCell]) ? st.grid[invArkIterSelCell] : invArkIterSel;
+        const cm = ARK_ITER_MODULES.filter(x => x.id === cardId)[0];
+        if (cm) {
+          const placed = st.grid.filter(x => x === cardId).length;
+          const pr = arkPartRaw(cardId);
+          const lv = pr.lv, expNow = pr.exp, expNeed = arkPartExpNeed(lv);
+          const hpNow = arkPartHp(cardId);
+          const eff = cardId === "shield" ? "提供 <b>" + arkShieldCap() + "</b> 点护盾（升级只加盾；耐久度归 0 之前，每场战斗后回满）" :
+                      cardId === "core" ? "提供 <b>" + arkEnergyCap() + "</b> 点能源上限（<b>全部被打爆 = 战败</b>），每级 +100%" :
+                      cardId === "weapon" ? "每 0.5 秒发射一道激光，造成 <b>" + arkWeaponDmg() + "</b> 点伤害（升级只加伤害，先打外层）" :
+                      cardId === "lab" ? "<b style='color:var(--red)'>易碎</b>：被击穿会削弱方舟科技；残骸奖励按存活数量算" :
+                      cardId === "repair" ? "每 2 秒修复<b>血量百分比最低</b>的一个部件（同比例优先能源核心），每台 +10% 上限" :
+                      cardId === "battery" ? "只提高<b>护盾上限 +" + arkBatteryCap() + "</b>，本身不提供护盾恢复" :
+                      cardId === "missile" ? "每 2 秒发射<b>无视护盾</b>的导弹，命中目标并连带往里一格（6 + 3 伤害）" :
+                      cardId === "nest" ? "叠在已有零件上（选中它再点那格），<b>优先承受该格伤害</b>，耐久 30" :
+                      cardId === "expand" ? "选中它再点<b>贴着船体的空格</b>：标记为扩容区，该格零件耗能 <b>×1.5</b>" :
+                      "<b>基础装甲</b>：血最厚，负责挡在外层替核心吃伤害";
+          setHTML("invArkPartCard",
+            '<div style="font-size:15px;font-weight:700;margin-bottom:6px;">' + cm.icon + " " + cm.name + '</div>' +
+            '<div>尺寸 <b>' + cm.w + "×" + cm.h + '</b>　能耗 <b>' + arkPartEnergy(cardId) + '</b></div>' +
+            '<div>分类 <b>' + (ARK_PART_CLASS[cardId] || "—") + '</b>　等级 <b>Lv.' + lv + '</b>　经验 <b>' + expNow + " / " + expNeed + '</b></div>' +
+            '<div>耐久 <b>' + hpNow + '</b>' + (cardId === "frame" ? (lv > 0 ? '（结构框架：每级 +100% 耐久）' : '（可升级加耐久）') : '（固定，不随等级提高）') + '</div>' +
+            '<div>战斗耗能 <b>' + arkPartEnergy(cardId) + '</b>' + (arkPartEnergy(cardId) > 0 && lv > 0 ? '（升级后 +1/级）' : '') + '</div>' +
+            '<div>蓝图内已放 <b>' + placed + '</b> 格</div>' +
+            '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);">' + eff + '</div>');
+        } else {
+          setHTML("invArkPartCard", "选择零件后在这里看属性");
+        }
+      } catch (e) { }
+      // 下方统计仍保留一行摘要
+      let partInfo = "";
+      const dlgId = (invArkIterSelCell >= 0 && st.grid[invArkIterSelCell]) ? st.grid[invArkIterSelCell] : invArkIterSel;
+      {
+        const mm = ARK_ITER_MODULES.filter(x => x.id === dlgId)[0];
+        if (mm) {
+          const isCell = (invArkIterSelCell >= 0 && st.grid[invArkIterSelCell]);
+          partInfo = "<br>" + (isCell ? "已选中（格子）：" : "当前零件：") + "<b>" + mm.icon + " " + mm.name + "</b>" +
+            "　尺寸 " + mm.w + "×" + mm.h +
+            "　能耗 " + arkPartEnergy(dlgId) +
+            "　耐久 " + arkPartHp(dlgId) + "　能耗 " + arkPartEnergy(dlgId) + (arkPartLv(dlgId) > 0 ? "（Lv." + arkPartLv(dlgId) + "）" : "") +
+            (dlgId === "shield" ? "　提供 30 点护盾" :
+             dlgId === "core" ? "　提供 " + arkEnergyCap() + " 点能源（全灭=战败）" :
+             dlgId === "weapon" ? "　每 0.5 秒发射激光（4 伤害）" :
+             dlgId === "lab" ? "　易碎：被击穿会削弱方舟科技" :
+             "　基础装甲：最耐打，负责挡在外面");
+        }
+      }
+      setHTML("invArkIterStats", [
+        "房间 " + S.rooms + " / " + S.cap + "（每个能源核心 +" + ARK_ITER_CORE_CAP + " 间）",
+        "🔬 研究室 " + S.labs + "　🛡 护盾 " + S.shields + "　⚡ 能源核心 " + S.cores + "　🔫 武器室 " + S.weapons,
+        S.valid ? '<b style="color:var(--green);">蓝图可用 ✓ 达到发射条件</b>' : '<b style="color:var(--red);">未完成：至少 1 间研究室(1×2)、1 护盾、1 能源核心、1 武器室，且房间数 ≤ 能源上限</b>',
+        "传说资格：" + (invArkIterLegendReady() ? '<b style="color:#f5a623;">已解锁 ✓</b>' : "累计发射 " + Math.max(0, Math.floor(Number(invArkState().launches) || 0)) + " / " + ARK_ITER_LEGEND_LAUNCHES + " 艘")
+      ].join("<br>") + partInfo);
+    }
+    function invArkIterPlace(idx) {
+      invArkIterSelCell = Number(idx) || 0;
+      const st = invArkIterState();
+      const m = ARK_ITER_MODULES.filter(x => x.id === invArkIterSel)[0];
+      if (!m) return;
+      const N = ARK_ITER_SIZE;
+      // V0.141：嵌套式装甲 —— 叠在已有零件上，承伤优先
+      if (m.id === "nest") {
+        if (!st.grid[idx]) { try { showToast("嵌套式装甲要叠在已有零件上（武器/护盾/能源/科研）。", "tech"); } catch (e2) { } return; }
+        st.overlay[idx] = st.overlay[idx] ? null : "nest";
+        saveGame(true); renderInvArkIter(); return;
+      }
+      // V0.141：基础扩容 —— 把空的相邻格标记为扩容区（该格上的零件耗能 ×1.5）
+      if (m.id === "expand") {
+        if (!Array.isArray(st.expand) || st.expand.length !== N * N) st.expand = new Array(N * N).fill(false);
+        // 已经扩过的格子 → 再点一次取消
+        if (st.expand[idx]) { st.expand[idx] = false; saveGame(true); renderInvArkIter(); return; }
+        if (arkIsBaseCell(idx)) { try { showToast("这是方舟本体格，不需要扩容。", "tech"); } catch (e2) { } return; }
+        if (st.grid[idx]) { try { showToast("扩容只能扩空格子（先把零件挪开）。", "tech"); } catch (e2) { } return; }
+        const NX = ARK_ITER_SIZE;
+        const R = Math.floor(idx / NX), C = idx % NX;
+        const near = [[R-1,C],[R+1,C],[R,C-1],[R,C+1]].some(([rr,cc]) => rr>=0 && rr<NX && cc>=0 && cc<NX && (arkIsBaseCell(rr*NX+cc) || st.expand[rr*NX+cc]));
+        if (!near) { try { showToast("扩容必须贴着已有的船体（连接处）才能扩。", "tech"); } catch (e2) { } return; }
+        const limit = Math.max(1, arkPartLv("expand"));
+        const used = st.expand.filter(Boolean).length;
+        if (used >= limit) { try { showToast("扩容上限已满：当前 Lv." + arkPartLv("expand") + " → 最多 " + limit + " 格（升级「基础扩容」可 +1/级）。", "tech"); } catch (e2) { } return; }
+        st.expand[idx] = true;
+        saveGame(true); renderInvArkIter(); return;
+      }
+      const r0 = Math.floor(idx / N), c0 = idx % N;
+      // V0.140：支持任意 w×h（维修机器人 2×2、动能导弹 1×3 …）
+      const cells = [];
+      for (let dr = 0; dr < m.h; dr++) for (let dc = 0; dc < m.w; dc++) {
+        const rr = r0 + dr, cc = c0 + dc;
+        if (rr >= N || cc >= N) { cells.length = 0; break; }
+        cells.push(rr * N + cc);
+      }
+      if (!cells.length) { try { showToast("放不下：" + m.name + " 是 " + m.w + "×" + m.h + "，右下越界了。", "tech"); } catch (e2) { } return; }
+      // V0.142（作者）：超出船体（未扩容）的格子不许放，避免零件挂到棋盘外
+      const badCell = cells.some(k => !(arkIsBaseCell(k) || (st.expand && st.expand[k])));
+      if (badCell) { try { showToast("这里放不下：" + m.name + " 需要 " + m.w + "×" + m.h + " 完整落在船体/扩容区上。", "tech"); } catch (e2) { } return; }
+      if (st.grid[idx]) {
+        // V0.141 修：只拆「和这一格相连的同一块零件」（BFS 连通块），不再删掉地图上所有同名零件
+        const id = st.grid[idx];
+        const seen = new Set([idx]);
+        const queue = [idx];
+        while (queue.length) {
+          const cur = queue.pop();
+          const r = Math.floor(cur / N), c = cur % N;
+          [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc]) => {
+            if (rr < 0 || rr >= N || cc < 0 || cc >= N) return;
+            const k = rr * N + cc;
+            if (!seen.has(k) && st.grid[k] === id) { seen.add(k); queue.push(k); }
+          });
+        }
+        seen.forEach(k => { st.grid[k] = null; });
+      } else {
+        cells.forEach(k => { st.grid[k] = m.id; });
+      }
+      saveGame(true);
+      renderInvArkIter();
+    }
+    // V0.133：迭代改为独立页签 —— 切过去时渲染蓝图编辑器
+
+    {
+      // V0.133：蓝图网格 / 模块选板 / 清空 / 铺框架（独立页签版）
+      delegate("invArkIterPane", "[data-ark-mod]", btn => {
+        invArkIterSel = btn.dataset.arkMod;
+        invArkIterSelCell = -1;      // V0.139：点选板 = 直接看这个零件的属性，不用先放一个
+        renderInvArkIter();
+      });
+      on("invArkIterClear", () => { invArkIterState().grid.fill(null); saveGame(true); renderInvArkIter(); });
+      on("invArkIterSavePreset", () => { try { invArkIterSavePreset(); } catch (e) { } });
+      on("invArkIterLoadPreset", () => { try { invArkIterLoadPreset(); } catch (e) { } });
+      // V0.139 双保险：容器级代理（按钮若因重渲染换了节点，on() 会失效，delegate 仍能接住）
+      delegate("invArkIterPane", "#invArkIterSavePreset", () => { try { invArkIterSavePreset(); } catch (e) { } });
+      delegate("invArkIterPane", "#invArkIterLoadPreset", () => { try { invArkIterLoadPreset(); } catch (e) { } });
+      // V0.138 修：toggleArkSub 是块内局部函数，这里不能直接调（曾报 toggleArkSub is not defined）
+      on("invArkIterFill", () => {
+        const g = invArkIterState().grid;
+        for (let i = 0; i < g.length; i++) if (!g[i]) g[i] = "frame";
+        saveGame(true); renderInvArkIter();
+      });
+    }
+    // V0.137：方舟页「专家科技 / 迭代」子页签
     {
       const toggleArkSub = (which) => {
         const ex = el("invArkSubExpert"), it = el("invArkSubIter");
-        const exPane = el("invGateExpertList"), itPane = el("invArkIterPane");
+        const shipPane = el("invArkShipPane"), itPane = el("invArkIterPane");
+        const btPane = el("invArkBattlePane");
+        const exList = shipPane;
         if (ex) ex.classList.toggle("active", which === "expert");
         if (it) it.classList.toggle("active", which === "iter");
-        if (exPane) exPane.style.display = which === "expert" ? "" : "none";
+        if (shipPane) shipPane.style.display = which === "expert" ? "" : "none";
         if (itPane) itPane.style.display = which === "iter" ? "" : "none";
+        if (btPane) btPane.style.display = which === "battle" ? "" : "none";
+        if (ex) ex.classList.toggle("active", which === "expert");
+        if (it) it.classList.toggle("active", which === "iter");
+        { const bt = el("invArkSubBattle"); if (bt) bt.classList.toggle("active", which === "battle"); }
+        if (which === "iter") { try { renderInvArkIter(); } catch (e) { } }
       };
       on("invArkSubExpert", () => toggleArkSub("expert"));
       on("invArkSubIter", () => toggleArkSub("iter"));
-    }   // V0.115：里程碑子页
+    }
+    // V0.142 修：这里原本漏了一个收口括号 —— 整个「方舟战斗」模块（ARK_BTL / arkBtlStart /
+    //   renderArkBtl …）被圈进了上面这个块作用域里，导致块外声明的 arkBtlLvSnap / arkBtlShieldCap
+    //   取不到 ARK_BTL，点「开始战斗」就会弹「战斗启动失败：ARK_BTL is not defined」。
+    //   现在在子页签绑定处收口，后面的战斗模块回到脚本顶层。
+
+    // ===== V0.138：蓝图预设 + 太空战 =====
+    // V0.139：暴露到 window，供按钮内联 onclick 直接调用（避免事件绑定失效）
+    window.__arkPresetSave = () => { try { invArkIterSavePreset(); } catch (e) { try { showToast("保存预设失败：" + e.message, "tech"); } catch (e2) { } } };
+    window.__arkPresetLoad = () => { try { invArkIterLoadPreset(); } catch (e) { try { showToast("载入预设失败：" + e.message, "tech"); } catch (e2) { } } };
+    function invArkIterSavePreset() {
+      const st = invArkIterState();
+      const slot = Math.max(1, Math.min(9, Math.floor(Number((el("invArkIterSlot") || {}).value) || 1)));
+      st.presets[slot] = { grid: st.grid.slice(), overlay: st.overlay.slice(), expand: st.expand.slice() };   // V0.141
+      st.preset = st.grid.slice();
+      saveGame(true);
+      try { showToast("💾 蓝图已保存为预设（下次点「载入预设」可还原）。", "tech"); } catch (e) { }
+      renderInvArkIter();
+    }
+    function invArkIterLoadPreset() {
+      const st = invArkIterState();
+      const slot = Math.max(1, Math.min(9, Math.floor(Number((el("invArkIterSlot") || {}).value) || 1)));
+      const raw = st.presets[slot];
+      const src = Array.isArray(raw) ? { grid: raw, overlay: null, expand: null } : raw;
+      if (!src || !Array.isArray(src.grid)) { try { showToast("预设 " + slot + " 还是空的。", "tech"); } catch (e) { } return; }
+      const mg2 = arkMigrateGrid(src.grid);
+      if (!mg2 || mg2.length !== st.grid.length) { try { showToast("预设 " + slot + " 格式不兼容。", "tech"); } catch (e) { } return; }
+      st.grid = mg2;
+      st.overlay = (Array.isArray(src.overlay) && src.overlay.length === st.grid.length) ? src.overlay.slice() : new Array(st.grid.length).fill(null);
+      st.expand = (Array.isArray(src.expand) && src.expand.length === st.grid.length) ? src.expand.slice() : new Array(st.grid.length).fill(false);
+      saveGame(true);
+      renderInvArkIter();
+      try { showToast("📥 已载入蓝图预设。", "tech"); } catch (e) { }
+    }
+    // —— 太空战 ——
+    let invBattleSel = -1;
+    const invBattle = { on: false, timer: null, hp: {}, shield: 0, shieldMax: 0, t: 0, wave: 0, waveMax: 5, enemies: [], kills: 0, over: false };
+    function invBattleBuildFromBlueprint(gridOverride) {
+      const st = invArkIterState();
+      const grid = Array.isArray(gridOverride) ? gridOverride : st.grid;
+      const hp = {}, shieldTotal = { n: 0 };
+      grid.forEach((id, i) => {
+        if (!id) return;
+        hp[i] = ARK_PART_HP[id] || 8;
+        if (id === "shield") shieldTotal.n += ARK_PART_HP.shield;
+      });
+      return { hp: hp, shieldMax: shieldTotal.n };
+    }
+    window.__arkBattleTab = () => {
+      try { renderInvArkBattle(); } catch (e) { }
+      try {
+        const ex = el("invArkSubExpert"), it = el("invArkSubIter"), bt = el("invArkSubBattle");
+        const shipPane = el("invArkShipPane"), itPane = el("invArkIterPane"), btPane = el("invArkBattlePane");
+        if (ex) ex.classList.remove("active");
+        if (it) it.classList.remove("active");
+        if (bt) bt.classList.add("active");
+        if (shipPane) shipPane.style.display = "none";
+        if (itPane) itPane.style.display = "none";
+        if (btPane) btPane.style.display = "";
+      } catch (e) { }
+    };
+    window.__arkExport = () => {
+      try {
+        const st0 = invArkIterState();
+        const payload = {
+          grid: st0.grid.map(x => x || "."),
+          overlay: (st0.overlay || []).map(x => x || "."),
+          expand: (st0.expand || []).map(x => !!x)
+        };
+        const code = "ARK1:" + btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+        const ta = el("invArkShare");
+        if (ta) { ta.value = code; ta.select && ta.select(); }
+        showToast("📤 设计图已生成，复制上面的分享码发给朋友。", "tech");
+      } catch (e) { try { showToast("导出失败：" + e.message, "tech"); } catch (e2) { } }
+    };
+    window.__arkImport = () => {
+      try {
+        const ta = el("invArkShare");
+        const raw = (ta && ta.value || "").trim();
+        if (!raw) { showToast("先把分享码粘进输入框。", "tech"); return; }
+        const body = raw.replace(/^ARK1:/, "");
+        const data0 = JSON.parse(decodeURIComponent(escape(atob(body))));
+        const rawArr = Array.isArray(data0) ? data0 : data0.grid;
+        const arr = arkMigrateGrid(rawArr);
+        if (!arr || arr.length !== ARK_ITER_SIZE * ARK_ITER_SIZE) { showToast("分享码格式不对。", "tech"); return; }
+        const st = invArkIterState();
+        st.grid = arr.map(x => (typeof x === "string" && ARK_ITER_MODULES.some(m => m.id === x)) ? x : null);
+        st.grid = st.grid.map(x => x === "." ? null : x);
+        if (data0 && Array.isArray(data0.overlay)) st.overlay = data0.overlay.map(x => x === "nest" ? "nest" : null);
+        if (data0 && Array.isArray(data0.expand)) st.expand = data0.expand.map(x => !!x);
+        saveGame(true);
+        renderInvArkIter();
+        showToast("📥 设计图已导入。", "tech");
+      } catch (e) { try { showToast("导入失败：分享码可能不完整。", "tech"); } catch (e2) { } }
+    };
+    window.__arkPackOpenAll = () => {
+      try {
+        const total = arkPacks();
+        if (total <= 0) { arkLogAdd("📦 没有零件包可开（打赢战斗才会掉）"); return; }
+        save.invArkPacks = 0;
+        const pool = ARK_T0_POOL;
+        const cnt = {}, ups = {};
+        for (let i = 0; i < total; i++) {
+          const id = ARK_T0_POOL[Math.floor(Math.random() * ARK_T0_POOL.length)];
+          const got = arkPartGain(id);
+          cnt[id] = (cnt[id] || 0) + 1;
+          if (got.up) ups[id] = (ups[id] || 0) + got.up;
+        }
+        saveGame(true);
+        arkLogAdd("<b>📦 一键开包 " + total + " 个 —— 结果汇总</b>");
+        pool.forEach(id => {
+          if (!cnt[id]) return;
+          const m0 = ARK_ITER_MODULES.filter(x => x.id === id)[0] || {};
+          const pr = arkPartRaw(id);
+          arkLogAdd("　" + (m0.icon || "📦") + " " + (m0.name || id) + "：+" + cnt[id] + " 经验" +
+            (ups[id] ? '　<b style="color:var(--gold)">升 ' + ups[id] + ' 级</b>' : "") +
+            "　→ Lv." + pr.lv + "（" + pr.exp + "/" + arkPartExpNeed(pr.lv) + "）");
+        });
+        renderArkBtl(); renderInvArkIter();
+      } catch (e) { try { arkLogAdd("开包失败：" + e.message); } catch (e2) { } }
+    };
+    window.__arkBattleStart = () => { try { invBattleStart(); } catch (e) { try { showToast("战斗启动失败：" + e.message, "tech"); } catch (e2) { } } };
+    window.__arkBattleStop = () => { try { invBattleStop(); } catch (e) { } };
+    // ===== V0.139：方舟战斗 2.0（耄耋战舰 / 激光穿甲 / 零件包）=====
+    const ARK_BTL = { on: false, timer: null, hp: {}, shield: 0, shieldMax: 0, grid: [], round: 1, enemy: null, kills: 0, over: false, log: [] };
+    // 敌人（时间耄耋战舰）：7×7 画布上长 25 格随机连通形状，随机装装备
+    const ARK_ENEMY_MODS = ["lab", "lab", "core", "shield", "shield", "weapon", "weapon", "frame", "frame", "frame"];
+    // 耄耋精英科技（只在精英舰上出现）
+    const ARK_ELITE_MOD = { id: "elite", icon: "🧿", name: "耄耋精英科技", color: "#f5a623", w: 1, h: 1 };
+    function arkModuleDef(id) {
+      if (id === "elite") return ARK_ELITE_MOD;
+      return ARK_ITER_MODULES.filter(x => x.id === id)[0];
+    }
+    function arkBtlGenEnemy(round) {
+      const elite = (round % 10 === 0);
+      const N = elite ? 9 : 7, need = elite ? (35 + Math.floor(Math.random() * 16)) : 25;
+      const grid = new Array(N * N).fill(null);
+      const c0 = Math.floor(N / 2) * N + Math.floor(N / 2);
+      grid[c0] = "core";
+      const cells = [c0];
+      let guard = 0;
+      while (cells.length < need && guard++ < 4000) {
+        const c = cells[Math.floor(Math.random() * cells.length)];
+        const r = Math.floor(c / N), col = c % N;
+        const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+        const d = dirs[Math.floor(Math.random() * 4)];
+        const nr = r + d[0], nc = col + d[1];
+        if (nr < 0 || nr >= N || nc < 0 || nc >= N) continue;
+        const ni = nr * N + nc;
+        if (grid[ni]) continue;
+        grid[ni] = ARK_ENEMY_MODS[Math.floor(Math.random() * ARK_ENEMY_MODS.length)];
+        cells.push(ni);
+      }
+      // V0.142（作者）：敌方随回合提升「部件等级」，并逐渐装上 T1 科技
+      const avgLv = Math.floor(Math.max(0, round - 1) / 3);
+      const t1Count = Math.min(6, Math.floor(Math.max(0, round - 1) / 4));
+      if (t1Count > 0) {
+        const cand = grid.map((x, i) => (x === "frame" || x === "weapon") ? i : -1).filter(i => i >= 0);
+        const t1mods = ["repair", "battery", "missile"];
+        for (let t = 0; t < t1Count && cand.length; t++) {
+          const pick = Math.floor(Math.random() * cand.length);
+          grid[cand[pick]] = t1mods[Math.floor(Math.random() * t1mods.length)];
+          cand.splice(pick, 1);
+        }
+      }
+      const hp = {}, sMax = { n: 0 }, labs = { n: 0 };
+      grid.forEach((id, i) => {
+        if (!id) return;
+        hp[i] = Math.round(arkPartHp(id) * (0.45 + 0.08 * (round - 1)) * (1 + 0.10 * avgLv));
+        if (id === "shield") sMax.n += 22;
+        if (id === "lab") labs.n++;
+      });
+      // 精英舰：必带一枚「耄耋精英科技」
+      if (elite) {
+        const filled = grid.map((x, i) => x ? i : -1).filter(i => i >= 0);
+        if (filled.length) {
+          const k = filled[Math.floor(Math.random() * filled.length)];
+          grid[k] = "elite";
+          hp[k] = Math.round((ARK_PART_HP.elite || 30) * (0.8 + 0.1 * round));
+        }
+      }
+      return { grid: grid, hp: hp, shieldMax: sMax.n, shield: sMax.n, labs: labs.n, elite: elite, avgLv: avgLv, t1Count: t1Count, name: (elite ? "精英耄耋战舰 R" : "时间耄耋战舰 R") + round };
+    }
+    // V0.139：零件能耗唯一来源 —— 研究室战斗中不耗电、结构框架 0 耗能
+    function arkPartEnergy(id) {
+      // V0.140（作者）：研究室/结构框架 0 耗电；其余零件**升级后耗能也会提高**（每级 +1）
+      if (id === "lab" || id === "frame") return 0;
+      if (id === "expand") return 0;
+      const baseE = (id === "nest") ? 0.5 : (id === "battery") ? 0.5 : (id === "repair" ? 2 : (id === "missile" ? 3 : 1));
+      return baseE + arkPartLv(id) * baseE;
+    }
+    function arkPacks() { return Math.max(0, Math.floor(Number(save.invArkPacks) || 0)); }
+    function arkT1Packs() { return Math.max(0, Math.floor(Number(save.invArkT1Packs) || 0)); }
+    function arkT1Seen() { return !!save.invArkT1Seen; }
+    // V0.139（作者）：右侧战斗日志 —— 用来显示抽到的零件，替代刷屏 toast
+    // V0.142 修：下面这三行原先是重复粘贴的第二份声明（ARK_LOG / ARK_T1_POOL / ARK_T0_POOL 上面已声明过），已删除
+    function arkLogAdd(html) {
+      try {
+        ARK_LOG.unshift({ t: Date.now(), html: String(html) });
+        if (ARK_LOG.length > 60) ARK_LOG.length = 60;
+        renderArkBtlLog();
+      } catch (e) { }
+    }
+    function renderArkBtlLog() {
+      const box = el("invArkBattleLog");
+      if (!box) return;
+      if (!ARK_LOG.length) { setHTML("invArkBattleLog", '<div style="color: var(--muted);">战斗日志会显示在这里</div>'); return; }
+      setHTML("invArkBattleLog", ARK_LOG.map(x => '<div style="padding:3px 0;border-bottom:1px dashed var(--line);">' + x.html + '</div>').join(""));
+    }
+    function arkPartsState() { if (!save.invArkParts || typeof save.invArkParts !== "object") save.invArkParts = {}; return save.invArkParts; }
+    // V0.140：T1 新零件（小概率）
+    function arkPackRoll() {
+      if (Math.random() < 0.30) return ARK_T1_POOL[Math.floor(Math.random() * ARK_T1_POOL.length)];
+      return ARK_T0_POOL[Math.floor(Math.random() * ARK_T0_POOL.length)];
+    }
+    // 从某个方向找「线上最外侧的存活格子」（必须先打穿外层才能打里面）
+    function arkBtlRayTarget(grid, hp, dir) {
+      const N = grid.length === 49 ? 7 : 5;
+      const order = [];
+      for (let k = 0; k < grid.length; k++) if (grid[k] && hp[k] > 0) order.push(k);
+      if (!order.length) return -1;
+      const rank = k => {
+        const r = Math.floor(k / N), c = k % N;
+        return dir === "up" ? r : dir === "down" ? (N - 1 - r) : dir === "left" ? c : (N - 1 - c);
+      };
+      order.sort((a, b) => rank(a) - rank(b));
+      return order[0];
+    }
+    function arkBtlStart() {
+      const a = invArkState();
+      const S = invArkIterStats();
+      if (!S.valid) { try { showToast("蓝图未完成（至少 1 研究室 / 1 护盾 / 1 能源核心 / 1 武器室）。", "tech"); } catch (e) { } return; }
+      if (a.legendBattleUsed) { try { showToast("本回合已经用传说方舟出击过了（多元宇宙重置后恢复）。", "tech"); } catch (e) { } return; }
+      a.legendBattleUsed = true;
+      const g = invArkIterState().grid.slice();
+      // 锁定本场等级快照（战斗中开包不生效）
+      ARK_BTL.lvSnap = {};
+      ["lab", "core", "shield", "weapon", "frame", "repair", "battery", "missile", "nest"].forEach(id => { ARK_BTL.lvSnap[id] = arkPartLv(id); });
+      const hp = {};
+      g.forEach((id, i) => { if (id) hp[i] = arkBtlPartHp(id); });
+      ARK_BTL.on = true; ARK_BTL.over = false; ARK_BTL.round = 1; ARK_BTL.kills = 0; ARK_BTL.log = [];
+      ARK_BTL.grid = g; ARK_BTL.hp = hp;
+      // V0.141：嵌套装甲独立血量（叠在零件上，先吃伤害）
+      ARK_BTL.nestHp = {};
+      (invArkIterState().overlay || []).forEach((id, i) => { if (id === "nest" && g[i]) ARK_BTL.nestHp[i] = arkPartHp("nest"); });
+      ARK_BTL.shieldMax = g.filter(x => x === "shield").length * arkBtlShieldCap() + g.filter(x => x === "battery").length * arkBtlBatteryCap();
+      ARK_BTL.shield = ARK_BTL.shieldMax;
+      ARK_BTL.enemy = arkBtlGenEnemy(1);
+      arkLogAdd("⚔ 战斗开始 —— 敌方第 1 艘飞船入场");
+      saveGame(true);
+      renderArkBtl();
+      if (ARK_BTL.timer) clearInterval(ARK_BTL.timer);
+      ARK_BTL.timer = setInterval(() => { try { arkBtlTick(); } catch (e) { } }, 500);
+    }
+    function arkBtlStop() {
+      if (ARK_BTL.timer) clearInterval(ARK_BTL.timer);
+      ARK_BTL.timer = null; ARK_BTL.on = false;
+      renderArkBtl();
+    }
+    function arkBtlTick() {
+      if (!ARK_BTL.on || ARK_BTL.over) return;
+      const E = ARK_BTL.enemy;
+      if (!E) return;
+      // ① 我方武器室：每个武器室朝随机方向打一道激光（先打外层）
+      const pCores = ARK_BTL.grid.filter(x => x === "core").length;
+      const pCoresAlive = ARK_BTL.grid.reduce((n, x, i) => n + (x === "core" && (ARK_BTL.hp[i] || 0) > 0 ? 1 : 0), 0);
+      const pPower = pCores <= 0 ? 1 : (pCoresAlive / pCores);
+      const order = arkPowerOrder();
+      const rankW = Math.max(0, order.indexOf("weapon"));
+      const slotN = Math.max(1, order.length);
+      // 越靠前 → 系数越接近 1；越靠后 → 越先掉到 pPower
+      const wMult = Math.max(pPower, Math.min(1, pPower * (slotN - rankW)));
+      const baseDmg = arkBtlWeaponDmg();
+      const dmgPer = Math.max(1, Math.round(baseDmg * wMult));
+      const weapons = ARK_BTL.grid.filter(x => x === "weapon").length;
+      for (let i = 0; i < weapons; i++) {
+        const dirs = ["up", "down", "left", "right"];
+        const k = arkBtlRayTarget(E.grid, E.hp, dirs[Math.floor(Math.random() * 4)]);
+        if (k < 0) break;
+        E.hp[k] -= dmgPer;
+        if (E.hp[k] <= 0) ARK_BTL.kills++;
+      }
+      // ② 敌人反击 —— V0.139：**核心被打爆 → 供电不足，超出部分停火**
+      const eCores = E.grid.filter(x => x === "core").length;
+      const eCoresAlive = E.grid.reduce((n, x, i) => n + (x === "core" && (E.hp[i] || 0) > 0 ? 1 : 0), 0);
+      const ePower = eCores <= 0 ? 1 : (eCoresAlive / eCores);       // 0~1
+      const eAtkRaw = E.grid.filter(x => x === "weapon").length * 1.6 * (0.7 + 0.08 * (ARK_BTL.round - 1));
+      const eAtk = ePower <= 0 ? 0 : Math.max(1, Math.round(eAtkRaw * ePower));
+      if (eAtk <= 0) { /* 敌方已停火 */ }
+      else if (ARK_BTL.shield > 0) ARK_BTL.shield = Math.max(0, ARK_BTL.shield - eAtk);
+      else if (eAtk > 0) {
+        const dirs = ["up", "down", "left", "right"];
+        const k = arkBtlRayTarget(ARK_BTL.grid, ARK_BTL.hp, dirs[Math.floor(Math.random() * 4)]);
+        if (k >= 0) {
+          // V0.141：这一格有嵌套装甲 → 先扣装甲
+          const nest = (ARK_BTL.nestHp || {})[k] || 0;
+          if (nest > 0) ARK_BTL.nestHp[k] = Math.max(0, nest - eAtk);
+          else ARK_BTL.hp[k] = Math.max(0, ARK_BTL.hp[k] - eAtk);
+        }
+      }
+      // ③ V0.140：护盾每秒回一点（不超过上限）
+      if (ARK_BTL.shieldMax > 0) {
+        // V0.141（作者）：每块小型护盾每秒恢复 2 点护盾（tick 0.5s → 每次 +1/块），不超过上限
+        const shieldParts = ARK_BTL.grid.filter(x => x === "shield").length;
+        const regen = Math.max(0, shieldParts);   // 每 tick（0.5s）每块 +1 → 2/秒
+        if (regen > 0) ARK_BTL.shield = Math.min(ARK_BTL.shieldMax, ARK_BTL.shield + regen);
+      }
+      // ④ V0.140：维修机器人 —— 每 2 秒修「血量百分比最低」的一个部件（同百分比优先能源核心）
+      if (ARK_BTL.tick2 === undefined) ARK_BTL.tick2 = 0;
+      ARK_BTL.tick2 += 0.5;
+      const repairs = ARK_BTL.grid.filter(x => x === "repair").length;
+      if (repairs > 0 && ARK_BTL.tick2 >= 2) {
+        ARK_BTL.tick2 = 0;
+        let worst = -1, worstPct = 2, worstCore = false;
+        ARK_BTL.grid.forEach((id, i) => {
+          if (!id) return;
+          const maxHp = arkBtlPartHp(id);
+          const cur = ARK_BTL.hp[i] || 0;
+          if (cur <= 0) return;
+          const pct = cur / maxHp;
+          const isCore = (id === "core");
+          if (pct < worstPct - 1e-9 || (Math.abs(pct - worstPct) < 1e-9 && isCore && !worstCore)) { worstPct = pct; worst = i; worstCore = isCore; }
+        });
+        if (worst >= 0) {
+          const maxHp = arkBtlPartHp(ARK_BTL.grid[worst]);
+          ARK_BTL.hp[worst] = Math.min(maxHp, (ARK_BTL.hp[worst] || 0) + Math.ceil(maxHp * 0.10) * repairs);
+        }
+      }
+      // ⑤ V0.140：动能导弹 —— 每 2 秒发射，无视护盾，命中目标 + 往里一格
+      if (ARK_BTL.tick3 === undefined) ARK_BTL.tick3 = 0;
+      ARK_BTL.tick3 += 0.5;
+      const missiles = ARK_BTL.grid.filter(x => x === "missile").length;
+      if (missiles > 0 && ARK_BTL.tick3 >= 2) {
+        ARK_BTL.tick3 = 0;
+        const dirs = ["up", "down", "left", "right"];
+        for (let mi = 0; mi < missiles; mi++) {
+          const dir = dirs[Math.floor(Math.random() * 4)];
+          const k1 = arkBtlRayTarget(E.grid, E.hp, dir);
+          if (k1 < 0) break;
+          E.hp[k1] -= 6 * (1 + arkBtlLvSnap("missile"));
+          if (E.hp[k1] <= 0) ARK_BTL.kills++;
+          // 再打「往里一格」：同方向第二层
+          const before = E.hp[k1];
+          E.hp[k1] = before;
+          const k2 = arkBtlRayTarget(E.grid, Object.assign({}, E.hp, { [k1]: 0 }), dir);
+          if (k2 >= 0) { E.hp[k2] -= 3 * (1 + arkBtlLvSnap("missile")); if (E.hp[k2] <= 0) ARK_BTL.kills++; }
+        }
+      }
+      // ⑥ 敌人被打光 → 胜利，进入下一轮（不回血，只回护盾）
+      const eAlive = Object.keys(E.hp).some(k => E.hp[k] > 0);
+      if (!eAlive) {
+        let pack = 1 + Math.floor(ARK_BTL.round / 2);
+        if (E.elite) pack += 1;   // 精英必额外掉一包
+        // V0.141：T1 科技包独立掉落 —— 普通战斗 15%，精英必掉
+        const t1Gain = E.elite ? 1 : (Math.random() < 0.22 ? 1 : 0);   // V0.142：敌人变强 → 0.15 → 0.22
+        if (t1Gain > 0) { save.invArkT1Packs = arkT1Packs() + t1Gain; save.invArkT1Seen = true; }
+        save.invArkPacks = arkPacks() + pack;
+        ARK_BTL.round += 1;
+        const shieldAlive = ARK_BTL.grid.some((x, i) => x === "shield" && (ARK_BTL.hp[i] || 0) > 0);
+        ARK_BTL.shieldMax = ARK_BTL.grid.filter(x => x === "shield").length * arkBtlShieldCap() + ARK_BTL.grid.filter(x => x === "battery").length * arkBtlBatteryCap();
+        ARK_BTL.shield = shieldAlive ? ARK_BTL.shieldMax : 0;   // 护盾没被打爆才回满
+        ARK_BTL.enemy = arkBtlGenEnemy(ARK_BTL.round);
+        arkLogAdd("🎉 击毁第 " + (ARK_BTL.round - 1) + " 艘敌舰，获得 <b>" + pack + "</b> 个零件包（现有 " + arkPacks() + "）");
+        if (ARK_BTL.enemy && ARK_BTL.enemy.elite) arkLogAdd('<b style="color:#f5a623">🧿 精英耄耋战舰出现！</b>（35~50 格 + 精英科技）');
+        saveGame(true);
+      }
+      // ④ 我方核心全灭 → 战败（不是全部零件）
+      const coresAlive = ARK_BTL.grid.some((x, i) => x === "core" && (ARK_BTL.hp[i] || 0) > 0);
+      if (!coresAlive) {
+        ARK_BTL.over = true; ARK_BTL.on = false;
+        if (ARK_BTL.timer) clearInterval(ARK_BTL.timer);
+        ARK_BTL.timer = null;
+        arkBtlCrash();
+      }
+      renderArkBtl();
+    }
+    // 战败：把 5×5 残骸丢到多元宇宙（记进方舟 list，可去拾取）
+    function arkBtlCrash() {
+      const a = invArkState();
+      // V0.139（作者）：只统计**存活**的研究室 —— 被打爆就不算
+      const labs = ARK_BTL.grid.reduce((n, x, i) => n + (x === "lab" && (ARK_BTL.hp[i] || 0) > 0 ? 1 : 0), 0);
+      const lv = Math.max(1, Math.floor(Number(invWorld && invWorld.best) || 0) / 1000 | 0);
+      if (!Array.isArray(a.list)) a.list = [];
+      // V0.139（作者）：战败残骸会**随机替换掉地图上一艘普通方舟**的坐标，
+      //   原地变成 5×5 传说残骸（内容 = 你这一场战斗的布局）
+      const normals = a.list.filter(x => x && x.pos && !x.isCrash);
+      let p0 = null, victim = null;
+      if (normals.length > 0) {
+        victim = normals[Math.floor(Math.random() * normals.length)];
+        p0 = { a: victim.pos.a, b: victim.pos.b };
+      }
+      if (!p0) {
+        const pos = getMapPos();
+        const dir = Math.floor(Math.random() * 4);
+        const dd = Math.floor(Math.random() * 151);   // V0.141（作者）：0~150 距离
+        p0 = { a: pos.a + (dir === 0 ? dd : dir === 1 ? -dd : 0), b: pos.b + (dir === 2 ? dd : dir === 3 ? -dd : 0) };
+      }
+      // V0.141（作者）：5×5 残骸如果压到玩家当前位置（或别的方舟）→ 往旁边挪到不重叠
+      {
+        const occupied = new Set();
+        (a.list || []).forEach(x => { if (x && x.pos && x !== victim) occupied.add(x.pos.a + "," + x.pos.b); });
+        const here = getMapPos();
+        const hits = (pa, pb) => {
+          for (let dr = 0; dr < 5; dr++) for (let dc = 0; dc < 5; dc++) {
+            const k = (pa + dr) + "," + (pb + dc);
+            if (occupied.has(k)) return true;
+            if (here.a === pa + dr && here.b === pb + dc) return true;
+          }
+          return false;
+        };
+        const stepDir = Math.floor(Math.random() * 4);
+        const stp = stepDir === 0 ? { a: 1, b: 0 } : stepDir === 1 ? { a: -1, b: 0 } : stepDir === 2 ? { a: 0, b: 1 } : { a: 0, b: -1 };
+        let guard = 0;
+        while (hits(p0.a, p0.b) && guard++ < 400) { p0 = { a: p0.a + stp.a, b: p0.b + stp.b }; }
+      }
+      const crash = {
+        pos: p0, level: Math.max(1, lv), rarity: "legend", contacted: false,
+        size: 5, isCrash: true, labCount: labs, round: ARK_BTL.round,
+        layout: ARK_BTL.grid.slice()      // 和玩家这一场的布局一模一样
+      };
+      a.list = a.list.filter(x => x !== victim);
+      a.list.push(crash);
+      a.pos = { a: p0.a, b: p0.b }; a.contacted = false; a.level = Math.max(1, lv); a.rarity = "legend";
+      saveGame(true);
+      arkLogAdd("💥 方舟战败 —— 残骸替换一艘普通方舟：X " + p0.b + "~" + (p0.b + 4) + "，Y " + p0.a + "~" + (p0.a + 4));
+      try {
+        showToast("💥 方舟战败 —— 残骸占据 <b>5×5</b>：X " + p0.b + "~" + (p0.b + 4) + "，Y " + p0.a + "~" + (p0.a + 4), "tech");
+      } catch (e) { }
+    }
+    function arkBtlRender() { renderArkBtl(); }
+    function renderArkBtl() {
+      const ships = el("invArkBattleShips"), stats = el("invArkBattleStats"), sum = el("invArkPackSummary");
+      if (!ships || !stats) return;
+      const N = 5, cell = 26;
+      const draw = (grid, hp, dim) => {
+        let out = '';
+        const W = (grid.length === 49 ? 7 : 5) * cell;
+        for (let k = 0; k < grid.length; k++) {
+          const id = grid[k]; if (!id) continue;
+          const m = arkModuleDef(id);
+          if (!m) continue;
+          const cols = grid.length === 49 ? 7 : 5;
+          const r = Math.floor(k / cols), c = k % cols;
+          const dead = !(hp[k] > 0);
+          out += '<div style="position:absolute;left:' + (c * cell) + 'px;top:' + (r * cell) + 'px;width:' + (cell - 2) + 'px;height:' + (cell - 2) + 'px;display:flex;align-items:center;justify-content:center;border-radius:5px;font-size:14px;background:' + m.color + (dead ? '22' : '66') + ';opacity:' + (dead ? 0.25 : 1) + '">' + m.icon + '</div>';
+        }
+        return '<div style="position:relative;width:' + W + 'px;height:' + W + 'px;' + dim + '">' + out + '</div>';
+      };
+      const E = ARK_BTL.enemy;
+      let html = '';
+      if (ARK_BTL.on || ARK_BTL.over) {
+        // V0.140（作者）：双方实时总量 —— 总耐久 / 总护盾 / 总电力
+        const sumHp = (grid, hp) => grid.reduce((n, id, i) => n + (id ? Math.max(0, hp[i] || 0) : 0), 0);
+        const maxHp = (grid) => grid.reduce((n, id) => n + (id ? arkBtlPartHp(id) : 0), 0);
+        const pUsed = ARK_BTL.grid.reduce((n, id) => n + (id ? arkPartEnergy(id) : 0), 0);
+        const pCap = ARK_BTL.grid.filter(x => x === "core").length * arkBtlEnergyCap();
+        const pCoresAlive2 = ARK_BTL.grid.reduce((n, x, i) => n + (x === "core" && (ARK_BTL.hp[i] || 0) > 0 ? 1 : 0), 0);
+        const pCoresAll = ARK_BTL.grid.filter(x => x === "core").length;
+        const pPow = pCoresAll ? Math.round((pCoresAlive2 / pCoresAll) * 100) : 100;
+        const eUsed = E ? E.grid.reduce((n, id) => n + (id ? arkPartEnergy(id) : 0), 0) : 0;
+        const eCap = E ? E.grid.filter(x => x === "core").length * arkEnergyCap() : 0;
+        const eHpNow = E ? sumHp(E.grid, E.hp) : 0;
+        const eHpMax = E ? maxHp(E.grid) : 0;
+        const eCoresAll = E ? E.grid.filter(x => x === "core").length : 0;
+        const eCoresAlive = E ? E.grid.reduce((n, x, i) => n + (x === "core" && (E.hp[i] || 0) > 0 ? 1 : 0), 0) : 0;
+        const ePow = eCoresAll ? Math.round((eCoresAlive / eCoresAll) * 100) : 100;
+        const head = (title, hpNow, hpMax, shNow, shMax, powPct) =>
+          '<div style="margin-bottom:6px;font-size:12.5px;line-height:1.7;text-align:center;min-width:200px;">' +
+          '<b>' + title + '</b><br>' +
+          '❤ 耐久 <b>' + formatNumber(hpNow) + " / " + formatNumber(hpMax) + '</b>　🛡 <b>' + formatNumber(Math.round(shNow)) + " / " + formatNumber(Math.round(shMax)) + '</b>' +
+          '<br>⚡ 电力 <b>' + Math.round(powPct) + '%</b>' + (powPct < 100 ? '（<span style="color:var(--red)">供电不足</span>）' : '') +
+          '</div>';
+        const lvTag = (E && (ARK_BTL.on || ARK_BTL.over))
+          ? '<div style="position:absolute;top:8px;right:10px;font-size:12.5px;color:#a78bfa;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:8px;padding:3px 8px;">敌方平均部件等级 <b>Lv.' + (E.avgLv || 0) + '</b>' + (E.t1Count ? "　T1×" + E.t1Count : "") + '</div>'
+          : '';
+        html = lvTag + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:30px;">' +
+          '<div>' + head("我方方舟", sumHp(ARK_BTL.grid, ARK_BTL.hp), maxHp(ARK_BTL.grid), ARK_BTL.shield, ARK_BTL.shieldMax, pPow) + draw(ARK_BTL.grid, ARK_BTL.hp, '') + '</div>' +
+          '<div style="font-size:22px;color:var(--red);">⇠ 激光 ⇢</div>' +
+          (E ? ('<div>' + head("敌方战舰", eHpNow, eHpMax, E.shield || 0, E.shieldMax || 0, ePow) + draw(E.grid, E.hp, '') + '</div>') : '') + '</div>';
+      } else {
+        html = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;">点「开始战斗」后，敌方耄耋战舰会出现在这里</div>';
+      }
+      setHTML("invArkBattleShips", html);
+      const aliveParts = Object.keys(ARK_BTL.hp).filter(k => ARK_BTL.hp[k] > 0).length;
+      const totalParts = Object.keys(ARK_BTL.hp).length || 1;
+      const eAlive = E ? Object.keys(E.hp).filter(k => E.hp[k] > 0).length : 0;
+      const coresAlive = ARK_BTL.grid.some((x, i) => x === "core" && (ARK_BTL.hp[i] || 0) > 0);
+      setHTML("invArkBattleStats",
+        (ARK_BTL.on || ARK_BTL.over ? ("<b>第 " + ARK_BTL.round + " 艘敌舰</b>　敌方剩余 <b>" + eAlive + "</b> 格<br>") : "") +
+        "🛡 护盾 <b>" + Math.round(ARK_BTL.shield) + " / " + ARK_BTL.shieldMax + "</b>　·　我方零件 <b>" + aliveParts + " / " + totalParts + "</b>" +
+        "　·　核心" + (coresAlive ? "<b style='color:var(--green);'>完好</b>" : "<b style='color:var(--red);'>全灭</b>") +
+        (ARK_BTL.on ? "　·　<b style='color:var(--gold);'>战斗中…</b>" : (ARK_BTL.over ? "　·　<b style='color:var(--red);'>已战败</b>" : "")));
+      if (sum) setHTML("invArkPackSummary", "（普通 <b>" + arkPacks() + "</b> 个" + (arkT1Seen() ? "　·　T1 <b>" + arkT1Packs() + "</b> 个" : "") + "）");
+      try { const t1r = el("invArkT1Row"); if (t1r) t1r.style.display = arkT1Seen() ? "" : "none"; } catch (e) { }
+      try { renderArkBtlLog(); } catch (e) { }
+    }
+    function arkPackOpenOne(kind) {
+      try {
+        const isT1 = (kind === "t1");
+        const cnt = isT1 ? arkT1Packs() : arkPacks();
+        if (cnt <= 0) { showToast(isT1 ? "还没有 T1 科技包 —— 打赢战斗小概率掉落、精英必掉。" : "还没有方舟零件包 —— 打赢战斗才会掉。", "tech"); return; }
+        if (isT1) save.invArkT1Packs = cnt - 1; else save.invArkPacks = cnt - 1;
+        const id = isT1 ? ARK_T1_POOL[Math.floor(Math.random() * ARK_T1_POOL.length)] : ARK_T0_POOL[Math.floor(Math.random() * ARK_T0_POOL.length)];
+        const got = arkPartGain(id);
+        const nm = (ARK_ITER_MODULES.filter(x => x.id === id)[0] || {}).name || id;
+        saveGame(true);
+        const m0 = ARK_ITER_MODULES.filter(x => x.id === id)[0] || { icon: "📦" };
+        arkLogAdd('📦 <b>' + m0.icon + " " + nm + '</b> 经验 +1 → ' + got.exp + "/" + got.need + (got.up ? '　<b style="color:var(--gold)">升级 Lv.' + got.lv + '</b>' : '') + "（耐久 " + arkPartHp(id) + "）");
+        renderArkBtl(); renderInvArkIter();
+      } catch (e) { try { showToast("开包失败：" + e.message, "tech"); } catch (e2) { } }
+    };
+    window.__arkPackOpen = () => arkPackOpenOne("t0");
+    window.__arkPackOpenT1 = () => arkPackOpenOne("t1");
+    window.__arkPackOpenAllT1 = () => {
+      try {
+        const total = arkT1Packs();
+        if (total <= 0) { arkLogAdd("🧪 没有 T1 科技包可开"); return; }
+        save.invArkT1Packs = 0;
+        const cnt = {}, ups = {};
+        for (let i = 0; i < total; i++) {
+          const id = ARK_T1_POOL[Math.floor(Math.random() * ARK_T1_POOL.length)];
+          const got = arkPartGain(id);
+          cnt[id] = (cnt[id] || 0) + 1;
+          if (got.up) ups[id] = (ups[id] || 0) + got.up;
+        }
+        saveGame(true);
+        arkLogAdd("<b>🧪 一键开 T1 包 " + total + " 个 —— 结果汇总</b>");
+        ARK_T1_POOL.forEach(id => {
+          if (!cnt[id]) return;
+          const m0 = ARK_ITER_MODULES.filter(x => x.id === id)[0] || {};
+          const pr = arkPartRaw(id);
+          arkLogAdd("　" + (m0.icon || "🧪") + " " + (m0.name || id) + "：+" + cnt[id] + " 经验" + (ups[id] ? "　<b>升 " + ups[id] + " 级</b>" : "") + "　→ Lv." + pr.lv);
+        });
+        renderArkBtl(); renderInvArkIter();
+      } catch (e) { try { arkLogAdd("开包失败：" + e.message); } catch (e2) { } }
+    };
+    window.__arkExport = () => {
+      try {
+        const st0 = invArkIterState();
+        const payload = {
+          grid: st0.grid.map(x => x || "."),
+          overlay: (st0.overlay || []).map(x => x || "."),
+          expand: (st0.expand || []).map(x => !!x)
+        };
+        const code = "ARK1:" + btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+        const ta = el("invArkShare");
+        if (ta) { ta.value = code; ta.select && ta.select(); }
+        showToast("📤 设计图已生成，复制上面的分享码发给朋友。", "tech");
+      } catch (e) { try { showToast("导出失败：" + e.message, "tech"); } catch (e2) { } }
+    };
+    window.__arkImport = () => {
+      try {
+        const ta = el("invArkShare");
+        const raw = (ta && ta.value || "").trim();
+        if (!raw) { showToast("先把分享码粘进输入框。", "tech"); return; }
+        const body = raw.replace(/^ARK1:/, "");
+        const data0 = JSON.parse(decodeURIComponent(escape(atob(body))));
+        const rawArr = Array.isArray(data0) ? data0 : data0.grid;
+        const arr = arkMigrateGrid(rawArr);
+        if (!arr || arr.length !== ARK_ITER_SIZE * ARK_ITER_SIZE) { showToast("分享码格式不对。", "tech"); return; }
+        const st = invArkIterState();
+        st.grid = arr.map(x => (typeof x === "string" && ARK_ITER_MODULES.some(m => m.id === x)) ? x : null);
+        st.grid = st.grid.map(x => x === "." ? null : x);
+        if (data0 && Array.isArray(data0.overlay)) st.overlay = data0.overlay.map(x => x === "nest" ? "nest" : null);
+        if (data0 && Array.isArray(data0.expand)) st.expand = data0.expand.map(x => !!x);
+        saveGame(true);
+        renderInvArkIter();
+        showToast("📥 设计图已导入。", "tech");
+      } catch (e) { try { showToast("导入失败：分享码可能不完整。", "tech"); } catch (e2) { } }
+    };
+    window.__arkPackOpenAll = () => {
+      try {
+        const total = arkPacks();
+        if (total <= 0) { arkLogAdd("📦 没有零件包可开（打赢战斗才会掉）"); return; }
+        save.invArkPacks = 0;
+        const pool = ARK_T0_POOL;
+        const cnt = {}, ups = {};
+        for (let i = 0; i < total; i++) {
+          const id = ARK_T0_POOL[Math.floor(Math.random() * ARK_T0_POOL.length)];
+          const got = arkPartGain(id);
+          cnt[id] = (cnt[id] || 0) + 1;
+          if (got.up) ups[id] = (ups[id] || 0) + got.up;
+        }
+        saveGame(true);
+        arkLogAdd("<b>📦 一键开包 " + total + " 个 —— 结果汇总</b>");
+        pool.forEach(id => {
+          if (!cnt[id]) return;
+          const m0 = ARK_ITER_MODULES.filter(x => x.id === id)[0] || {};
+          const pr = arkPartRaw(id);
+          arkLogAdd("　" + (m0.icon || "📦") + " " + (m0.name || id) + "：+" + cnt[id] + " 经验" +
+            (ups[id] ? '　<b style="color:var(--gold)">升 ' + ups[id] + ' 级</b>' : "") +
+            "　→ Lv." + pr.lv + "（" + pr.exp + "/" + arkPartExpNeed(pr.lv) + "）");
+        });
+        renderArkBtl(); renderInvArkIter();
+      } catch (e) { try { arkLogAdd("开包失败：" + e.message); } catch (e2) { } }
+    };
+    window.__arkBattleStart = () => { try { arkBtlStart(); } catch (e) { try { showToast("战斗启动失败：" + e.message, "tech"); } catch (e2) { } } };
+    window.__arkBattleStop = () => { try { arkBtlStop(); } catch (e) { } };
+    window.__arkBattleTab = () => {
+      try { renderArkBtl(); } catch (e) { }
+      try {
+        const ex = el("invArkSubExpert"), it = el("invArkSubIter"), bt = el("invArkSubBattle");
+        const shipPane = el("invArkShipPane"), itPane = el("invArkIterPane"), btPane = el("invArkBattlePane");
+        if (ex) ex.classList.remove("active");
+        if (it) it.classList.remove("active");
+        if (bt) bt.classList.add("active");
+        if (shipPane) shipPane.style.display = "none";
+        if (itPane) itPane.style.display = "none";
+        if (btPane) btPane.style.display = "";
+      } catch (e) { }
+    };
+
+    function invBattleStart() {
+      const a = invArkState();
+      const S = invArkIterStats();
+      if (!S.valid) { try { showToast("蓝图未完成（至少 1 研究室 / 1 护盾 / 1 能源核心 / 1 武器室）。", "tech"); } catch (e) { } return; }
+      // V0.139（作者）：战斗 = 用「传说方舟」出击 —— 本回合不能再发普通方舟，每回合只能打一场
+      if (a.legendBattleUsed) { try { showToast("本回合已经用传说方舟出击过了（每次多元宇宙重置恢复一次）。", "tech"); } catch (e) { } return; }
+      a.legendBattleUsed = true;
+      const slot = Math.max(0, Math.min(9, Math.floor(Number((el("invArkBattleSlot") || {}).value) || 0)));
+      let useGrid = invArkIterState().grid;
+      if (slot > 0) {
+        const pre = invArkIterState().presets[slot];
+        if (Array.isArray(pre) && pre.length === useGrid.length) useGrid = pre;
+        else { try { showToast("预设 " + slot + " 是空的，改用当前蓝图。", "tech"); } catch (e) { } }
+      }
+      invBattle.grid = useGrid.slice();
+      const base = invBattleBuildFromBlueprint(useGrid);
+      invBattle.on = true; invBattle.over = false; invBattle.t = 0; invBattle.wave = 1; invBattle.kills = 0;
+      invBattle.hp = base.hp; invBattle.shield = base.shieldMax; invBattle.shieldMax = base.shieldMax;
+      invBattle.enemies = [];
+      saveGame(true);
+      renderInvArkBattle();
+      if (invBattle.timer) clearInterval(invBattle.timer);
+      invBattle.timer = setInterval(() => { try { invBattleTick(); } catch (e) { } }, 500);
+    }
+    function invBattleStop() {
+      if (invBattle.timer) clearInterval(invBattle.timer);
+      invBattle.timer = null; invBattle.on = false; invBattle.enemies = [];
+      renderInvArkBattle();
+    }
+    // 来袭方向 → 该方向对应的格子（用蓝图里该方向的部件承伤）
+    function invBattlePickTarget(dir) {
+      const st = { grid: (invBattle.grid && invBattle.grid.length) ? invBattle.grid : invArkIterState().grid };
+      const N = ARK_ITER_SIZE;
+      const cand = [];
+      for (let k = 0; k < st.grid.length; k++) {
+        const id = st.grid[k]; if (!id || !(invBattle.hp[k] > 0)) continue;
+        const r = Math.floor(k / N), c = k % N;
+        let sc = 0;
+        if (dir === "up") sc = r; else if (dir === "down") sc = N - 1 - r;
+        else if (dir === "left") sc = c; else sc = N - 1 - c;
+        cand.push({ k: k, sc: sc });
+      }
+      if (!cand.length) return -1;
+      cand.sort((x, y) => x.sc - y.sc);
+      return cand[0].k;
+    }
+    function invBattleTick() {
+      if (!invBattle.on || invBattle.over) return;
+      invBattle.t += 0.5;
+      // 出怪：每 3 秒来一波，共 waveMax 波
+      if (invBattle.t % 3 < 0.6 && invBattle.wave <= invBattle.waveMax && invBattle.enemies.filter(e => !e.dead).length < 6) {
+        const dirs = ["up", "down", "left", "right"];
+        const dir = dirs[Math.floor(Math.random() * 4)];
+        invBattle.enemies.push({ id: Math.random().toString(36).slice(2), dir: dir, hp: 6 + invBattle.wave * 2, life: 0, dead: false });
+        invBattle.wave++;
+      }
+      // 敌人推进 + 攻击
+      invBattle.enemies.forEach(e => {
+        if (e.dead) return;
+        e.life += 0.5;
+        if (e.life >= 2) {
+          // 攻击
+          if (invBattle.shield > 0) { invBattle.shield = Math.max(0, invBattle.shield - e.hp); }
+          else {
+            const k = invBattlePickTarget(e.dir);
+            if (k >= 0) { invBattle.hp[k] = Math.max(0, (invBattle.hp[k] || 0) - e.hp); }
+          }
+          e.dead = true; e.life = 0;
+        }
+      });
+      // 武器反击：武器室每 tick 打掉一个敌人
+      const st = invArkIterState();
+      const weapons = st.grid.filter(x => x === "weapon").length;
+      let shots = weapons;
+      for (const e of invBattle.enemies) {
+        if (shots <= 0) break;
+        if (e.dead) continue;
+        e.hp -= 4; shots--;
+        if (e.hp <= 0) { e.dead = true; invBattle.kills++; }
+      }
+      invBattle.enemies = invBattle.enemies.filter(e => !e.dead || e.life > 0);
+      // 结束判定
+      const alive = Object.keys(invBattle.hp).some(k => invBattle.hp[k] > 0);
+      if (!alive) { invBattle.over = true; invBattle.on = false; clearInterval(invBattle.timer); invBattle.timer = null; try { showToast("💥 方舟被击毁 —— 蓝图全部部件损坏。", "tech"); } catch (e) { } }
+      else if (invBattle.wave > invBattle.waveMax && invBattle.enemies.length === 0) {
+        invBattle.over = true; invBattle.on = false; clearInterval(invBattle.timer); invBattle.timer = null;
+        const bounty = 20 + invBattle.kills * 5;
+        const a2 = invArkState(); a2.points = Math.max(0, Math.floor(a2.points || 0)) + bounty;
+        try { showToast("🎉 战斗胜利！击毁 <b>" + invBattle.kills + "</b> 艘敌舰，获得 <b>" + bounty + "</b> 现实改写点数。", "tech"); } catch (e) { }
+        saveGame(true);
+      }
+      renderInvArkBattle();
+    }
+    function renderInvArkBattle() {
+      const ships = el("invArkBattleShips"), fx = el("invArkBattleFx"), stats = el("invArkBattleStats");
+      if (!ships || !stats) return;
+      const st = { grid: (invBattle.grid && invBattle.grid.length) ? invBattle.grid : invArkIterState().grid };
+      const N = ARK_ITER_SIZE;
+      // 船体：按 5×5 实际位置画
+      const cell = 34;
+      const totalW = N * cell;
+      let html = "";
+      for (let k = 0; k < st.grid.length; k++) {
+        const id = st.grid[k]; if (!id) continue;
+        const m = ARK_ITER_MODULES.filter(x => x.id === id)[0];
+        if (!m) continue;
+        const r = Math.floor(k / N), c = k % N;
+        const hp = invBattle.hp[k];
+        const dead = !(hp > 0);
+        const selBorder = (invBattleSel === k) ? ';box-shadow:0 0 0 2px var(--gold),0 0 10px var(--gold)' : '';
+        html += '<div data-ark-part="' + k + '" onclick="window.__arkBattlePart && window.__arkBattlePart(' + k + ')" data-ark-part-name="' + m.name + '" data-ark-part-hp="' + (hp > 0 ? hp : 0) + '" data-ark-part-max="' + (ARK_PART_HP[id] || 8) + '" style="cursor:pointer;position:absolute;left:calc(50% - ' + (totalW / 2) + 'px + ' + (c * cell) + 'px);top:calc(50% - ' + (totalW / 2) + 'px + ' + (r * cell) + 'px);width:' + (cell - 2) + 'px;height:' + (cell - 2) + 'px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:16px;background:' + m.color + (dead ? '22' : '55') + ';opacity:' + (dead ? 0.3 : 1) + ';box-shadow:0 0 0 1px ' + m.color + '66' + selBorder + ';">' + m.icon + '</div>';
+      }
+      // 敌人（四条边）
+      invBattle.enemies.forEach(e => {
+        if (e.dead) return;
+        const p = Math.min(1, e.life / 2);
+        let x = 50, y = 50;
+        if (e.dir === "up") { y = 5 + p * 20; } else if (e.dir === "down") { y = 95 - p * 20; }
+        else if (e.dir === "left") { x = 5 + p * 20; } else { x = 95 - p * 20; }
+        html += '<div style="position:absolute;left:' + x + '%;top:' + y + '%;transform:translate(-50%,-50%);font-size:20px;">👾</div>';
+      });
+      setHTML("invArkBattleShips", html);
+      // 护盾 + 部件血條
+      const alive = Object.keys(invBattle.hp).filter(k => invBattle.hp[k] > 0).length;
+      const total = Object.keys(invBattle.hp).length;
+      let detail = "";
+      if (invBattleSel >= 0 && st.grid[invBattleSel]) {
+        const did = st.grid[invBattleSel];
+        const dm = ARK_ITER_MODULES.filter(x => x.id === did)[0];
+        const dhp = Math.max(0, invBattle.hp[invBattleSel] || 0), dmax = ARK_PART_HP[did] || 8;
+        detail = "<br>已选中：<b>" + (dm ? dm.icon + " " + dm.name : did) + "</b>　耐久 <b>" + dhp + " / " + dmax + "</b>（" +
+          Math.round((dhp / Math.max(1, dmax)) * 100) + "%）" + (dhp <= 0 ? "　<b style='color:var(--red);'>已损坏</b>" : "");
+      }
+      setHTML("invArkBattleStats",
+        "🛡 护盾 <b>" + Math.max(0, Math.round(invBattle.shield)) + " / " + invBattle.shieldMax + "</b>" +
+        "　·　部件完好 <b>" + alive + " / " + total + "</b>" +
+        "　·　波次 <b>" + Math.min(invBattle.wave, invBattle.waveMax) + " / " + invBattle.waveMax + "</b>" +
+        "　·　击毁 <b>" + invBattle.kills + "</b>" +
+        (invBattle.over ? (alive > 0 ? "　·　<b style='color:var(--green);'>胜利</b>" : "　·　<b style='color:var(--red);'>失败</b>") : (invBattle.on ? "　·　<b style='color:var(--gold);'>战斗中…</b>" : "")) + detail);
+    }
+
+    // V0.115：里程碑子页
+    // V0.115：里程碑子页
     on("subTabGene", () => switchPossibilitySub("gene"));
     on("subTabLab", () => switchPossibilitySub("lab"));
     on("subTabPain", () => switchPossibilitySub("pain"));
@@ -17953,7 +19299,7 @@
     on("confirmOk", () => closeConfirmModal(true));
     on("mvModalCancel", closeMultiverseConfirm);
     on("mvModalConfirm", confirmMultiverseEntry);
-    delegate("geneBody", "[data-gene-add]", () => addGene());
+    delegate("geneBody", "[data-gene-add]", btn => addGene(Number(btn.dataset.geneAdd) || 1));
     delegate("geneBody", "[data-gene-pick]", btn => toggleGenePick(Number(btn.dataset.genePick)));
     delegate("geneBody", "[data-gene-pick-all]", () => toggleGenePickAll());
     delegate("geneBody", "[data-gene-remove-picked]", () => removeSelectedGenes());
@@ -18225,14 +19571,42 @@
         if (hp > bp) return h;
         return (hp === bp && h.level > best.level) ? h : best;
       }, null);
-      if (next) save.activeHoundId = next.id;
+      // ⚠️ V0.135 修（作者：回归完立马不动了，只能手动一只只打）——
+      //   原来「换最强的一只」是拿**仍活着的**犬去比 ✗；如果回归的那只还在出战位（或仓库里全是它自己），
+      //   activeHoundId 会被指回它自己 → 下一拍又判定"该回归"，于是来回空转、狩猎彻底停住 ✗。
+      //   修：① 明确排除刚回归的那只；② 找不到可换的犬就把出战位清空，让 autoHuntStep 重新挑一只 ✓
+      const alive = save.hounds.filter(h => h.lifespan > 0 && h.id !== hound.id);
+      const next2 = alive.reduce((best, h) => {
+        if (!best) return h;
+        const bp = houndPowerKey(best), hp = houndPowerKey(h);
+        if (hp > bp) return h;
+        return (hp === bp && h.level > best.level) ? h : best;
+      }, null);
+      if (next2) save.activeHoundId = next2.id;
+      else save.activeHoundId = null;   // V0.135：没有可换的犬 → 清空出战位，下一步自动重新挑
       saveGame(true);
       render();
       return true;
     }
 
+    let autoHuntBattleSince = 0;   // V0.139：战斗看门狗起点
     function autoHuntPump() {
       if (!isAutoUnlocked("hunt") || !save.auto.hunt) return;
+      // V0.139（作者：挂机一会儿就自动停）—— 看门狗自救：
+      //   ① 战斗卡住超过 2 分钟 → 强制判定结束；② 长时间既没在打也没开新场 → 重置节拍
+      {
+        const now0 = Date.now();
+        if (activeBattle) {
+          if (!autoHuntBattleSince) autoHuntBattleSince = now0;
+          else if (now0 - autoHuntBattleSince > 120000) {
+            try { endBattle(false, "超时强制结束"); } catch (e) { try { activeBattle = null; } catch (e2) { } }
+            autoHuntBattleSince = 0; autoHuntLastBattleAt = 0; autoHuntNextAt = 0;
+          }
+          return;
+        }
+        autoHuntBattleSince = 0;
+        if (autoHuntLastBattleAt && now0 - autoHuntLastBattleAt > 120000) { autoHuntLastBattleAt = 0; autoHuntNextAt = 0; }   // V0.142：5 分钟 → 2 分钟
+      }
       // V0.98：自动回归开着时，寿命将尽（或已打满设定场次）的猎犬先办回归，绝不带着它开下一场
       if (isAutoUnlocked("retire") && save.auto.retire) {
         const doomed = getSelectedHound();
@@ -18559,7 +19933,7 @@
     ];
     function invArkState() {
       if (!save.invArk || typeof save.invArk !== "object" || Array.isArray(save.invArk)) {
-        save.invArk = { unlocked: false, launches: 0, pos: null, level: 0, contacted: false, seen: false, expert: {}, points: 0, parse: { xp: 0, lv: 0 } };
+        save.invArk = { unlocked: false, launches: 0, pos: null, level: 0, contacted: false, seen: false, expert: {}, points: 0, parse: { xp: 0, lv: 0 }, list: [] };
       }
       const a = save.invArk;
       a.unlocked = !!a.unlocked;
@@ -18568,6 +19942,14 @@
       a.launches = Math.max(0, Math.floor(a.launches || 0));
       a.level = Math.max(0, Math.floor(a.level || 0));
       a.points = Math.max(0, Math.floor(a.points || 0));
+      // V0.138：多艘方舟 —— list 里存每一艘的 {pos, level, rarity, contacted}
+      if (!Array.isArray(a.list)) a.list = [];
+      a.list = a.list.filter(x => x && x.pos && typeof x.pos.a === "number" && typeof x.pos.b === "number")
+        .map(x => ({ pos: { a: Math.round(x.pos.a), b: Math.round(x.pos.b) }, level: Math.max(1, Math.floor(Number(x.level) || 1)), rarity: typeof x.rarity === "string" ? x.rarity : "normal", contacted: !!x.contacted }));
+      // 兼容旧档：如果旧档只有单个 pos，迁进 list
+      if (a.pos && !a.contacted && !a.list.some(x => x.pos.a === a.pos.a && x.pos.b === a.pos.b)) {
+        a.list.push({ pos: { a: a.pos.a, b: a.pos.b }, level: Math.max(1, a.level || 1), rarity: a.rarity || "normal", contacted: false });
+      }
       // V0.131：专家科技解析（每获得 1 级专家科技 → 1 点经验；满了升 1 级解析）
       if (!a.parse || typeof a.parse !== "object") a.parse = { xp: 0, lv: 0 };
       a.parse.xp = Math.max(0, Math.floor(Number(a.parse.xp) || 0));
@@ -18678,10 +20060,10 @@
     function mapViewR() { return MAP_VIEW_R + invRwLv("scope"); }
     function mapBound() { return MAP_BOUND + invRwLv("scope"); }
     function invArkUnlocked() {
-      const a = invArkState();
-      if (a.unlocked) return true;                                     // 老存档的永久解锁（兼容）
-      if (invWorld && invWorld.arkUnlocked) return true;               // 本回合已解锁
-      return false;
+      // V0.138（作者）：方舟必须是**本回合**最高等级到 1K 才解锁 —— 不能一进反转世界就能发射
+      if (!invWorld) return false;
+      if (invWorld.arkUnlocked) return true;                                        // 本回合已达成过
+      return Math.max(0, Math.floor(Number(invWorld.best) || 0)) >= INV_ARK_UNLOCK_LEVEL;
     }
     function invArkExpertLv(id) { return Math.max(0, Math.floor(invArkState().expert[id] || 0)); }
     // ===== V0.131（作者要求）：专家科技解析 =====
@@ -18713,7 +20095,7 @@
       if (!def) return 1;
       const lv = invArkExpertLv(id);
       // V0.121：专家科技倍率软上限 500（之后每 ×10 只再涨 1 份）
-      return invSoftCap(Math.pow(1 + def.step, lv), 500);
+      return invSoftCap(Math.pow(1 + def.step, lv), 5000);   // V0.137：500 → 5000
     }
     function invArkPointsNow() { return invArkState().points; }
     // V0.115（作者要求）：尘埃上限的显示 ——
@@ -18729,43 +20111,70 @@
       return a.level > 0 ? ("Lv." + formatNumber(a.level)) : "—";
     }
     // 发射：按最高反转等级造一艘方舟，落点写进星图坐标
+    // V0.139（作者）：落点太远够不着时，可以弃置当前方舟（放弃这次坐标，不算接触）
+    function invArkDiscard() {
+      const a = invArkState();
+      // V0.139 修：按 list 里的「未接触」条目判断，不再只看单个 a.pos
+      const pending = Array.isArray(a.list) ? a.list.filter(x => x && !x.contacted) : [];
+      if (!pending.length && (!a.pos || a.contacted)) { try { showToast("现在没有可以弃置的方舟。", "tech"); } catch (e) { } return; }
+      if (Array.isArray(a.list)) {
+        a.list = a.list.filter(x => x && x.contacted);
+      }
+      a.pos = null; a.level = 0; a.contracted = false; a.contacted = true; a.rarity = null;
+      saveGame(true);
+      try { renderInvArkPane(); renderPossibility(); showToast("🗑 已弃置这艘方舟，可以去发射下一艘了。", "tech"); } catch (e) { }
+    }
     function invArkLaunch() {
       const a = invArkState();
       if (!invActive || !invWorld) return false;
       if (!invArkUnlocked()) { showToast("反转等级到 <b>" + INV_ARK_UNLOCK_LEVEL + "</b> 才能发射方舟。", "tech"); return false; }
-      // V0.115（作者要求）：多元信标 → 每个多元宇宙周期可发射的方舟 +1
-      const capLaunches = 1 + invRwLv("beacon");
-      const usedLaunches = Math.max(0, Math.floor(a.cycleLaunches || 0));
-      if (usedLaunches >= capLaunches) {
-        showToast("🚀 这个周期已经发射过 <b>" + usedLaunches + "</b> 艘了（上限 " + capLaunches +
-          "，买「多元信标」可以多发射）。", "tech");
+      // V0.139（作者）：**每次进入反转世界（一个轮回）只能按一次发射**；
+      //   多元信标 = 这一次同时放出 1+信标 艘方舟；想再发就退出重进（可以来回跑、把地图铺满）
+      if (invWorld.arkLaunchedRun) {
+        showToast("🚀 本次进入反转世界已经发射过了 —— 退出重进可以再发一次。", "tech");
         return false;
       }
-      if (a.pos && !a.contacted) { showToast("上一艘方舟还在星图上漂着 —— 先去找到它再发射下一艘。", "tech"); return false; }
-      // V0.113（作者要求）：**方舟等级 = 本回合最高反转等级 ÷ 1000（向下取整，至少 1）** ——
-      //   每提升 1K 级，方舟等级 +1：
-      //     1K 级 → 1 级方舟 · 2K → 2 级 · 10K → 10 级 · 100K → 100 级 …
+      // V0.139（作者）：发射同时**重置战斗**（每发一次就能再打一场传说方舟战）
+      a.legendBattleUsed = false;
+      // V0.113（作者要求）：**方舟等级 = 本回合最高反转等级 ÷ 1000（向下取整，至少 1）**
       const runBest = Math.max(0, Math.floor(invWorld.best || 0));
       a.level = Math.max(1, Math.floor(runBest / INV_ARK_LEVEL_PER));
       a.contacted = false;
       a.launches = (a.launches || 0) + 1;
-      a.cycleLaunches = usedLaunches + 1;   // V0.115：本周期已发射数（重置时清零）
+      a.cycleLaunches = Math.max(0, Math.floor(a.cycleLaunches || 0)) + 1;
+      invWorld.arkLaunchedRun = true;
       const pos = getMapPos();
-      // 落点距离：**1 ~ 2×方舟等级**（1 级 → 1~2 格；10 级 → 1~20 格；100 级 → 1~200 格）
-      // ⚠️ 首次发射**故意**压到 1~2 格（让玩家以为是随机撞上来的）——这段意图不许写进任何玩家可见文案。
-      // ⚠️ 地图是有限方框（±MAP_BOUND），所以落点距离也要夹进去 ——
-      //   否则 10 级/100 级方舟会漂到走不到的地方。
-      // V0.114：不再夹在 ±4 —— 落到隔壁/更远的 20×20 分区里也能走过去（跨区即换图）
-      const boundD = Math.max(2, Math.min(Math.max(2, 2 * a.level), 60));
-      const d = (a.launches === 1)
-        ? (1 + Math.floor(Math.random() * 2))
-        : (1 + Math.floor(Math.random() * boundD));
-      const dir = Math.floor(Math.random() * 4);
-      const off = dir === 0 ? { a: d, b: 0 } : (dir === 1 ? { a: -d, b: 0 } : (dir === 2 ? { a: 0, b: d } : { a: 0, b: -d }));
-      if (a.launches === 1) {
-        a.pos = { a: pos.a + off.a, b: pos.b + off.b };   // 首艘：相对玩家当前位置
-      } else {
-        a.pos = { a: off.a, b: off.b };                   // 之后：相对原点（跑出去找）
+      // 落点距离 = 0 ~ 方舟等级（上限受地图 ±9999 约束）
+      const boundD = Math.max(1, Math.min(Math.floor(a.level) || 1, 9999));
+      // 占位检测：和已有方舟重叠就沿同一方向往外挪 1 格，直到不重叠
+      const occupied = new Set();
+      (Array.isArray(a.list) ? a.list : []).forEach(x => { if (x && x.pos) occupied.add(x.pos.a + "," + x.pos.b); });
+      const pickFree = (base, d0, dir) => {
+        const step = dir === 0 ? { a: 1, b: 0 } : (dir === 1 ? { a: -1, b: 0 } : (dir === 2 ? { a: 0, b: 1 } : { a: 0, b: -1 }));
+        let pa = base.a + (dir === 0 ? d0 : dir === 1 ? -d0 : 0);
+        let pb = base.b + (dir === 2 ? d0 : dir === 3 ? -d0 : 0);
+        let guard = 0;
+        while (occupied.has(pa + "," + pb) && guard++ < 500) {
+          pa += step.a; pb += step.b;
+          if (pa > 9999 || pa < -9999 || pb > 9999 || pb < -9999) break;
+        }
+        occupied.add(pa + "," + pb);
+        return { a: pa, b: pb };
+      };
+      const d0 = Math.floor(Math.random() * (boundD + 1));
+      const dir0 = Math.floor(Math.random() * 4);
+      a.pos = pickFree((a.launches === 1) ? pos : { a: 0, b: 0 }, d0, dir0);
+      // 信标：一次多放 N 艘（各自随机方向与距离，全部避让重叠）
+      {
+        const extra = Math.max(0, Math.min(20, invRwLv("beacon")));
+        if (!Array.isArray(a.list)) a.list = [];
+        a.list.push({ pos: { a: a.pos.a, b: a.pos.b }, level: a.level, rarity: a.rarity || "normal", contacted: false });
+        for (let k = 0; k < extra; k++) {
+          const dd = Math.floor(Math.random() * (boundD + 1));
+          const dr = Math.floor(Math.random() * 4);
+          const pp = pickFree((a.launches === 1) ? pos : { a: 0, b: 0 }, dd, dr);
+          a.list.push({ pos: pp, level: a.level, rarity: "normal", contacted: false });
+        }
       }
       // V0.116（作者要求）：**离中心越远，品质倾向越高**（但低品质永不归零）；
       //   目前封顶「稀有（紫）」，史诗/传说先锁着（等作者后续想好再放）。
@@ -18785,6 +20194,12 @@
           if (roll <= 0 && ws[i4] > 0) { picked = ARK_RARITY[i4]; break; }
         }
         a.rarity = picked.id;
+        // V0.138：把这艘记进 list（面板一次性列出所有方舟位置）
+        if (Array.isArray(a.list)) {
+          if (!a.list.some(x => x.pos.a === a.pos.a && x.pos.b === a.pos.b && !x.contacted)) {
+            a.list.push({ pos: { a: a.pos.a, b: a.pos.b }, level: a.level, rarity: a.rarity, contacted: false });
+          }
+        }
       }
 
       saveGame(true);
@@ -18798,11 +20213,36 @@
     function invArkContact() {
       const a = invArkState();
       if (!a.pos || a.contacted) return false;
+      // V0.139：如果踩到的是战败残骸（5×5 传说方舟），额外给奖励
       const pos = getMapPos();
-      if (pos.a !== a.pos.a || pos.b !== a.pos.b) return false;
+      let crashBonus = null;
+      if (Array.isArray(a.list)) {
+        // V0.139：传说残骸是 5×5 —— 站到其中任意一格都算踩到
+        crashBonus = a.list.filter(x => x && x.isCrash && !x.contacted && x.pos &&
+          pos.a >= x.pos.a && pos.a <= x.pos.a + 4 && pos.b >= x.pos.b && pos.b <= x.pos.b + 4)[0] || null;
+      }
+      if (!crashBonus && (pos.a !== a.pos.a || pos.b !== a.pos.b)) return false;
       a.contacted = true;
+      // V0.139 修：list 里同坐标的条目同步标记为已接触（否则会一直卡住发射）
+      if (Array.isArray(a.list)) {
+        a.list.forEach(x => { if (x && x.pos && a.pos && x.pos.a === a.pos.a && x.pos.b === a.pos.b) x.contacted = true; });
+      }
       // V0.115：主宇宙成就「方舟收藏家」用的累计计数
       save.arkContactsTotal = Math.max(0, Math.floor(Number(save.arkContactsTotal) || 0)) + 1;
+      if (crashBonus) {
+        a.pos = { a: crashBonus.pos.a, b: crashBonus.pos.b };
+        // V0.139（作者）：现实改写点数 = 存活研究室数 × 战斗轮次；研究室全被打爆则每轮只给一点点
+        const labsN = Math.max(0, Math.floor(crashBonus.labCount || 0));
+        const roundN = Math.max(1, Math.floor(crashBonus.round || 1));
+        const pts = Math.round((labsN > 0 ? (labsN * roundN) : (roundN * 3)) * arkLabMul());
+        a.points = Math.max(0, Math.floor(a.points || 0)) + pts;
+        const techs = INV_ARK_EXPERT_TECHS;
+        const t0 = techs[Math.floor(Math.random() * techs.length)];
+        const gainT = 1 + Math.floor(((crashBonus.labCount || 0) + (crashBonus.round || 1)) / 2);
+        a.expert[t0.id] = Math.max(0, Math.floor(a.expert[t0.id] || 0)) + gainT;
+        crashBonus.contacted = true;
+        try { showToast("🚀 拾取战败方舟残骸：<b>+" + pts + "</b> 现实改写点数，专家科技 <b>" + t0.name + " +" + gainT + "</b>", "tech"); } catch (e) { }
+      }
       const lv = Math.max(1, a.level);
       // ① 随机一项专家科技（按方舟等级给等级：等级越高给得越高）
       const tech = INV_ARK_EXPERT_TECHS[Math.floor(Math.random() * INV_ARK_EXPERT_TECHS.length)];
@@ -18892,7 +20332,8 @@
     }
     function invTechEffSoft(raw) {
       // V0.121：基础科技有效等级 3000 级前线性；之后 log10 缓慢增长 ✓
-      const base = invSoftCap(Math.max(0, raw || 0), 3000);
+      // V0.137（作者：一千多级就很难升上去、差三位数）—— 软上限从 3000 提到 30000，让中后段还有明显收益
+      const base = invSoftCap(Math.max(0, raw || 0), 30000);
       return base * invMilestoneCapMult();
     }
     // V0.104：进阶科技放大对应基础科技的效果倍率 —— 有效等级 = 软上限(基础等级 ×（1 + 0.5 × 进阶等级）)
@@ -19246,7 +20687,7 @@
     function invParseMult(id) {
       const step = INV_PARSE_STEP[id] || 1;
       // V0.121：解析倍率软上限 1000（之后每 ×10 只再涨 1 份）
-      return invSoftCap(Math.pow(step, invParseLv(id)), 1000);
+      return invSoftCap(Math.pow(step, invParseLv(id)), 100000);   // V0.137：1000 → 100000
     }
     function invParseDustMult() { return invParseMult("dust"); }
     // 护盾协议：**乘在抵抗总量上**（复利），同时自带 +10%/级的底子 ——
@@ -19612,6 +21053,14 @@
     }
     function exitInvWorld(skipSettle) {
       if (!invActive) return;
+      // V0.139（作者）：战斗中退出反转世界 → 传说方舟立刻坠落（按战败处理）
+      try {
+        if (typeof ARK_BTL !== "undefined" && ARK_BTL && ARK_BTL.on && !ARK_BTL.over) {
+          arkBtlStop();
+          arkBtlCrash();
+          try { showToast("⚠️ 战斗中退出反转世界 —— 传说方舟当场坠落。", "tech"); } catch (e) { }
+        }
+      } catch (e) { }
       // V0.104（作者要求）：主动退出 = 放弃这趟旅程 —— 先按最高等级增量结算科技点数，再清掉进度。
       //   skipSettle = 清档 / 导入存档这类「被动离开」，不结算、不提示。
       const settled = skipSettle ? null : settleInvTechPoints();
@@ -19858,14 +21307,22 @@
     //   times = Infinity / "max" = 一键最大（配 10000 级保险丝防极端循环）。
     function invTryLevelUp(silent, times) {
       if (!invActive || !invWorld) return false;
+      // V0.140（作者）：以前硬顶 10000 级/次 ✗ —— 现在按「买得起多少就升多少」，
+      //   只留一个很大的保险丝（200 万级）+ 250ms 时间预算，避免卡死页面
       let n = Math.floor(times || 1);
-      if (!isFinite(n) || n <= 0) n = 10000;   // 一键最大 / 异常输入
-      n = Math.min(10000, n);
+      if (!isFinite(n) || n <= 0) n = 2000000;   // 一键最大 / 自动铸级（Infinity）都用这个上限
+      n = Math.min(2000000, n);
       const startLv = invLevelNow();
       let spent = bigOf(0);                       // V0.115：花费是大数了，累加也要用大数（以前是数字 += ✗）
+      const __t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+      const __budget = silent ? 60 : 250;   // 自动铸级每拍最多 60ms，手动一键最大 250ms
       for (let i = 0; i < n; i++) {
         const cost = invLevelCost();
         if (bigCmp(invWorld.dust, bigOf(cost)) < 0) break;
+        if ((i & 1023) === 0) {
+          const __now = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+          if (__now - __t0 > __budget) break;   // 超预算就停，剩下的下一帧继续
+        }
         invWorld.dust = bigSub(invWorld.dust, bigOf(cost));
         invWorld.level = invLevelNow() + 1;
         if (invWorld.level > invWorld.best) invWorld.best = invWorld.level;
@@ -19932,10 +21389,10 @@
         }
         return;
       }
+      // V0.139（作者）：被捕获概率已经是 0% —— 既不结算也不弹提示，省得刷屏
+      if (chance <= 0) { invCaptureAccReset(); return; }
       if (Math.random() >= chance) {
-        if (!quiet) {
-          showToast(`◑ ${houndName}扑了上来，被<b>硬扛了过去</b>（被捕获概率只有 ${(chance * 100).toFixed(1)}%）。`);
-        }
+        invCaptureAccReset();   // 扛过去了：当前累计段归零，不弹单条提示
         return;
       }
       invWorld.captures += 1;
@@ -19945,12 +21402,37 @@
       const echo = INV_TECH_REFUND_PER_LEVEL * invTechEffLv("echo");
       if (echo > 0) invWorld.dust = bigMin(invCapBig(), bigAdd(invWorld.dust, bigOf(echo)));
       if (quiet) return;
-      const echoNote = echo > 0 ? `，回响电容返还 <b>+${formatNumber(echo)}</b> 反转尘埃` : "";
-      if (before > 0) {
-        showToast(`◑ 被<b>${houndName}</b>捕获：<b>等级 −${formatNumber(dmg)} → Lv.${formatNumber(invWorld.level)}</b>${echoNote}（本局第 ${formatNumber(invWorld.captures)} 次）。`);
-      } else {
-        showToast(`◑ 被<b>${houndName}</b>捕获：等级已经归零，没有等级可掉了（本局第 ${formatNumber(invWorld.captures)} 次）。`);
+      // V0.139（作者）：一秒弹一屏太吓人 —— 改成**聚合**，最多每 2.5 秒汇总一条
+      {
+        const acc = invCaptureAcc();
+        acc.n += 1; acc.dmg += dmg; acc.echo += echo; acc.lastLv = invWorld.level;
+        invCaptureToastFlush(false);
       }
+    }
+    // ===== V0.139：反转世界捕获提示聚合（防刷屏）=====
+    let invCaptureLastToastAt = 0;
+    function invCaptureAcc() {
+      if (!invWorld) return { n: 0, dmg: 0, echo: 0, lastLv: 0 };
+      if (!invWorld.capAcc || typeof invWorld.capAcc !== "object") invWorld.capAcc = { n: 0, dmg: 0, echo: 0, lastLv: 0 };
+      return invWorld.capAcc;
+    }
+    function invCaptureAccReset() {
+      if (!invWorld) return;
+      if (invWorld.capAcc) { invWorld.capAcc.n = 0; invWorld.capAcc.dmg = 0; invWorld.capAcc.echo = 0; }
+    }
+    function invCaptureToastFlush(force) {
+      const acc = invCaptureAcc();
+      if (!acc.n) return;
+      const now = Date.now();
+      if (!force && now - invCaptureLastToastAt < 2500) return;   // 2.5 秒最多一条
+      invCaptureLastToastAt = now;
+      const echoNote = acc.echo > 0 ? `，回响电容返还 <b>+${formatNumber(acc.echo)}</b> 反转尘埃` : "";
+      if (acc.lastLv > 0) {
+        showToast(`◑ 被时间耄耋捕获 <b>${formatNumber(acc.n)}</b> 次：<b>等级 −${formatNumber(acc.dmg)} → Lv.${formatNumber(acc.lastLv)}</b>${echoNote}`);
+      } else {
+        showToast(`◑ 被时间耄耋捕获 <b>${formatNumber(acc.n)}</b> 次：等级已归零，没有等级可掉了`);
+      }
+      acc.n = 0; acc.dmg = 0; acc.echo = 0;
     }
     // 独立结算：只在反转世界模式下由 runLoop 调用 —— 主宇宙的 gameStep 整段跳过
     function invStep(dt) {
@@ -19961,6 +21443,7 @@
       invEternalStartAt();
       if (!invEternalDone && invEternalLeftMs() <= 0) { invEternalDevour(); return; }
       invTechConsumedFlush();   // V0.109：废件汇总按 3 秒节流刷出
+      try { if (invCaptureAcc().n && Date.now() - invCaptureLastToastAt >= 2500) invCaptureToastFlush(false); } catch (e) { }   // V0.139：捕获汇总
       // V0.109（作者要求）：能源 —— 在反转世界里的每一秒 +1，**不吃任何加成**（刻意不乘任何倍率）。
       //   它直接记在主存档上：退出反转世界、进宇宙重置都不会清掉它（它是唯一跨局保留的东西）。
       // V0.110：能源速率 = 基础 1/秒 × 成就奖励（「赌神」→ ×1.5）
@@ -20141,11 +21624,14 @@
     }
     // ===== V0.104（作者要求）：自动化 = 花尘解锁 + 花尘堆效率（最高 3 次/秒） =====
     function invAutoUnlocked(kind) {
+      // V0.134：永久成就（10 级）也算已解锁
+      if (invPermAutoLv(kind) > 0) return true;
       return !!(invWorld && invWorld.autoUnlock && invWorld.autoUnlock[kind]);
     }
     function invAutoEffLv(kind) {
       const v = invWorld && invWorld.autoEff ? invWorld.autoEff[kind] : 0;
-      return Math.max(0, Math.min(INV_AUTO_EFF_MAX, Math.floor((typeof v === "number" && isFinite(v)) ? v : 0)));
+      const cur = Math.max(0, Math.min(INV_AUTO_EFF_MAX, Math.floor((typeof v === "number" && isFinite(v)) ? v : 0)));
+      return Math.max(cur, invPermAutoLv(kind));   // V0.134：永久等级也算（取较大值）
     }
     function invAutoRate(kind) {
       // V0.113：专家科技「万象电池」放大自动化效率
@@ -20445,6 +21931,16 @@
         `（本局最高 Lv.${formatNumber(invWorld.best)}，下一层 Lv.${formatNumber((mCount + 1) * INV_MILESTONE_STEP)}） · ` +
         `大里程碑 <b>${formatNumber(invMilestoneBigCount())}</b> 座 · 超级 <b>${formatNumber(invMilestoneMegaCount())}</b> 座 · ` +
         `加成：尘埃 <b>×${invMilestoneDustMult().toFixed(2)}</b> · 抵抗 <b>+${(invMilestoneResist() * 100).toFixed(0)}%</b> · 软上限 <b>×${invMilestoneCapMult().toFixed(3)}</b>`);
+      // V0.138（作者要求）：把里程碑的**加成总数**单独列一行，一眼能看全
+      try {
+        const mBase = mCount, mBig = invMilestoneBigCount(), mMega = invMilestoneMegaCount();
+        setHTML("invMilestoneSum",
+          "<b>加成总计</b>：" +
+          "基础 " + formatNumber(mBase) + " 层（尘埃 +" + formatNumber(mBase * 25) + "% · 抵抗 +" + formatNumber(mBase * 25) + "%）" +
+          " · 大 " + formatNumber(mBig) + " 座（尘埃 +" + formatNumber(mBig * 100) + "% · 抵抗 +" + formatNumber(mBig * 100) + "% · 科技有效等级 +" + formatNumber(mBig * 2) + "%）" +
+          " · 超级 " + formatNumber(mMega) + " 座（尘埃 +" + formatNumber(mMega * 500) + "% · 抵抗 +" + formatNumber(mMega * 500) + "% · 科技有效等级 +" + formatNumber(mMega * 20) + "%）" +
+          "<br>合计：尘埃 <b>×" + invMilestoneDustMult().toFixed(3) + "</b> · 抵抗 <b>+" + (invMilestoneResist() * 100).toFixed(0) + "%</b> · 科技有效等级 <b>×" + invMilestoneCapMult().toFixed(3) + "</b>");
+      } catch (e) { }
       renderInvAutoPane();   // V0.104：自动化两行（解锁 / 开关 / 效率）
       renderInvEnergyPane(); // V0.109：能源页
       renderInvTechPane();   // V0.104：科技页的八格
@@ -20800,13 +22296,32 @@
       //   · 没拿到时**连列表都不显示**（见渲染处的 hidden 判断）；
       //   · 效果只剩「能源获取 ×1.5」。
       { id: "gambler", icon: "🧪", name: "内测成就", cond: "参与过早期内测（赛博赌场）",
-        reward: "能源获取 ×1.5", hidden: true, check: () => invChalState().gamblerCleared }
+        reward: "能源获取 ×1.5", hidden: true, check: () => invChalState().gamblerCleared },
+      // ===== V0.134：反转世界新成就 =====
+      { id: "ark_iter", icon: "♻", name: "第一次迭代", cond: "组装出一张可用的 5×5 方舟蓝图",
+        reward: "解锁传说方舟抽取资格的前置条件之一", check: () => { try { return invArkIterStats().valid; } catch (e) { return false; } } },
+      { id: "ark_legend", icon: "🚀", name: "虚空远航", cond: "累计发射 10 艘方舟",
+        reward: "传说方舟抽取资格", check: () => Math.max(0, Math.floor(Number(invArkState().launches) || 0)) >= 10 },
+      { id: "auto_level", icon: "⚙", name: "自动铸级大师", cond: "累计发射 3 艘方舟",
+        reward: "**永久**解锁自动铸级 10 级", perm: "level", check: () => Math.max(0, Math.floor(Number(invArkState().launches) || 0)) >= 3 },
+      { id: "auto_harvest", icon: "🔬", name: "自动凝析大师", cond: "累计发射 5 艘方舟",
+        reward: "**永久**解锁自动凝析 10 级", perm: "harvest", check: () => Math.max(0, Math.floor(Number(invArkState().launches) || 0)) >= 5 },
+      { id: "deep_dive", icon: "🔭", name: "深潜者", cond: "单局反转等级达到 10 万",
+        reward: "纪念成就", check: () => Math.max(0, Math.floor(Number(invWorld && invWorld.best) || 0)) >= 100000 }
     ];
     function invAchvOn(id) {
       if (!save.invAchv || typeof save.invAchv !== "object") save.invAchv = {};
       return save.invAchv[id] === true;
     }
     function invAchvCount() { return INV_ACHV_DEFS.filter(d => invAchvOn(d.id)).length; }
+    // V0.134：永久自动化（跨局保留，存在 save.invPermAuto）
+    function invPermAutoState() {
+      if (!save.invPermAuto || typeof save.invPermAuto !== "object") save.invPermAuto = { level: 0, harvest: 0 };
+      save.invPermAuto.level = Math.max(0, Math.floor(Number(save.invPermAuto.level) || 0));
+      save.invPermAuto.harvest = Math.max(0, Math.floor(Number(save.invPermAuto.harvest) || 0));
+      return save.invPermAuto;
+    }
+    function invPermAutoLv(kind) { return invPermAutoState()[kind] || 0; }
     // 检查有没有新达成的（达成即记录 + 提示；每帧调用开销可忽略）
     function checkInvAchv() {
       let got = 0;
@@ -20816,6 +22331,8 @@
         try { ok = !!d.check(); } catch (e) { ok = false; }
         if (!ok) return;
         save.invAchv[d.id] = true;
+        // V0.134：带 perm 的成就 → 直接发永久等级（跨局保留）
+        if (d.perm) { invPermAutoState()[d.perm] = 10; }
         got += 1;
         logEvent("🏆", "反转世界成就达成：<b>" + d.name + "</b>（" + d.cond + "）—— " + d.reward, "gold");
         showToast("🏆 反转世界成就：<b>" + d.icon + " " + d.name + "</b>　成就条件：" + d.cond + "<br>奖励：<b>" + d.reward + "</b>", "tech");
