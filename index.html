@@ -4501,8 +4501,10 @@
         </div>
           <div id="invArkBattlePane" style="display: none;">
             <div class="inv-note" style="line-height: 1.8; margin-bottom: 8px;">
-              组装好蓝图后，可<b>消耗一次传说方舟发射机会</b>进行太空战：敌人从<b>四个方向</b>来袭，
-              先扣<b>护盾</b>，护盾破了就按来袭方向打对应位置的部件。
+              用当前蓝图出击：敌人从<b>四个方向</b>来袭，先扣<b>护盾</b>，护盾破了就按方向打对应部件；
+              <b>能源核心全灭才算战败</b>，打爆对方核心能大幅削弱它的火力。<br>
+              <b style="color:#f5a623;">发射方舟后战斗资格会立刻刷新</b> —— 每次发射都能再打一场；
+              战斗中退出反转世界，传说方舟会当场坠落。打赢获得「方舟零件包」，精英舰必掉「T1 科技包」。
             </div>
             <div style="display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap; margin-bottom: 10px;">
               <div id="invArkBattleStage" style="position: relative; flex: 1 1 420px; height: 460px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: rgba(120,160,255,.05);">
@@ -4541,7 +4543,10 @@
           </div>
           <div id="invArkIterPane" style="display: none;">
                 <p class="inv-note" style="line-height: 1.8; margin-bottom: 10px;">
-                  我们放射的方舟会在<b>虚空中自我迭代升级</b>，锻造出全新的科技 —— 累计发射 <b id="invArkIterLaunches">0</b> 艘即可解锁<b style="color:#f5a623;">传说方舟</b>抽取资格。
+                  方舟会在<b>虚空中自我迭代</b>，用你搭的蓝图锻造新科技 —— <b>累计发射 5 艘</b>后解锁「迭代 / 战斗」
+                  （当前已发射 <b id="invArkIterLaunches">0</b> 艘）。<br>
+                  在下方 7×7 船体上摆放零件：<b>能源核心</b>决定能装多少耗电件，<b>护盾</b>先扛伤害，
+                  <b>武器</b>从外到内打穿敌舰，<b>结构框架</b>当装甲。<b>基础扩容</b>可把外圈换成可用格子（耗能 ×1.5）。
                 </p>
                 <div id="invArkIterEnergyWrap" style="margin-bottom: 10px;">
                 <div class="inv-track" style="height: 24px; border-radius: 10px;">
@@ -12594,6 +12599,14 @@
       line.name = "黄金的" + line.name;
     }
     function ensureLines() {
+      // V0.146：旧档里的保底线可能还留着旧数值（强度 2.74 / 推荐战力 141）——
+      //   加载时直接标记重织，保证卡片显示与实战（3 血 / 1 伤）一致
+      try {
+        if (Array.isArray(save.lines) && save.lines.some(l => l && l.guaranteed &&
+          (Math.abs(Number(l.enemyScale) - 0.01) > 1e-9 || Number(l.refPower) !== 1))) {
+          save.linesDirty = true;
+        }
+      } catch (e) { }
       if (!save.lines || save.lines.length !== LINE_COUNT || save.linesDirty) {
         save.lines = generateLines();
         save.linesDirty = false;
@@ -18253,6 +18266,17 @@
       return v;
     }
     function arkPartLv(id) { return arkPartRaw(id).lv; }
+    // V0.146：T1 零件必须先「掉落过」才解锁 —— 没解锁的不显示、也不给放
+    function arkPartSeen(id) {
+      const def = ARK_ITER_MODULES.filter(x => x.id === id)[0];
+      if (!def) return false;
+      if (def.tier === "T0") return true;
+      try {
+        if (save.invArkPartSeen && save.invArkPartSeen[id]) return true;
+        if (arkPartLv(id) > 0) return true;
+      } catch (e) { }
+      return false;
+    }
     function arkPartHp(id) {
       const base = ARK_PART_HP[id] || 20;
       // V0.140（作者）：只有**结构框架**靠升级提高耐久；护盾只加盾、武器只加伤害、核心只加能源、研究室只加结算
@@ -18283,6 +18307,10 @@
     function arkBtlEnergyCap() { return ARK_ITER_CORE_CAP * (1 + arkBtlLvSnap("core")); }
 
     function arkPartGain(id) {
+      try {
+        if (!save.invArkPartSeen || typeof save.invArkPartSeen !== "object") save.invArkPartSeen = {};
+        if (!save.invArkPartSeen[id]) { save.invArkPartSeen[id] = true; }
+      } catch (e) { }
       const v = arkPartRaw(id);
       // V0.142（作者）：基础扩容刚获得就是 Lv.1（经验仍按 Lv.1 的需求走，不再出现「显示 1 级但按 0 级算」）
       if (id === "expand" && v.lv === 0 && v.exp === 0) { v.lv = 1; }
@@ -18318,6 +18346,17 @@
       if (!arr.length) { setHTML("voyageLog", '<div style="color:var(--muted);">还没有记录</div>'); return; }
       setHTML("voyageLog", arr.map(x => '<div style="padding:3px 0;border-bottom:1px dashed var(--line);">' + x.html + '</div>').join(""));
     }
+    // V0.146：卡死时的逃生门 —— 清掉未完成的本局进度（不结算科技点数）
+    window.__invForceQuit = () => {
+      try {
+        if (activeBattle) { try { endBattle(false, "强制放弃"); } catch (e) { } }
+        save.invSave = null;
+        invActive = false;
+        saveGame(true);
+        try { showToast("已放弃未完成的反转旅程（科技点数未结算）。", "tech"); } catch (e) { }
+        try { render(); } catch (e) { }
+      } catch (e) { }
+    };
     window.__voyageClear = () => { try { save.voyageLog = []; saveGame(true); renderVoyageLog(); } catch (e) { } };
     function arkPacks() { return Math.max(0, Math.floor(Number(save.invArkPacks) || 0)); }
     function arkT1Packs() { return Math.max(0, Math.floor(Number(save.invArkT1Packs) || 0)); }
@@ -18373,6 +18412,7 @@
       } catch (e) { }
       const __st = invArkIterState();
       const __list = ARK_ITER_MODULES.filter(m =>
+        arkPartSeen(m.id) &&
         (__st.palTier === "全部" || m.tier === __st.palTier) &&
         (__st.palType === "全部" || m.type === __st.palType));
       if (!__list.length) { setHTML("invArkIterPalette", '<span style="color:var(--muted);font-size:12px;">这个分类下还没有零件</span>'); }
@@ -18472,6 +18512,7 @@
       const st = invArkIterState();
       const m = ARK_ITER_MODULES.filter(x => x.id === invArkIterSel)[0];
       if (!m) return;
+      if (!arkPartSeen(m.id)) { try { showToast("这个 T1 零件还没解锁 —— 先从 T1 科技包里开出来。", "tech"); } catch (e2) { } return; }
       const N = ARK_ITER_SIZE;
       // V0.141：嵌套式装甲 —— 叠在已有零件上，承伤优先
       if (m.id === "nest") {
@@ -18753,59 +18794,8 @@
       }
       return { grid: grid, hp: hp, shieldMax: sMax.n, shield: sMax.n, labs: labs.n, elite: elite, avgLv: avgLv, t1Count: t1Count, name: (elite ? "精英耄耋战舰 R" : "时间耄耋战舰 R") + round };
     }
-    // V0.139：零件能耗唯一来源 —— 研究室战斗中不耗电、结构框架 0 耗能
-    function arkPartEnergy(id) {
-      // V0.140（作者）：研究室/结构框架 0 耗电；其余零件**升级后耗能也会提高**（每级 +1）
-      if (id === "lab" || id === "frame") return 0;
-      if (id === "expand") return 0;
-      const baseE = (id === "nest") ? 0.5 : (id === "battery") ? 0.5 : (id === "repair" ? 2 : (id === "missile" ? 3 : 1));
-      return baseE + arkPartLv(id) * baseE;
-    }
-    // ===== V0.143：航行日志（多元宇宙页右侧）=====
-    function voyageLogs() { if (!Array.isArray(save.voyageLog)) save.voyageLog = []; return save.voyageLog; }
-    function voyageLogAdd(html) {
-      try {
-        const arr = voyageLogs();
-        const now = Date.now();
-        if (arr.length && arr[0].html === String(html) && now - (arr[0].t || 0) < 5000) return;   // V0.145：5 秒内重复不记
-        arr.unshift({ t: Date.now(), html: String(html) });
-        if (arr.length > 80) arr.length = 80;
-        renderVoyageLog();
-      } catch (e) { }
-    }
-    function renderVoyageLog() {
-      const box = el("voyageLog");
-      if (!box) return;
-      const arr = voyageLogs();
-      if (!arr.length) { setHTML("voyageLog", '<div style="color:var(--muted);">还没有记录</div>'); return; }
-      setHTML("voyageLog", arr.map(x => '<div style="padding:3px 0;border-bottom:1px dashed var(--line);">' + x.html + '</div>').join(""));
-    }
-    window.__voyageClear = () => { try { save.voyageLog = []; saveGame(true); renderVoyageLog(); } catch (e) { } };
-    function arkPacks() { return Math.max(0, Math.floor(Number(save.invArkPacks) || 0)); }
-    function arkT1Packs() { return Math.max(0, Math.floor(Number(save.invArkT1Packs) || 0)); }
-    function arkT1Seen() { return !!save.invArkT1Seen; }
-    // V0.139（作者）：右侧战斗日志 —— 用来显示抽到的零件，替代刷屏 toast
-    // V0.142 修：下面这三行原先是重复粘贴的第二份声明（ARK_LOG / ARK_T1_POOL / ARK_T0_POOL 上面已声明过），已删除
-    function arkLogAdd(html) {
-      try {
-        voyageLogAdd(html);
-        ARK_LOG.unshift({ t: Date.now(), html: String(html) });
-        if (ARK_LOG.length > 60) ARK_LOG.length = 60;
-        renderArkBtlLog();
-      } catch (e) { }
-    }
-    function renderArkBtlLog() {
-      const box = el("invArkBattleLog");
-      if (!box) return;
-      if (!ARK_LOG.length) { setHTML("invArkBattleLog", '<div style="color: var(--muted);">战斗日志会显示在这里</div>'); return; }
-      setHTML("invArkBattleLog", ARK_LOG.map(x => '<div style="padding:3px 0;border-bottom:1px dashed var(--line);">' + x.html + '</div>').join(""));
-    }
-    function arkPartsState() { if (!save.invArkParts || typeof save.invArkParts !== "object") save.invArkParts = {}; return save.invArkParts; }
-    // V0.140：T1 新零件（小概率）
-    function arkPackRoll() {
-      if (Math.random() < 0.30) return ARK_T1_POOL[Math.floor(Math.random() * ARK_T1_POOL.length)];
-      return ARK_T0_POOL[Math.floor(Math.random() * ARK_T0_POOL.length)];
-    }
+    // V0.146 修：这一段（arkPartEnergy / voyageLogs / __invForceQuit / arkLogAdd / arkPartsState / arkPackRoll 等 11 个函数）
+    //   原先是重复粘贴的第二份（与上方完全一致），已删除
     // 从某个方向找「线上最外侧的存活格子」（必须先打穿外层才能打里面）
     function arkBtlRayTarget(grid, hp, dir) {
       const N = grid.length === 49 ? 7 : 5;
@@ -21949,6 +21939,7 @@
           } catch (e) { return ""; }
         })() +
         `<button class="primary-button" data-inv-enter="1">◑ 进入反转世界</button>` +
+        `<button class="secondary-button" id="invForceQuitBtn" onclick="window.__invForceQuit && window.__invForceQuit()" style="margin-left:8px;width:auto;padding:6px 12px;">⚠ 强制放弃本局</button>` +
         `<p class="inventory-note" style="color: var(--muted);">主动退出会清空本次进度、并按最高等级的增量结算科技点数；` +
         `<b>关掉网页不算退出</b> —— 下次打开会接着玩。</p>`);
     }
@@ -23981,7 +23972,10 @@
     if (offlineInfo) saveGame(true);   // 立刻落盘，防止刷新一次重复结算同一段时间
     // V0.98.1：启动渲染也包防护网 —— 万一某个面板数据异常，也不至于开屏即白屏
     safeRun("启动渲染", render);
-    if (resumeInv) safeRun("恢复反转世界", () => enterInvWorld(true));   // 直接回到反转世界继续
+    // V0.146（玩家反馈：进反转世界后页面无响应、刷新也一样）——
+    //   启动时**不再自动跳进反转世界**，改为停在门页，由玩家点「继续上局」再进。
+    //   这样即使某局状态有问题，刷新后也能回到门页，还有「强制放弃本局」的退路。
+    if (resumeInv) { try { showToast("检测到未完成的反转旅程：在「◑ 反转世界」页点「继续上局」即可接着玩。", "tech"); } catch (e) { } }
     if (offlineInfo) showOfflineModal(offlineInfo);
   </script>
 </body>
