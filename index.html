@@ -1481,6 +1481,7 @@
     .map-cell.origin { border-color: var(--gold); color: var(--gold); }
     .map-cell.here { background: rgba(124, 92, 255, .18); border-color: var(--purple); color: var(--text); font-weight: 700; }
     .map-cell.zoom { font-size: 13px; color: #6b7484; }
+    .map-cell.crash { background: rgba(167, 139, 250, .20); border-color: rgba(167, 139, 250, .60); font-size: 14px; }
     /* V0.115（作者要求）：自己所在块 = **红色方框**（不是紫的），一眼就能找到自己 */
     .map-cell.zoom.here { border: 2px solid var(--red); background: rgba(224, 82, 82, .16); color: var(--text); font-weight: 700; }
     .map-cell.zoom.both { font-size: 10px; letter-spacing: -1px; }   // 自己和方舟挤一块时缩小一点
@@ -3055,7 +3056,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.147</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.148</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -5076,7 +5077,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.147";
+    const GAME_VERSION = "V0.148";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -10355,6 +10356,46 @@
       0x9b, 0x07, 0xd1, 0x52, 0xa8, 0x3f, 0x8c, 0x1a
     ];
     const SAVE_CHECK_SEED = 0x9e3779b9;
+    const SAVE_FILE_TAG_Z = "THI2";   // V0.147：压缩版存档（LZW）
+    // ===== V0.147：极简字节级 LZW —— 手机上「存档太长、复制被截断/超限」的根治办法 =====
+    function lzwEncode(bytes) {
+      const dict = new Map();
+      for (let i = 0; i < 256; i++) dict.set(String.fromCharCode(i), i);
+      let next = 256, w = "";
+      const out = [];
+      for (let k = 0; k < bytes.length; k++) {
+        const c = String.fromCharCode(bytes[k]);
+        const wc = w + c;
+        if (dict.has(wc)) { w = wc; continue; }
+        out.push(dict.get(w));
+        if (next < 65536) dict.set(wc, next++);
+        w = c;
+      }
+      if (w !== "") out.push(dict.get(w));
+      const buf = new Uint8Array(out.length * 2);
+      for (let i = 0; i < out.length; i++) { buf[i * 2] = out[i] >> 8; buf[i * 2 + 1] = out[i] & 255; }
+      return buf;
+    }
+    function lzwDecode(bytes) {
+      const dict = [];
+      for (let i = 0; i < 256; i++) dict[i] = String.fromCharCode(i);
+      let next = 256, w = "";
+      const out = [];
+      for (let i = 0; i + 1 < bytes.length; i += 2) {
+        const code = (bytes[i] << 8) | bytes[i + 1];
+        let entry;
+        if (dict[code] !== undefined) entry = dict[code];
+        else if (code === next) entry = w + w.charAt(0);
+        else throw new Error("压缩数据损坏");
+        out.push(entry);
+        if (w !== "" && next < 65536) dict[next++] = w + entry.charAt(0);
+        w = entry;
+      }
+      const str = out.join("");
+      const arr = new Uint8Array(str.length);
+      for (let i = 0; i < str.length; i++) arr[i] = str.charCodeAt(i) & 255;
+      return arr;
+    }
     // 「本机已经结算到哪一刻」的标记：只给导入存档用。
     // 没有它的话，同一份 .txt 反复载入就能反复拿满 12 小时离线（存档里的导出时刻是固定的）。
     // 有了它，离线只会从「存档里的导出时刻」和「本机上一次结算时刻」里更晚的那个开始算。
@@ -10427,13 +10468,14 @@
 
     // 存档 → 加密文本（就是导出的 .txt 内容）
     function encodeSaveText() {
-      const bytes = new TextEncoder().encode(JSON.stringify(save));
+      // V0.147：先 LZW 压缩 JSON（手机上一份 36k 字符的存档能缩到 ~1/3），再走原来的 RC4 + base64
+      const bytes = lzwEncode(new TextEncoder().encode(JSON.stringify(save)));
       let nonce = "";
       for (let i = 0; i < 8; i++) nonce += "0123456789abcdef".charAt(Math.floor(Math.random() * 16));
       const ks = rc4Keystream(makeSaveCipherKey(nonce));
       const cipher = new Uint8Array(bytes.length);
       for (let i = 0; i < bytes.length; i++) cipher[i] = bytes[i] ^ ks();
-      const head = SAVE_FILE_TAG + "-" + nonce + "-" +
+      const head = SAVE_FILE_TAG_Z + "-" + nonce + "-" +
         saveChecksum(bytes).toString(16).padStart(8, "0");
       const body = bytesToBase64(cipher).replace(/(.{96})/g, "$1\n").replace(/\n$/, "");
       // V0.109（玩家事故：导出文本被复制工具截断）：加一行**长度自证** ——
@@ -10458,7 +10500,7 @@
       if (lines.length < 2) throw new Error("存档文本不完整");
       const m = lines[0].match(/^([A-Za-z0-9]+)-([0-9a-fA-F]{8})-([0-9a-fA-F]{8})$/);
       if (!m) throw new Error("存档头部无法识别");
-      if (m[1] !== SAVE_FILE_TAG) throw new Error("这不是本游戏导出的存档");
+      if (m[1] !== SAVE_FILE_TAG && m[1] !== SAVE_FILE_TAG_Z) throw new Error("这不是本游戏导出的存档");
       const nonce = m[2].toLowerCase();
       const want = parseInt(m[3], 16) >>> 0;
       let cipher;
@@ -10468,8 +10510,12 @@
       const bytes = new Uint8Array(cipher.length);
       for (let i = 0; i < cipher.length; i++) bytes[i] = cipher[i] ^ ks();
       if (saveChecksum(bytes) !== want) throw new Error("校验失败：这份存档被修改过（或已损坏）");
+      let plainBytes = bytes;
+      if (m[1] === SAVE_FILE_TAG_Z) {
+        try { plainBytes = lzwDecode(bytes); } catch (e) { throw new Error("存档解压失败（内容可能被截断）"); }
+      }
       let parsed;
-      try { parsed = JSON.parse(new TextDecoder("utf-8").decode(bytes)); }
+      try { parsed = JSON.parse(new TextDecoder("utf-8").decode(plainBytes)); }
       catch (e) { throw new Error("存档内容无法解析"); }
       if (!parsed || typeof parsed !== "object") throw new Error("存档内容无法解析");
       return parsed;
@@ -12552,6 +12598,23 @@
       return low;
     }
 
+    // V0.147（作者：四条时间线仍每 100ms 重掷）——
+    //   根因：generateLines() 走 "ok 有候选" 分支时不产出 guaranteed 线，
+    //   而重织判断要求「必须存在 guaranteed」，于是永远判过期 → 每帧重生成。
+    //   这里统一后处理：把最容易的一条强制标成保底线（0.01 强度 / 推荐战力 1）。
+    function arkForceGuaranteedLine(lines, refId) {
+      try {
+        if (!Array.isArray(lines) || !lines.length) return lines;
+        let pick = lines[0];
+        lines.forEach(l => { if (Number(l.enemyScale) < Number(pick.enemyScale)) pick = l; });
+        pick.guaranteed = true;
+        pick.enemyScale = 0.01;
+        pick.refPower = 1;
+        pick.refHoundId = refId;
+        pick.difficulty = 1;
+      } catch (e) { }
+      return lines;
+    }
     function generateLines() {
       const lines = [];
       const inv = save.invasions;
@@ -12636,7 +12699,7 @@
         }
       } catch (e) { }
       if (!save.lines || save.lines.length !== LINE_COUNT || save.linesDirty) {
-        save.lines = generateLines();
+        save.lines = arkForceGuaranteedLine(generateLines(), (getLineReferenceHound() || {}).id);
         save.linesDirty = false;
       }
     }
@@ -13984,6 +14047,16 @@
     // id / 等级 / 寿命 / 经验 / 血量 / 击杀（其余属性都随等级走）。
     let houndGridSig = "";
     function renderHoundGrid() {
+      // V0.147：列表只在「犬只数据 / 选中项」变化时重建，避免 0.1 秒一次闪烁
+      try {
+        const sig = JSON.stringify([
+          save.activeHoundId,
+          save.hounds.map(h => [h.id, h.level, Math.round(h.hp), h.lifespan, h.qualityTier, Math.round(h.atk), Math.round(h.def)]),
+          save.hounds.length
+        ]);
+        if (sig === window.__houndGridSig) return;
+        window.__houndGridSig = sig;
+      } catch (e) { }
       if (save.hounds.length === 0) {
         if (houndGridSig === "empty") return;
         houndGridSig = "empty";
@@ -14095,12 +14168,18 @@
         const refPowNow = ref ? houndPower(ref) : 0;
         // V0.105 修复：除了「没有保底 / 换犬」，参考战力**掉下来**（战败腰斩、加成变化）也要重织 ——
         //   否则保底线还是按旧的强战力解的，弱化后的猎犬根本吃不到。
-        const stale = save.lines.some(l => l.guaranteed && l.refHoundId === ref.id &&
-          typeof l.refPower === "number" && Math.abs(l.refPower - refPowNow) > Math.max(1, l.refPower * 0.02));
+        // ⚠️ V0.147（作者：时间线 0.1 秒整批重掷）——保底线 refPower 恒为 1，和猎犬战力(141)一比永远"过期"，
+        //   于是每帧 generateLines() ✗。保底线必须排除在这个比较之外。
+        const stale = save.lines.some(l => !l.guaranteed && l.refHoundId === ref.id &&
+          typeof l.refPower === "number" && Math.abs(l.refPower - refPowNow) > Math.max(1, l.refPower * 0.10));
         // V0.144：旧档里的保底线还带着「推荐战力 5.61E10 / 强度 12.48」→ 也必须重织成 1 / 0.01
         const staleGuar = save.lines.some(l => l.guaranteed && (Math.abs(Number(l.enemyScale) - 0.01) > 1e-9 || Number(l.refPower) !== 1));
-        if (!busy && ref && (!save.lines.some(l => l.guaranteed && l.refHoundId === ref.id) || stale || staleGuar)) {
-          save.lines = generateLines();
+        const __nowMs = Date.now();
+        const __canRegen = !window.__lastLineRegenAt || (__nowMs - window.__lastLineRegenAt) > 10000;
+        if (!busy && ref && (staleGuar || (__canRegen && (!save.lines.some(l => l.guaranteed && l.refHoundId === ref.id) || stale)))) {
+          window.__lastLineRegenAt = __nowMs;
+          save.lines = arkForceGuaranteedLine(generateLines(), ref.id);
+          save.linesDirty = false;
         }
       }
 
@@ -14184,7 +14263,9 @@
       if (battleSimMode) return;
       const b = activeBattle;
       if (!b) {
-        // 左栏常驻：没有战斗时显示占位，避免整列塌陷
+        // V0.147（作者：战斗面板 0.1 秒闪一次）—— 占位只渲染一次，重复调用直接返回
+        if (window.__battleIdleDrawn) return;
+        window.__battleIdleDrawn = true;
         setText("battleTitle", "战场");
         setText("battleLineName", "");
         setHTML("battleBox",
@@ -14194,6 +14275,7 @@
           '</div>');
         return;
       }
+      window.__battleIdleDrawn = false;
       setText("battleTitle", "入侵进行中");
       const line = save.lines.find(l => l.id === b.lineId);
       setText("battleLineName", line ? line.name : "");
@@ -14455,6 +14537,7 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.148", "残骸在星图 1:1 复刻蓝图；航行日志不再记方舟内部战斗"],
       ["V0.147", "方舟可投降并坠毁，方舟保持绝对坐标，航行日志按宇宙隔离"],
       ["V0.146", "解除反转等级与两个引擎的等级上限，下调里程碑乘数，修…"],
       ["V0.145", "修复解析加成未作用于铸级造价的问题，新增多元宇宙航行…"],
@@ -15715,26 +15798,49 @@
       }
       // V0.115：一档每格 20×20；二档（二次展开）每格 400×400
       const BLOCK = mapZoomLv() >= 2 ? 400 : 20;
-      const ark = getArkPosSafe();
-      const arkOn = ark && !isArkContactedSafe();
+      // V0.147（作者）：缩放地图上要标出**所有**未接触的方舟，以及四类生态的颜色
+      const __arks = [];
+      try {
+        const __a = invArkState();
+        (__a.list || []).forEach(l => { if (l && l.pos && !l.contacted) __arks.push(l.pos); });
+        if (__a.pos && !__a.contacted) __arks.push(__a.pos);
+      } catch (e) { }
+      const __arkCount = {};
+      __arks.forEach(pz => {
+        const k = Math.floor(pz.a / BLOCK) + "," + Math.floor(pz.b / BLOCK);
+        __arkCount[k] = (__arkCount[k] || 0) + 1;
+      });
+      const __biomes = (typeof mapBiomes === "function") ? mapBiomes() : [];
+      const __biomeColor = { fertile: "233,196,106", abyss: "124,92,255", silent: "150,160,180", storm: "224,82,82" };
+      const __biomeAt = (ba, bb) => {
+        const ca = ba * BLOCK + BLOCK / 2, cb = bb * BLOCK + BLOCK / 2;
+        for (const bi of __biomes) {
+          if (Math.abs(ca - bi.a) + Math.abs(cb - bi.b) <= Math.max(4, bi.r || 8)) return bi.id;
+        }
+        return null;
+      };
       const cur0 = getMapPos();
       // V0.115（作者要求）：缩放视角里也要**标出自己现在在哪一块**
       const myBa = Math.floor(cur0.a / BLOCK), myBb = Math.floor(cur0.b / BLOCK);
       const cells = [];
       for (let ba = R; ba >= -R; ba--) {
         for (let bb = -R; bb <= R; bb++) {
-          const hasArk = !!arkOn &&
-            Math.floor(ark.a / BLOCK) === ba && Math.floor(ark.b / BLOCK) === bb;
+          const key = ba + "," + bb;
+          const nArk = __arkCount[key] || 0;
+          const hasArk = nArk > 0;
           const isMe = (ba === myBa && bb === myBb);
-          // V0.115（作者要求）：一块里同时有「你」和「方舟」时**两个都显示**；
-          //   自己那一块用**红色方框**标出来（一眼知道自己在哪）。
-          const marks = (isMe ? "📍" : "") + (hasArk ? "🚀" : "");
+          const bid = __biomeAt(ba, bb);
+          // V0.147：一块里可能有多艘方舟（显示数量）；生态用底色区分
+          const marks = (isMe ? "📍" : "") + (hasArk ? (nArk > 1 ? "🚀×" + nArk : "🚀") : "");
+          const bg = bid ? ("background: rgba(" + __biomeColor[bid] + ",0.22);") : "";
+          const bd = bid ? ("border-color: rgba(" + __biomeColor[bid] + ",0.65);") : "";
           cells.push('<div class="map-cell zoom' + (hasArk ? " ark" : "") + (isMe ? " here" : "") +
             (isMe && hasArk ? " both" : "") +
-            '" title="块 (' + ba + ", " + bb + ') 覆盖 ' +
+            '" style="' + bg + bd + '" title="块 (' + ba + ", " + bb + ') 覆盖 ' +
             (ba * BLOCK) + "~" + (ba * BLOCK + BLOCK - 1) + " × " + (bb * BLOCK) + "~" + (bb * BLOCK + BLOCK - 1) +
-            (isMe ? "（你在这里）" : "") + (hasArk ? "（这里有方舟）" : "") + '">' +
-            (marks || "·") + "</div>");
+            (isMe ? "（你在这里）" : "") + (hasArk ? "（方舟 ×" + nArk + "）" : "") +
+            (bid ? "（生态：" + ((mapBiomeDef(bid) || {}).name || bid) + "）" : "") + '">' +
+            (marks || (bid ? "●" : "·")) + "</div>");
         }
       }
       setHTML("mapGrid", cells.join(""));
@@ -15776,6 +15882,23 @@
       //   没升级只看得见附近（其余格子是迷雾），满级才能看到整块区的全貌。
       //   ⚠️ 迷雾只影响「看不看得见」，不影响走路（走到哪都能走）。
       const VR = mapViewR();
+      // V0.148（作者）：传说残骸要在星图上**1:1 复刻玩家蓝图**（每个格子显示对应零件图标）
+      const __crashCells = {};
+      try {
+        const __a = invArkState();
+        (__a.list || []).forEach(c => {
+          if (!c || !c.isCrash || !c.layout || !c.pos) return;
+          const L = c.layout.length;
+          const N0 = Math.max(1, Math.round(Math.sqrt(L)));
+          c.layout.forEach((id, idx) => {
+            if (!id) return;
+            const r = Math.floor(idx / N0), col = idx % N0;
+            const pa = c.pos.a + r, pb = c.pos.b + col;
+            const def = ARK_ITER_MODULES.filter(mm => mm.id === id)[0];
+            __crashCells[pa + "," + pb] = def ? def.icon : "▦";
+          });
+        });
+      } catch (e) { }
       for (let da = SEC - 1; da >= 0; da--) {
         for (let db = 0; db <= SEC - 1; db++) {
           const a = baseA + da, b = baseB + db;
@@ -15791,21 +15914,25 @@
           // V0.113：方舟标记（只在视野里出现；未接触时显示）
           const ark = getArkPosSafe();
           const isArk = ark && a === ark.a && b === ark.b && !isArkContactedSafe();
-          if (isArk) cls.push("ark");
+          const crashIcon = __crashCells[a + "," + b];
+          if (crashIcon) cls.push("ark", "crash");
+          else if (isArk) cls.push("ark");
           const far2 = Math.abs(a - cur.a) > VR || Math.abs(b - cur.b) > VR;
-          if (far2) cls.push("fog");
+          if (far2 && !crashIcon) cls.push("fog");
           // V0.116：生态用**格子底色**表示（不加图标，避免太挤）—— 迷雾区不染
           if (!far2) {
             const bi2 = mapBiomeAt(a, b);
             if (bi2) cls.push("biome-" + bi2.id);
           }
-          const label = (a === cur.a && b === cur.b) ? "📍"
-            : (isArk ? "🚀"
-            : (isTgt ? "◇"
-            : ((!a && !b) ? "◆"
-            // V0.115：数字 = **离多元宇宙中心 (0,0) 的曼哈顿距离**（加成强度就按它算）✓
-            : (far2 ? "·" : (Math.abs(a) + Math.abs(b))))));
-          cells.push('<div class="' + cls.join(" ") + '" title="X: ' + b + '  Y: ' + a + '">' + label + "</div>");
+          let label;
+          if (a === cur.a && b === cur.b) label = crashIcon || "📍";
+          else if (crashIcon) label = crashIcon;
+          else if (isArk) label = "🚀";
+          else if (isTgt) label = "◇";
+          else if (!a && !b) label = "◆";
+          else if (far2) label = "·";
+          else label = String(Math.abs(a) + Math.abs(b));
+          cells.push('<div class="' + cls.join(" ") + '" title="X: ' + b + '  Y: ' + a + (crashIcon ? "（传说方舟残骸·零件）" : "") + '">' + label + "</div>");
         }
       }
       setHTML("mapGrid", cells.join(""));
@@ -18387,7 +18514,10 @@
     function renderVoyageLog() {
       const box = el("voyageLog");
       if (!box) return;
-      const arr = voyageLogs();
+      const arr = voyageLogs().filter(x => {
+        const t = String(x.html || "");
+        return t.indexOf("战斗开始") < 0 && t.indexOf("击毁第") < 0 && t.indexOf("T1 科技包") < 0 && t.indexOf("精英耄耋") < 0;
+      });
       if (!arr.length) { setHTML("voyageLog", '<div style="color:var(--muted);">还没有记录</div>'); return; }
       setHTML("voyageLog", arr.map(x => '<div style="padding:3px 0;border-bottom:1px dashed var(--line);">' + x.html + '</div>').join(""));
     }
@@ -18410,7 +18540,11 @@
     const ARK_LOG = [];
     function arkLogAdd(html) {
       try {
-        voyageLogAdd(html);
+        // V0.148（作者）：方舟内部战斗流水（战斗开始 / 击毁敌舰 / T1 科技包）与主宇宙无关，
+        //   航行日志只保留「发射方舟」「方舟战败」「拾取残骸」这三类
+        const __t = String(html);
+        const __keep = __t.indexOf("发射方舟") >= 0 || __t.indexOf("方舟战败") >= 0 || __t.indexOf("拾取战败方舟残骸") >= 0;
+        if (__keep) voyageLogAdd(html);
         ARK_LOG.unshift({ t: Date.now(), html: String(html) });
         if (ARK_LOG.length > 60) ARK_LOG.length = 60;
         renderArkBtlLog();
@@ -19023,13 +19157,16 @@
         const dd = Math.floor(Math.random() * 151);   // V0.141（作者）：0~150 距离
         p0 = { a: pos.a + (dir === 0 ? dd : dir === 1 ? -dd : 0), b: pos.b + (dir === 2 ? dd : dir === 3 ? -dd : 0) };
       }
-      // V0.141（作者）：5×5 残骸如果压到玩家当前位置（或别的方舟）→ 往旁边挪到不重叠
+      // V0.148 修：残骸边长按蓝图实际尺寸算（蓝图已改成 7×7，原先硬编码 5 会导致
+      //   只按 5×5 避让 → 7×7 的残骸压到玩家或其他方舟；提示文案也跟着一起偏）
+      const CS = Math.max(3, Math.round(Math.sqrt(ARK_BTL.grid.length || 25)) || 5);
+      // V0.141（作者）：残骸如果压到玩家当前位置（或别的方舟）→ 往旁边挪到不重叠
       {
         const occupied = new Set();
         (a.list || []).forEach(x => { if (x && x.pos && x !== victim) occupied.add(x.pos.a + "," + x.pos.b); });
         const here = getMapPos();
         const hits = (pa, pb) => {
-          for (let dr = 0; dr < 5; dr++) for (let dc = 0; dc < 5; dc++) {
+          for (let dr = 0; dr < CS; dr++) for (let dc = 0; dc < CS; dc++) {
             const k = (pa + dr) + "," + (pb + dc);
             if (occupied.has(k)) return true;
             if (here.a === pa + dr && here.b === pb + dc) return true;
@@ -19043,16 +19180,17 @@
       }
       const crash = {
         pos: p0, level: Math.max(1, lv), rarity: "legend", contacted: false,
-        size: 5, isCrash: true, labCount: labs, round: ARK_BTL.round,
+        size: CS, isCrash: true, labCount: labs, round: ARK_BTL.round,
         layout: ARK_BTL.grid.slice()      // 和玩家这一场的布局一模一样
       };
       a.list = a.list.filter(x => x !== victim);
       a.list.push(crash);
       a.pos = { a: p0.a, b: p0.b }; a.contacted = false; a.level = Math.max(1, lv); a.rarity = "legend";
       saveGame(true);
-      arkLogAdd("💥 方舟战败 —— 残骸替换一艘普通方舟：X " + p0.b + "~" + (p0.b + 4) + "，Y " + p0.a + "~" + (p0.a + 4));
+      const __span = "X " + p0.b + "~" + (p0.b + CS - 1) + "，Y " + p0.a + "~" + (p0.a + CS - 1);
+      arkLogAdd("💥 方舟战败 —— 残骸替换一艘普通方舟：" + __span);
       try {
-        showToast("💥 方舟战败 —— 残骸占据 <b>5×5</b>：X " + p0.b + "~" + (p0.b + 4) + "，Y " + p0.a + "~" + (p0.a + 4), "tech");
+        showToast("💥 方舟战败 —— 残骸占据 <b>" + CS + "×" + CS + "</b>：" + __span, "tech");
       } catch (e) { }
     }
     function arkBtlRender() { renderArkBtl(); }
@@ -20084,7 +20222,20 @@
       // V0.138：多艘方舟 —— list 里存每一艘的 {pos, level, rarity, contacted}
       if (!Array.isArray(a.list)) a.list = [];
       a.list = a.list.filter(x => x && x.pos && typeof x.pos.a === "number" && typeof x.pos.b === "number")
-        .map(x => ({ pos: { a: Math.round(x.pos.a), b: Math.round(x.pos.b) }, level: Math.max(1, Math.floor(Number(x.level) || 1)), rarity: typeof x.rarity === "string" ? x.rarity : "normal", contacted: !!x.contacted }));
+        .map(x => {
+          const o = { pos: { a: Math.round(x.pos.a), b: Math.round(x.pos.b) }, level: Math.max(1, Math.floor(Number(x.level) || 1)), rarity: typeof x.rarity === "string" ? x.rarity : "normal", contacted: !!x.contacted };
+          // V0.148 修：残骸的附加字段（isCrash / layout / size / labCount / round）必须原样带上。
+          //   原先这里只留 5 个基础字段，于是每次调用本函数都会把残骸「洗」成普通方舟 ——
+          //   星图上的 1:1 残骸绘图永远拿不到 layout，等于没生效。
+          if (x.isCrash) {
+            o.isCrash = true;
+            o.size = Math.max(3, Math.floor(Number(x.size) || 5));
+            o.layout = Array.isArray(x.layout) ? x.layout.slice() : null;
+            if (typeof x.labCount === "number") o.labCount = x.labCount;
+            if (typeof x.round === "number") o.round = x.round;
+          }
+          return o;
+        });
       // 兼容旧档：如果旧档只有单个 pos，迁进 list
       if (a.pos && !a.contacted && !a.list.some(x => x.pos.a === a.pos.a && x.pos.b === a.pos.b)) {
         a.list.push({ pos: { a: a.pos.a, b: a.pos.b }, level: Math.max(1, a.level || 1), rarity: a.rarity || "normal", contacted: false });
@@ -20358,8 +20509,11 @@
       let crashBonus = null;
       if (Array.isArray(a.list)) {
         // V0.139：传说残骸是 5×5 —— 站到其中任意一格都算踩到
-        crashBonus = a.list.filter(x => x && x.isCrash && !x.contacted && x.pos &&
-          pos.a >= x.pos.a && pos.a <= x.pos.a + 4 && pos.b >= x.pos.b && pos.b <= x.pos.b + 4)[0] || null;
+        crashBonus = a.list.filter(x => {
+          if (!x || !x.isCrash || x.contacted || !x.pos) return false;
+          const sz = Math.max(1, Math.floor(Number(x.size) || 5)) - 1;
+          return pos.a >= x.pos.a && pos.a <= x.pos.a + sz && pos.b >= x.pos.b && pos.b <= x.pos.b + sz;
+        })[0] || null;
       }
       if (!crashBonus && (pos.a !== a.pos.a || pos.b !== a.pos.b)) return false;
       a.contacted = true;
@@ -20389,11 +20543,15 @@
       const tech = INV_ARK_EXPERT_TECHS[Math.floor(Math.random() * INV_ARK_EXPERT_TECHS.length)];
       // V0.116：品质倍率
       const rar = ARK_RARITY.filter(r => r.id === a.rarity)[0] || ARK_RARITY[0];
-      const gain = Math.max(1, Math.floor((lv / 200) + 1) * rar.mult);
+      // V0.147：原来 floor(lv/200 + 1)：Lv.40 只有 1 级 ✗ → 改成每 20 级 +1 级（品质照乘）
+      const gain = Math.max(1, Math.floor((lv / 20 + 1) * rar.mult));
       a.expert[tech.id] = Math.max(0, Math.floor(a.expert[tech.id] || 0)) + gain;
       invArkParseAddXp(gain);   // V0.131：每获得 1 级专家科技 = 1 点解析经验
       // ② 现实改写点数
-      const pts = Math.max(1, Math.floor((lv / INV_ARK_POINTS_PER) * rar.mult));
+      // V0.147（玩家反馈：40 级方舟只给 1 点）——
+      //   原来 floor(lv/50)：Lv.40 → 0 → 被 max(1) 兜成 1 ✗
+      //   现在每级给 0.5 点（品质倍率照乘）：Lv.40 普通 → 20 点、Lv.100 → 50 点、史诗 ×3.2 更高
+      const pts = Math.max(1, Math.floor(lv * 0.5 * rar.mult));
       a.points += pts;
       saveGame(true);
       logEvent("🚀", "接触方舟（Lv." + formatNumber(lv) + "）：获得专家科技「<b>" + tech.name + "</b> ×" + gain +
