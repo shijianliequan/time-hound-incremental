@@ -3056,7 +3056,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.149b</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.149g</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -5083,7 +5083,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.149b";
+    const GAME_VERSION = "V0.149g";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -6897,7 +6897,7 @@
 
     const AUTO_ROWS = [
       // V0.116：两个多元宇宙相关的自动化
-      { key: "mvreset", name: "多元宇宙重置", desc: "行动力花完、结算已备好、主线挑战全通时，自动领奖并进入下一个大循环。" },
+      { key: "mvreset", name: "多元宇宙重置", desc: "主线挑战全通后全自动：行动力用完自动付 1E1000 领行动力，星图走完自动领奖并进入下一个大循环（尘埃不够就停下等）。" },
       { key: "autonav", name: "自动导航", desc: "有行动力且星图上有未接触的方舟时，自动朝最近的方舟开路（危险区域会照样走）。" },
 
       {
@@ -8054,7 +8054,12 @@
         //   而地图和走路都是 ±9999 ✓ → 走得远一点就被夹回去，看起来像"被重置到原点"✗。
         out.a = int(m.a, -9999, 9999);
         out.b = int(m.b, -9999, 9999);
-        out.sta = int(m.sta, 0, 1);
+        // V0.149c 修（玩家：自动导航只走一格就不动了）——
+        //   这里原来把行动力夹到 **0~1** ✗，而跃迁引擎每级 +20、上限早就到几百点，
+        //   于是每次刷新/读档都把手上几百点行动力砍成 1 点 → 走一格就没了。
+        //   现在只做「非负 + 整数」的安全夹取，真正的上限交给 mapStamina() 用 mapStaminaMax() 收敛
+        //   （这里不能直接调 mapStaminaMax：它依赖 RW_UPGRADES 等 const，读档时还在 TDZ）。
+        out.sta = int(m.sta, 0, 999999);
         out.staAt = Math.max(0, Math.floor(Number(m.staAt) || 0));
         out.zoom = !!m.zoom;
         out.apClaimed = !!m.apClaimed;   // V0.114：本轮是否已经领过行动力
@@ -8173,6 +8178,12 @@
         everUnlocked: !!(painRaw && painRaw.everUnlocked)
       };
       return {
+        // ⚠️⚠️ V0.149c 修（玩家：自动重置不触发 / 自动导航不走）——
+        //   这个 return 对象是**白名单**：开头 `d.map = cleanMap(raw.map)` 算得好好的，
+        //   但这里没把 map 带出去 ✗ → 每次读档星图状态整个丢失（坐标归 0、行动力归 0、
+        //   待领结算 null、格子缓存清空）→ 自动导航没行动力可走、自动重置永远没有账可领。
+        //   以后往 possibility 加字段，务必同时加进这个 return。
+        map: d.map,
         tabUnlocked: !!raw.tabUnlocked,
         multiverse: !!raw.multiverse,
         entries: intOf(raw.entries),
@@ -9058,8 +9069,20 @@
       if (invActive) return false;                       // 反转世界里不重置
       const p2 = getPossibility();
       if (!p2.multiverse) return false;                  // 还没解锁多元宇宙
-      if (!mapPendingReward()) return false;             // 这轮没有待领结算
       if (!hasClearedAllChallenges()) return false;      // 挑战没通不打（和手动口径一致）
+      // ⚠️ V0.149e 修（玩家：刷了尘埃，自动重置还是完全不动）——
+      //   原来第一道判定就是「没有待领结算 → return false」✗，而**结算只在玩家手动点
+      //   「支付并回满行动力」时才会挂上**，于是重置后的新一轮永远卡在「行动力 0 + 没有账」，
+      //   自动重置等于只能替玩家收尾一次，之后再也不动 ✗。
+      //   现在补上前半段：行动力空着、这一轮没领过、尘埃够 → 自动替玩家付 1E1000 领行动力并发牌。
+      const pNow = getMapPos();
+      if (!mapPendingReward()) {
+        if (mapStamina() >= 1) return false;             // 手上还有行动力：先交给自动导航花掉
+        if (pNow.apClaimed) return false;                // 这一轮已经领过（等走完再重置）
+        if (!canAffordMultiverse()) return false;        // 尘埃不够 1E1000 —— 等攒够
+        try { beginMultiverseEntry(); } catch (e) { return false; }
+        return !!mapPendingReward();
+      }
       // V0.149：**还有方舟可去就先别重置**（否则一到手就把行动力清掉，玩家走不了）
       try {
         const __left = (invArkState().list || []).some(x => x && x.pos && !x.contacted);
@@ -9079,10 +9102,24 @@
       const p0 = getMapPos();
       if (p0.manualNav) return false;                      // 手动坐标优先
       if (mapStamina() <= 0) return false;
-      const ark = getArkPosSafe();
-      if (!ark || isArkContactedSafe()) return false;
-      const dA = ark.a - p0.a, dB = ark.b - p0.b;
-      if (!dA && !dB) return false;
+      // V0.149d：目标改成「最近的一艘未接触方舟」—— 吃掉一艘后自动换下一艘，不再停在原地
+      let ark = arkNearestTarget();
+      if (!ark) return false;
+      arkTargetSync(ark);
+      let dA = ark.a - p0.a, dB = ark.b - p0.b;
+      // V0.149g 修（玩家：发射方舟后要手动吃第一艘，自动导航才肯动）——
+      //   发射的落点距离可以是 **0**（`pickFree` 的 d0 随机到 0 时方舟就落在玩家脚下），
+      //   而 `arkPickupAtPlayer()` 的调用写在这一段**之后**，于是「距离 0 → 直接 return false」
+      //   每帧都提前退出：既不走、也不结算接触 → 必须玩家手动走一步才破局 ✗。
+      //   现在：目标就在脚下时先结算接触，再重新挑下一艘继续走。
+      if (!dA && !dB) {
+        try { if (typeof arkPickupAtPlayer === "function") arkPickupAtPlayer(); } catch (e) { }
+        ark = arkNearestTarget();
+        if (!ark) return false;
+        arkTargetSync(ark);
+        dA = ark.a - p0.a; dB = ark.b - p0.b;
+        if (!dA && !dB) return false;          // 仍有贴脸的（极少）：下一帧继续尝试
+      }
       const dist = Math.abs(dA) + Math.abs(dB);
       if (invRwLv("warp") > 0 && dist > 20 && mapStamina() >= 20) {
         const step = Math.min(20, Math.max(Math.abs(dA), Math.abs(dB)));
@@ -9149,14 +9186,26 @@
     }
     function mapAutoNavigate() {
       if (invRwLv("autonav") <= 0) { showToast("🧭 需要先买「自动导航系统」。", "tech"); return false; }
-      const ark = getArkPosSafe();
-      if (!ark || isArkContactedSafe()) { showToast("🧭 现在没有可导航的方舟。", "tech"); return false; }
+      // V0.149d：一键自动导航同样改为「最近的一艘未接触方舟」
+      let ark = arkNearestTarget();
+      if (!ark) { showToast("🧭 现在没有可导航的方舟。", "tech"); return false; }
+      arkTargetSync(ark);
       const p0 = getMapPos();
       let steps = 0;
+      let guard = 0;
       const warpOK = invRwLv("warp") > 0;
-      while (mapStamina() > 0) {
-        const dA = ark.a - p0.a, dB = ark.b - p0.b;
-        if (!dA && !dB) break;
+      while (mapStamina() > 0 && guard++ < 600) {
+        let dA = ark.a - p0.a, dB = ark.b - p0.b;
+        // V0.149g：目标就在脚下（发射落点距离可以是 0）→ 先结算接触，再换下一艘，别直接 break
+        if (!dA && !dB) {
+          try { if (typeof arkPickupAtPlayer === "function") arkPickupAtPlayer(); } catch (e) { }
+          const nk = arkNearestTarget();
+          if (!nk) break;
+          ark = nk;
+          arkTargetSync(ark);
+          dA = ark.a - p0.a; dB = ark.b - p0.b;
+          if (!dA && !dB) break;
+        }
         const dist = Math.abs(dA) + Math.abs(dB);
         // >20 格且买了跃迁引擎 → 用跃迁跨块（按 400/20 的块长跳，但别越过目标）
         if (warpOK && dist > 20) {
@@ -10088,7 +10137,6 @@
           showToast("这一轮的行动力<b>已经领过了</b> —— 走完那一格点「<b>确定</b>」进入下一个大循环吧。", "tech");
           return;
         }
-        mpc.apClaimed = true;
       }
       if (!canAffordMultiverse()) {
         showToast(`进入多元宇宙需要 ${formatNumber(bigFromLog10(MULTIVERSE_COST_E))} 尘埃（<b>按本轮最高判定</b>：` +
@@ -10099,6 +10147,10 @@
       // ⚠️ 有候选在场时这个函数会被守卫挡住（按钮也不会渲染），
       //    所以「开启新的一批」只可能发生在上一批已消散（pending === null）之后。
       // 付款：手上有多少扣多少（判定已按历史最高通过，这里不再拦）
+      // ⚠️ V0.149e 修 BUG：`apClaimed = true` 原来写在**尘埃判定之前** ✗ ——
+      //   钱不够时点一次支付，apClaimed 就被置 true，这一轮再也领不了行动力，
+      //   而重置又必须有待领账目 → 直接死锁（只能刷新赌一把）。现在改成付款动作真正开始时才置位。
+      getMapPos().apClaimed = true;
       const mvCost = bigFromLog10(MULTIVERSE_COST_E);
       save.dust = bigCmp(save.dust, mvCost) >= 0 ? bigSub(save.dust, mvCost) : bigOf(0);
       p.multiverse = true;
@@ -14578,6 +14630,11 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.149g", "修发射后方舟正好落在脚下时自动导航不走（距离 0 会提前退出，必须手动吃第一艘）"],
+      ["V0.149f", "四种生态区改为铺在玩家周围 20×20（四种各一个、半径 10~16），不再漂远"],
+      ["V0.149e", "自动多元宇宙重置补上前半段：行动力用完会自动付费领行动力；修「钱不够点支付却把本轮标记成已领」的死锁"],
+      ["V0.149d", "修自动导航只吃第一艘方舟就停下（改成每次挑最近的未接触方舟）"],
+      ["V0.149c", "修读档把星图状态整个丢掉（坐标/行动力/待领结算）、行动力被夹成 1 点"],
       ["V0.149b", "修自动多元宇宙重置把行动力清零、地图上出现重复火箭，星图拾取改为按玩家所在格判定"],
       ["V0.149", "新增奇异科技（每 10 场方舟战斗掉 1 级，黑底白字影响主宇宙 / 白底黑字影响反转宇宙）"],
       ["V0.148", "残骸在星图 1:1 复刻蓝图；航行日志不再记方舟内部战斗"],
@@ -15653,6 +15710,43 @@
     function isArkContactedSafe() {
       try { return !!invArkState().contacted; } catch (e) { return true; }
     }
+    // V0.149d 修（玩家：三艘方舟，自动导航只吃了第一艘就不走了）——
+    //   自动导航以前只认 `invArk.pos` 这**一艘** ✗：吃掉它之后 `contacted = true`，
+    //   `autoNavStep()` 的第一道判定 `isArkContactedSafe()` 直接 return false ✗，
+    //   于是 list 里剩下的方舟再也不会被当成目标（地图上明明还画着它们）。
+    //   现在统一从 list 里挑**最近的、还没接触的**一艘（残骸按 7×7 方框算距离）。
+    function arkNearestTarget() {
+      try {
+        const a = invArkState();
+        const p0 = getMapPos();
+        let best = null;
+        (a.list || []).forEach(x => {
+          if (!x || !x.pos || x.contacted) return;
+          const sz = x.isCrash ? Math.max(1, Math.floor(Number(x.size) || 5)) : 1;
+          // 到「方舟/残骸所占方框」的曼哈顿距离（站进方框内 = 0）
+          const da = Math.max(0, x.pos.a - p0.a, p0.a - (x.pos.a + sz - 1));
+          const db = Math.max(0, x.pos.b - p0.b, p0.b - (x.pos.b + sz - 1));
+          const d = da + db;
+          if (!best || d < best.d) best = { a: x.pos.a, b: x.pos.b, d: d };
+        });
+        // 兼容老存档：list 里没有条目、但 a.pos 还没接触
+        if (!best && a.pos && !a.contacted) {
+          best = { a: a.pos.a, b: a.pos.b, d: Math.abs(a.pos.a - p0.a) + Math.abs(a.pos.b - p0.b) };
+        }
+        return best ? { a: best.a, b: best.b } : null;
+      } catch (e) { return null; }
+    }
+    // 把「最近目标」设成当前接触目标，这样踩上去 invArkContact() 才认这一艘
+    function arkTargetSync(t) {
+      try {
+        if (!t) return;
+        const a = invArkState();
+        if (!a.pos || a.pos.a !== t.a || a.pos.b !== t.b || a.contacted) {
+          a.pos = { a: t.a, b: t.b };
+          a.contacted = false;
+        }
+      } catch (e) { }
+    }
 
     // V0.112：多元宇宙星图渲染（9×9 视野，中心永远在正中央）
     const MAP_VIEW_R = 4;
@@ -15764,34 +15858,56 @@
     function mapInitBiomes() {
       const p0 = getMapPos();
       p0.biomes = [];
-      for (let i = 0; i < 3; i++) {
-        const def = MAP_BIOME_DEFS[Math.floor(Math.random() * MAP_BIOME_DEFS.length)];
+      // V0.149f（玩家：四种生态区太散，一个周期走几十格几乎碰不到）——
+      //   以前只随机 3 个、中心撒在玩家周围 ±30 甚至 ±40 的地方，半径 6~15 ✗。
+      //   而一个周期最多也就走几十格，经常一次都进不了生态区。
+      //   现在：**四种各一个**，固定铺在玩家周围约 20×20 的四个象限（中心 ±6、半径 9~13），
+      //   玩家站在原地通常就已经落在其中一片里，往外走十几格也还在生态区内。
+      const OFF = [[-6, -6], [-6, 6], [6, -6], [6, 6]];
+      MAP_BIOME_DEFS.forEach((def, i) => {
+        const o = OFF[i % OFF.length];
         p0.biomes.push({
           id: def.id,
-          a: p0.a + Math.floor(Math.random() * 60) - 30,
-          b: p0.b + Math.floor(Math.random() * 60) - 30,
-          r: 6 + Math.floor(Math.random() * 10),
+          a: p0.a + o[0] + Math.floor(Math.random() * 3) - 1,
+          b: p0.b + o[1] + Math.floor(Math.random() * 3) - 1,
+          r: 9 + Math.floor(Math.random() * 5),        // 9~13
           born: Date.now()
         });
-      }
+      });
     }
     function mapEvolveBiomes() {
       const p0 = getMapPos();
       const list = mapBiomes();
       const next = [];
+      const seen = {};
       list.forEach(bl => {
-        if (Math.random() < 0.3) return;                 // 30% 消散
-        bl.a += Math.floor(Math.random() * 7) - 3;       // 漂流 ±3
-        bl.b += Math.floor(Math.random() * 7) - 3;
-        bl.r = Math.max(3, Math.min(26, (bl.r || 8) + (Math.random() < 0.5 ? -1 : 1) * (1 + Math.floor(Math.random() * 3))));
+        if (!bl || !bl.id) return;
+        if (seen[bl.id]) return;                         // 同种只留一片（避免重复把位置占满）
+        if (Math.random() < 0.25) return;                // 25% 消散（原来 30%，生态区别越来越少）
+        bl.a += Math.floor(Math.random() * 5) - 2;       // 漂流 ±2（原来 ±3，免得一漂就走远）
+        bl.b += Math.floor(Math.random() * 5) - 2;
+        // V0.149f：**不许漂出玩家周围 20×20** —— 否则重置几次之后生态区全跑远了，又变回「吃不到」
+        bl.a = Math.max(p0.a - 10, Math.min(p0.a + 10, bl.a));
+        bl.b = Math.max(p0.b - 10, Math.min(p0.b + 10, bl.b));
+        bl.r = Math.max(10, Math.min(16, (bl.r || 11) + (Math.random() < 0.5 ? -1 : 1) * (1 + Math.floor(Math.random() * 2))));
+        seen[bl.id] = true;
         next.push(bl);
       });
-      while (next.length < 2) {
-        const def = MAP_BIOME_DEFS[Math.floor(Math.random() * MAP_BIOME_DEFS.length)];
-        next.push({ id: def.id,
-          a: p0.a + Math.floor(Math.random() * 80) - 40,
-          b: p0.b + Math.floor(Math.random() * 80) - 40,
-          r: 5 + Math.floor(Math.random() * 8), born: Date.now() });
+      // V0.149f：缺哪种就补哪种，且**只补在玩家周围 20×20 内**（以前补到 ±40，等于白给）
+      const OFF = [[-6, -6], [-6, 6], [6, -6], [6, 6]];
+      let guard = 0;
+      while (next.length < MAP_BIOME_DEFS.length && guard++ < 8) {
+        const def = MAP_BIOME_DEFS.filter(d => !seen[d.id])[0];
+        if (!def) break;
+        const o = OFF[next.length % OFF.length];
+        next.push({
+          id: def.id,
+          a: p0.a + o[0] + Math.floor(Math.random() * 5) - 2,
+          b: p0.b + o[1] + Math.floor(Math.random() * 5) - 2,
+          r: 11 + Math.floor(Math.random() * 4),
+          born: Date.now()
+        });
+        seen[def.id] = true;
       }
       p0.biomes = next.slice(0, 4);
     }
