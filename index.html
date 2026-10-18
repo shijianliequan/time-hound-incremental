@@ -3055,7 +3055,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.143</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.144</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -5070,7 +5070,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.143";
+    const GAME_VERSION = "V0.144";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -14391,6 +14391,7 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.144", "修复解析加成未作用于铸级造价的问题，新增多元宇宙航行日志，保底线战斗改为必过（敌方 3 血、每次最多 1 伤）。"],
       ["V0.143", "多元宇宙页右侧新增「🧭 航行日志」，方舟发射、方舟接触与残骸拾取、战斗胜负、精英舰出现、T1 科技包获…"],
       ["V0.142", "修复蓝图操作两处硬伤，点格子会同时触发「放置」和「拆除」两次，已去掉重复监听，点一下只做一次"],
       ["V0.141", "补齐两件 T1 零件，嵌套式装甲可叠在已有零件上，该格受伤时先扣装甲"],
@@ -21032,7 +21033,11 @@
       const forgeLv = Math.max(0, invTechEffLv("forge"));
       const forgeDiscLog = forgeLv * Math.log10(0.94);      // 每级乘法：0.94^等级
       // V0.131：解析等级越高，造价的每级增幅越小（1.4 → 最低 1.05）
-      const growthNow = (typeof invArkParseCostGrowth === "function") ? invArkParseCostGrowth() : INV_LEVEL_COST_GROWTH;
+      // V0.143（作者：解析升级了但造价指数不动）—— 成长率必须有限且严格 >1，
+      //   否则 log10 会变 NaN/0，造价就会退回「按 1.4 算」，看起来像解析完全没生效
+      let growthNow = (typeof invArkParseCostGrowth === "function") ? Number(invArkParseCostGrowth()) : INV_LEVEL_COST_GROWTH;
+      if (!Number.isFinite(growthNow) || growthNow <= 1.0000001) growthNow = 1.0000001;
+      if (growthNow > INV_LEVEL_COST_GROWTH) growthNow = INV_LEVEL_COST_GROWTH;
       const costE = Math.log10(INV_LEVEL_COST_BASE) +
         Math.max(0, lv - 1) * Math.log10(growthNow) +
         forgeDiscLog;
@@ -21041,7 +21046,8 @@
       //   现在兜底改成**按等级算的有限值**（不带折扣），保证造价连续、可读 ✓。
       let costE2 = costE;
       if (!isFinite(costE2)) {
-        costE2 = Math.log10(INV_LEVEL_COST_BASE) + Math.max(0, lv - 1) * Math.log10(INV_LEVEL_COST_GROWTH);
+        // V0.143：兜底也要按「当前解析成长率」算，绝不能再退回固定 1.4
+        costE2 = Math.log10(INV_LEVEL_COST_BASE) + Math.max(0, lv - 1) * Math.log10(growthNow);
       }
       if (!isFinite(costE2)) costE2 = 0;
       // V0.116：成本指数下限定在 −30（≈1E−30）——「无限接近 0 但不是 0」，同时保证大数表示不丢精度
@@ -21997,7 +22003,8 @@
       setHTML("invMilestoneLine", `🏁 <b>反转里程碑</b>：已达 <b style="color: var(--gold);">${formatNumber(mCount)}</b> 层` +
         `（本局最高 Lv.${formatNumber(invWorld.best)}，下一层 Lv.${formatNumber((mCount + 1) * INV_MILESTONE_STEP)}） · ` +
         `大里程碑 <b>${formatNumber(invMilestoneBigCount())}</b> 座 · 超级 <b>${formatNumber(invMilestoneMegaCount())}</b> 座 · ` +
-        `加成：尘埃 <b>×${invMilestoneDustMult().toFixed(2)}</b> · 抵抗 <b>+${(invMilestoneResist() * 100).toFixed(0)}%</b> · 软上限 <b>×${invMilestoneCapMult().toFixed(3)}</b>`);
+        `加成：尘埃 <b>×${invMilestoneDustMult().toFixed(2)}</b> · 抵抗 <b>+${(invMilestoneResist() * 100).toFixed(0)}%</b> · 软上限 <b>×${invMilestoneCapMult().toFixed(3)}</b>` +
+        `　·　铸级增幅 <b>×${(typeof invArkParseCostGrowth === "function" ? invArkParseCostGrowth() : 1.4).toFixed(4)}</b>（解析 Lv.${typeof invArkParseLv === "function" ? invArkParseLv() : 0}）`);
       // V0.138（作者要求）：把里程碑的**加成总数**单独列一行，一眼能看全
       try {
         const mBase = mCount, mBig = invMilestoneBigCount(), mMega = invMilestoneMegaCount();
