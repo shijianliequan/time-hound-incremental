@@ -3056,7 +3056,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.149</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.149b</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -5083,7 +5083,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.149";
+    const GAME_VERSION = "V0.149b";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -9058,12 +9058,17 @@
       if (invActive) return false;                       // 反转世界里不重置
       const p2 = getPossibility();
       if (!p2.multiverse) return false;                  // 还没解锁多元宇宙
-      // ⚠️ V0.148（作者：自动多元宇宙重置不生效）——
-      //   以前要求「行动力必须为 0」✗，但跃迁一次扣 20、上限常常不是 20 的倍数，
-      //   余数永远清不掉 → 自动重置永远不触发 ✗。现在改成：自动重置时**放弃剩余行动力**。
-      if (mapStamina() >= 1) { try { const pz = getMapPos(); pz.sta = 0; } catch (e) { } }
       if (!mapPendingReward()) return false;             // 这轮没有待领结算
       if (!hasClearedAllChallenges()) return false;      // 挑战没通不打（和手动口径一致）
+      // V0.149：**还有方舟可去就先别重置**（否则一到手就把行动力清掉，玩家走不了）
+      try {
+        const __left = (invArkState().list || []).some(x => x && x.pos && !x.contacted);
+        if (mapStamina() >= 1 && __left) return false;
+      } catch (e) { }
+      // ⚠️ V0.149 修（作者：开了自动重置，行动力一拿到就归 0）——
+      //   上面那句「放弃行动力」原来放在**前置检查之前**，于是每帧都把手上的行动力清掉 ✗。
+      //   现在只在「所有条件都满足、真的要去重置」时才放弃余数 ✓。
+      if (mapStamina() >= 1) { try { const pz = getMapPos(); pz.sta = 0; } catch (e) { } }
       mapClaimPendingReward();
       return enterNextCycle();
     }
@@ -9173,7 +9178,7 @@
         p0.cells = p0.cells || {};
         mapSelReset(); mapRollCell();
         // V0.136：一键自动导航同样要判定方舟接触（否则站上去也不会拾取）
-        try { if (typeof invArkContact === "function") invArkContact(); } catch (e) { }
+        try { if (typeof arkPickupAtPlayer === "function") arkPickupAtPlayer(); } catch (e) { }
         saveGame(true); renderPossibility();
         showToast("🧭 <b>自动导航</b>：朝方舟前进了 <b>" + steps + "</b> 步（消耗行动力 " + steps +
           "），现在坐标 <b>(" + p0.a + ", " + p0.b + ")</b>，还差 <b>" +
@@ -9239,10 +9244,10 @@
       // V0.116：按概率踩到事件（在方舟接触之前判定，避免把"接触方舟"事件挤掉）
       if (Math.random() < MAP_EVENT_CHANCE) { try { mapTriggerEvent(); } catch (e) { } }
       // V0.113：如果正好落在方舟上 → 接触它（发专家科技 + 现实改写点数）
-      let arkHit = (typeof invArkContact === "function") ? invArkContact() : false;
+      let arkHit = (typeof arkPickupAtPlayer === "function") ? arkPickupAtPlayer() : ((typeof invArkContact === "function") ? invArkContact() : false);
       // V0.122：确定性补判 —— 「确定移动」后只要站在方舟上就必须算接触（作者口径）
       if (!arkHit && typeof invArkContact === "function") {
-        try { arkHit = invArkContact(); } catch (e) { }
+        try { arkHit = (typeof arkPickupAtPlayer === "function") ? arkPickupAtPlayer() : invArkContact(); } catch (e) { }
       }
       // V0.113（作者要求）：走完这一步**先不发奖** —— 面板右侧会显示「本回合结算：
       //   +X 基因点 + Y 基因修饰点」，等玩家点「确定」再发放并做多元宇宙重置。
@@ -14573,6 +14578,7 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.149b", "修自动多元宇宙重置把行动力清零、地图上出现重复火箭，星图拾取改为按玩家所在格判定"],
       ["V0.149", "新增奇异科技（每 10 场方舟战斗掉 1 级，黑底白字影响主宇宙 / 白底黑字影响反转宇宙）"],
       ["V0.148", "残骸在星图 1:1 复刻蓝图；航行日志不再记方舟内部战斗"],
       ["V0.147", "方舟可投降并坠毁，方舟保持绝对坐标，航行日志按宇宙隔离"],
@@ -20361,6 +20367,19 @@
       a.points = Math.max(0, Math.floor(a.points || 0));
       // V0.138：多艘方舟 —— list 里存每一艘的 {pos, level, rarity, contacted}
       if (!Array.isArray(a.list)) a.list = [];
+      // V0.149（玩家：地图上有重复/错误的火箭）—— 同坐标只保留一条，残骸优先。
+      //   V0.149b 修：原写法在「先普通、后残骸」时两条都会被留下（filter 两次都返回 true），
+      //   所以地图上照样能看到重复火箭 —— 改成先按坐标归并、残骸覆盖普通。
+      try {
+        const __best = new Map();
+        a.list.forEach(x => {
+          if (!x || !x.pos || typeof x.pos.a !== "number" || typeof x.pos.b !== "number") return;
+          const k = Math.round(x.pos.a) + "," + Math.round(x.pos.b);
+          const prev = __best.get(k);
+          if (!prev || (x.isCrash && !prev.isCrash)) __best.set(k, x);
+        });
+        a.list = Array.from(__best.values());
+      } catch (e) { }
       a.list = a.list.filter(x => x && x.pos && typeof x.pos.a === "number" && typeof x.pos.b === "number")
         .map(x => {
           const o = { pos: { a: Math.round(x.pos.a), b: Math.round(x.pos.b) }, level: Math.max(1, Math.floor(Number(x.level) || 1)), rarity: typeof x.rarity === "string" ? x.rarity : "normal", contacted: !!x.contacted };
