@@ -3055,7 +3055,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.145</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.146</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -4461,6 +4461,7 @@
           <!-- V0.137（作者要求）：迭代是方舟页里的子页面（专家科技右侧） -->
           <div class="sub-tab-bar" style="margin: 0 0 10px; display: flex; gap: 8px;">
             <button class="sub-tab active" id="invArkSubExpert" title="管理方舟发射与获得的专家科技等级">🚀 发射</button>
+            <span id="invArkUnlockHint" class="inv-note" style="margin:0 8px;font-size:12px;color:var(--muted);">再发射 <b>5</b> 次方舟解锁「迭代 / 战斗」</span>
             <button class="sub-tab" id="invArkSubIter" title="5×5 方舟蓝图管理">♻ 迭代</button>
             <button class="sub-tab" id="invArkSubBattle" onclick="window.__arkBattleTab && window.__arkBattleTab()" title="消耗一次传说方舟发射机会，进行太空战">⚔ 战斗</button>
           </div>
@@ -5070,7 +5071,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.145";
+    const GAME_VERSION = "V0.146";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -8817,7 +8818,8 @@
     // V0.115（作者要求）：「扭曲引擎」把每次多元宇宙能移动的点数 +1/级
     function mapStaminaMax() {
       // V0.118：扭曲引擎每级 +1；**多元跃迁引擎 +20**（重做后不再有独立的跃迁行动力）
-      return MAP_STAMINA_MAX + invRwLv("engine") + (invRwLv("warp") > 0 ? 20 : 0);
+      // V0.145：跃迁引擎改为「每级 +20 行动力」（原来只判 >0 给 20，升多级没收益）
+      return MAP_STAMINA_MAX + invRwLv("engine") + 20 * invRwLv("warp");
     }
     function setMapEventChance(v) { MAP_EVENT_CHANCE = Math.max(0, Math.min(1, Number(v) || 0)); }   // V0.116：单测用
 
@@ -9868,7 +9870,7 @@
 
     function performMultiverseEntry(choice) {
       lastCycleAt = Date.now();   // V0.127：每次真正重置都记冷却（连点/双击无效）
-      try { voyageLogAdd("🌌 进入新的多元宇宙（第 " + (Math.max(0, Math.floor(Number(save.multiverseRuns) || 0)) + 1) + " 次）"); } catch (e) { }
+      try { voyageLogAdd("🌌 进入新的多元宇宙"); } catch (e) { }
       const p = getPossibility();
       const modGain = getWipeModPoints();
       // V0.71：苦痛之路的回报 —— 本次进入宇宙的基因点数按倍率发放；
@@ -14396,39 +14398,40 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
-      ["V0.145", "修复解析加成未作用于铸级造价的问题，新增多元宇宙航行日志，保底线战斗改为必过（敌方 3 血、每次最多 1 伤）。"],
-      ["V0.143", "多元宇宙页右侧新增「🧭 航行日志」，方舟发射、方舟接触与残骸拾取、战斗胜负、精英舰出现、T1 科技包获…"],
-      ["V0.142", "修复蓝图操作两处硬伤，点格子会同时触发「放置」和「拆除」两次，已去掉重复监听，点一下只做一次"],
-      ["V0.141", "补齐两件 T1 零件，嵌套式装甲可叠在已有零件上，该格受伤时先扣装甲"],
-      ["V0.140", "方舟零件系统重做，重复零件改为「+1 经验」，满经验升级，护盾加护盾容量、武器加伤害、结构加耐久、研究室…"],
+      ["V0.146", "解除反转等级与两个引擎的等级上限，下调里程碑乘数，修…"],
+      ["V0.145", "修复解析加成未作用于铸级造价的问题，新增多元宇宙航行…"],
+      ["V0.143", "多元宇宙页右侧新增「🧭 航行日志」，方舟发射、方舟…"],
+      ["V0.142", "修复蓝图操作两处硬伤，点格子会同时触发「放置」和「拆…"],
+      ["V0.141", "补齐两件 T1 零件，嵌套式装甲可叠在已有零件上，该…"],
+      ["V0.140", "方舟零件系统重做，重复零件改为「+1 经验」，满经验…"],
       ["V0.139", "方舟解锁改为「本回合最高等级 ≥ 1000」"],
-      ["V0.138", "反转里程碑下方新增「加成总计」一行，分别列出基础/大/超级里程碑的层数与各自给的尘埃、抵抗、科技有效等级…"],
-      ["V0.137", "两个自动成就改成「累计发射 3 艘 / 5 艘方舟」解锁"],
-      ["V0.136", "修复「自动导航走到方舟上不会自动拾取」，autoNavStep 是直接改坐标的，不走「确定移动」那条链…"],
+      ["V0.138", "反转里程碑下方新增「加成总计」一行，分别列出基础/大…"],
+      ["V0.137", "两个自动成就改成「累计发射 3 艘 / 5 艘方舟」…"],
+      ["V0.136", "修复「自动导航走到方舟上不会自动拾取」，autoNa…"],
       ["V0.135", "星图页去掉「🧭 自动导航」按钮"],
-      ["V0.134", "反转世界成就补齐，第一次迭代 / 虚空远航/ 自动铸级大师 / 自动凝析大师 / 深潜者"],
-      ["V0.133", "方舟「♻ 迭代」上线，5×5 蓝图编辑器，可放置研究室、小型护盾、能源核心、小型武器室、结构框架"],
-      ["V0.132", "专家科技解析进度条改为显示「当前涨幅 → 下一级涨幅」"],
-      ["V0.131", "新增「专家科技解析」，每获得 1 级专家科技 = 1 点解析经验，进度条满了升 1 级"],
-      ["V0.130", "修一个反复弹窗的 BUG，chalTab is not defined」）"],
-      ["V0.129", "修一个玩家反馈的 BUG，星图走完一格后点「确定」，会结算两到三次"],
-      ["V0.128", "赛博赌场彻底下线，赌神改成隐藏的「内测成就」· 采样增幅器改为反转尘埃收益、虚空棱镜改为数据点收益· 爆…"],
-      ["V0.123", "反转世界的成就弹窗重做，改成和主宇宙一样的宽列表，不再被挤成竖排细条"],
+      ["V0.134", "反转世界成就补齐，第一次迭代 / 虚空远航/ 自动铸…"],
+      ["V0.133", "方舟「♻ 迭代」上线，5×5 蓝图编辑器，可放置研究…"],
+      ["V0.132", "专家科技解析进度条改为显示「当前涨幅 → 下一级涨幅…"],
+      ["V0.131", "新增「专家科技解析」，每获得 1 级专家科技 = 1…"],
+      ["V0.130", "修一个反复弹窗的 BUG，chalTab is no…"],
+      ["V0.129", "修一个玩家反馈的 BUG，星图走完一格后点「确定」，…"],
+      ["V0.128", "赛博赌场彻底下线，赌神改成隐藏的「内测成就」· 采样…"],
+      ["V0.123", "反转世界的成就弹窗重做，改成和主宇宙一样的宽列表，不…"],
       ["V0.122", "修复星图坐标，读档时坐标不再被夹到 ±99"],
-      ["V0.121", "给所有「没有软上限」的科技效果加上软上限，超过阈值后改为对数增长，边际收益迅速趋近 0"],
+      ["V0.121", "给所有「没有软上限」的科技效果加上软上限，超过阈值后…"],
       ["V0.120", "解析支持批量升级"],
-      ["V0.119", "修复多元宇宙刷奖励，走完一格后本轮就锁死，「支付并领取」不可能再点第二次"],
-      ["V0.118", "修复「买了扭曲引擎、行动力不涨」，现在「支付并领取」会直接把行动力补满到上限"],
+      ["V0.119", "修复多元宇宙刷奖励，走完一格后本轮就锁死，「支付并领…"],
+      ["V0.118", "修复「买了扭曲引擎、行动力不涨」，现在「支付并领取」…"],
       ["V0.117", "星图正式「有地方」了，四种生态· 事件格· 方舟品质"],
-      ["V0.116", "星图生态· 事件格 · 方舟品质 · 加成改为随重置次数增长"],
-      ["V0.115", "新增九款现实改写科技 · 突破反转铸级 1E308 上限 · 数字显示可自选位数与单/双 E"],
-      ["V0.114", "多元宇宙星图定稿· 赌神结算修复 · 方舟与专家科技 · 改写现实科技"],
+      ["V0.116", "星图生态· 事件格 · 方舟品质 · 加成改为随重置…"],
+      ["V0.115", "新增九款现实改写科技 · 突破反转铸级 1E308 …"],
+      ["V0.114", "多元宇宙星图定稿· 赌神结算修复 · 方舟与专家科技…"],
       ["V0.113", "反转世界增加方舟，开始浩瀚的宇宙之旅吧"],
       ["V0.112", "重置多元宇宙系统 · 修复一些BUG"],
       ["V0.111", "反转世界整批上线· 玩家反馈修复"],
-      ["V0.110", "赌场破产自动收场 · 反转世界成就 · 新增虚拟挑战「赌神」"],
+      ["V0.110", "赌场破产自动收场 · 反转世界成就 · 新增虚拟挑战…"],
       ["V0.109", "自动狩猎提示不再刷屏 · 战斗提速等体验优化"],
-      ["V0.108", "修复「展示柜打不开」· 基因点数改为大数· 数字显示统一规则"],
+      ["V0.108", "修复「展示柜打不开」· 基因点数改为大数· 数字显示…"],
       ["V0.107", "六处改动"],
       ["V0.106", "两条小调 + 一次结算"],
       ["V0.105", "两条新东西 + 一次总收编"],
@@ -14441,12 +14444,12 @@
       ["V0.98", "反转世界上线"],
       ["V0.96", "十五条体验与平衡修正"],
       ["V0.95", "修复了海量 BUG"],
-      ["V0.94", "时间进度条重做，满了之后不再只能收，而是可以继续「溢流」到 200%"],
+      ["V0.94", "时间进度条重做，满了之后不再只能收，而是可以继续「溢…"],
       ["V0.92", "排行榜开放了"],
       ["V0.91", "修「导入存档后必须退回主界面才生效」"],
-      ["V0.90", "诱饵改为永久保留，掉率固定 1/500、不再吃任何爆率加成"],
+      ["V0.90", "诱饵改为永久保留，掉率固定 1/500、不再吃任何爆…"],
       ["V0.89", "新增「多元宇宙里程碑」"],
-      ["V0.88", "修复「一刷新存档就丢了」的严重 bug，并加了存档备份 + 自动回滚保护"],
+      ["V0.88", "修复「一刷新存档就丢了」的严重 bug，并加了存档备…"],
       ["V0.87", "苦痛之路改为免费预约"],
       ["V0.86", "基因实验室改为完成 2 次多元宇宙后解锁"],
       ["V0.85", "苦痛挑战「猎影如潮」改为被捕获概率 ÷50"],
@@ -14458,7 +14461,7 @@
       ["V0.79", "展示柜新增「总加成」与「按加成排序」"],
       ["V0.78", "没拿到本源前隐藏「本源加成」那一行"],
       ["V0.77", "挑战一改为「被捕概率 ÷10 + 达成一次悖论」"],
-      ["V0.76", "新解锁的功能页签会高亮并带一个红「新」角标，点过就熄灭"],
+      ["V0.76", "新解锁的功能页签会高亮并带一个红「新」角标，点过就熄…"],
       ["V0.75", "苦痛挑战奖励改成乘法 ×1.05"],
       ["V0.74", "新增新手教程"],
     ];
@@ -15428,6 +15431,22 @@
         : (a.pos && !a.contacted
           ? ("星图上还有方舟：<b>X:" + a.pos.b + " Y:" + a.pos.a + "</b>（不接触也能继续发射）")
           : "发射后会给你一个坐标，到星图上找 🚀"));
+      // V0.145（作者）：迭代 / 战斗 改为「累计发射 5 次方舟」后解锁
+      try {
+        const launchedN = Math.max(0, Math.floor(Number(a.launches) || 0));
+        const unlocked = launchedN >= 5;
+        ["invArkSubIter", "invArkSubBattle"].forEach(id => { const b = el(id); if (b) b.style.display = unlocked ? "" : "none"; });
+        const h = el("invArkUnlockHint");
+        if (h) {
+          h.style.display = unlocked ? "none" : "";
+          setHTML("invArkUnlockHint", "再发射 <b>" + Math.max(0, 5 - launchedN) + "</b> 次方舟解锁「迭代 / 战斗」（已发射 " + launchedN + " / 5）");
+        }
+        if (!unlocked) {
+          const it = el("invArkIterPane"), bt = el("invArkBattlePane");
+          if (it) it.style.display = "none";
+          if (bt) bt.style.display = "none";
+        }
+      } catch (e) { }
       const list = el("invArkExpertList");
       if (list) {
         setHTML("invArkExpertList", INV_ARK_EXPERT_TECHS.map(t => {
@@ -18285,6 +18304,8 @@
     function voyageLogAdd(html) {
       try {
         const arr = voyageLogs();
+        const now = Date.now();
+        if (arr.length && arr[0].html === String(html) && now - (arr[0].t || 0) < 5000) return;   // V0.145：5 秒内重复不记
         arr.unshift({ t: Date.now(), html: String(html) });
         if (arr.length > 80) arr.length = 80;
         renderVoyageLog();
@@ -18745,6 +18766,8 @@
     function voyageLogAdd(html) {
       try {
         const arr = voyageLogs();
+        const now = Date.now();
+        if (arr.length && arr[0].html === String(html) && now - (arr[0].t || 0) < 5000) return;   // V0.145：5 秒内重复不记
         arr.unshift({ t: Date.now(), html: String(html) });
         if (arr.length > 80) arr.length = 80;
         renderVoyageLog();
@@ -20050,7 +20073,7 @@
         maxLv: 4, cost: lv => 15 * (lv + 1) },
       // V0.115（作者要求）：扭曲引擎 —— 每次多元宇宙能移动的点数 +1/级
       { id: "engine", icon: "⚙", name: "扭曲引擎", desc: "每次多元宇宙可移动点数 +1/级（行动力上限跟着涨）",
-        maxLv: 5, cost: lv => 20 * (lv + 1) },
+        maxLv: 9999, cost: lv => 20 * (lv + 1) },   // V0.145：解除 5 级上限
       // ===== V0.115 新增五个 =====
       { id: "deep", icon: "🔭", name: "深空眺望镜", desc: "缩放视角下**多探 1 圈相邻宇宙**（每圈 = 一大片 20×20 区；相邻的只标方舟位置，不显示加成）",
         maxLv: 3, cost: lv => 25 * (lv + 1) },
@@ -20059,7 +20082,7 @@
       { id: "beacon", icon: "📡", name: "多元信标", desc: "每个多元宇宙周期可发射的方舟 +1（发射并接触后可再发一艘）",
         maxLv: 2, cost: lv => 35 * (lv + 1) },
       { id: "warp", icon: "🌀", name: "多元跃迁引擎", desc: "行动力上限 **+20**；缩放视角里点方向键＝**跃迁一整块宇宙**（每次扣 20 行动力；自动导航 >20 格时也会用它）",
-        maxLv: 1, cost: () => 50 },
+        maxLv: 9999, cost: lv => 50 * (lv + 1) },   // V0.145：解除 1 级上限，造价随等级增长
       { id: "zoom2", icon: "🔬", name: "缩放仪·二次展开", desc: "让缩放视角可以再放大一档（第二档每格 = 400×400 世界）",
         maxLv: 1, cost: () => 60 },
       // V0.115（作者要求）：时空扩容 —— 每投 1 点点数，时间尘埃上限 +E100；最高到 1EE10
@@ -20827,27 +20850,35 @@
     //   （填进去之后页面会自动渲染成加点卡片，逻辑函数都还在）。
     const INV_VWORLD_UPS = [];
     const INV_MILESTONE_STEP = 50;
-    const INV_MILESTONE_DUST_STEP = 0.25;
-    const INV_MILESTONE_RESIST_STEP = 0.25;
+    // V0.145（作者）：乘数改为线性小步长 —— +2% / 层、大 +10% / 座、超级 +50% / 座，
+    //   10 万级（2000 层）时总计约 ×71，不再出现 ×73502 这种把收益撑成 Infinity 的值
+    const INV_MILESTONE_DUST_STEP = 0.02;
+    const INV_MILESTONE_RESIST_STEP = 0.01;
     // V0.105（作者要求）：大里程碑 —— 每 500 级一座（巨额奖励）、每 5000 级一座（超级巨额）。
     const INV_MILESTONE_BIG_STEP = 500;
     const INV_MILESTONE_MEGA_STEP = 5000;
-    const INV_MILESTONE_BIG_BONUS = 1.0;    // 每座大里程碑：尘埃 +100% · 抵抗 +100%
-    const INV_MILESTONE_MEGA_BONUS = 5.0;   // 每座超级里程碑：尘埃 +500% · 抵抗 +500%
+    const INV_MILESTONE_BIG_BONUS = 0.10;   // 每座大里程碑：尘埃 +10% · 抵抗 +10%
+    const INV_MILESTONE_MEGA_BONUS = 0.50;  // 每座超级里程碑：尘埃 +50% · 抵抗 +50%
     // V0.105（作者要求）：里程碑还会抬高「基础科技软上限」——
     //   每座大里程碑 ×1.01、每座超级里程碑 ×1.2（逐座复利）。
     // V0.109：软上限取消后，这两级里程碑改为**直接抬高基础科技的有效等级**（见 invTechEffSoft）
-    const INV_MILESTONE_CAP_STEP_BIG = 1.02;    // 每座大里程碑：有效等级 +2%
-    const INV_MILESTONE_CAP_STEP_MEGA = 1.2;    // 每座超级里程碑：有效等级 +20%
+    const INV_MILESTONE_CAP_STEP_BIG = 0.01;    // 每座大里程碑：有效等级 +1%（加法）
+    const INV_MILESTONE_CAP_STEP_MEGA = 0.10;   // 每座超级里程碑：有效等级 +10%（加法）
     function invMilestoneCapMult() {
-      return Math.pow(INV_MILESTONE_CAP_STEP_BIG, invMilestoneBigCount())
-        * Math.pow(INV_MILESTONE_CAP_STEP_MEGA, invMilestoneMegaCount());
+      // V0.145：加法 + 封顶 20 倍 —— 里程碑可以无限堆，但科技有效等级最多 ×20，避免科技乘数把数值撑爆
+      const raw = 1 + INV_MILESTONE_CAP_STEP_BIG * invMilestoneBigCount() + INV_MILESTONE_CAP_STEP_MEGA * invMilestoneMegaCount();
+      return Math.min(20, Math.max(1, raw));
     }
+    // V0.145：等级异常时（曾到过 900 万级）里程碑乘数会把收益推到 Infinity，
+    //   这里统一按「有效最高等级」封顶 10 万级计算，保证经济永远有限。
+    var INV_SANE_LEVEL_CAP = 100000;
+    // V0.145（作者）：等级不再设上限，里程碑计数也跟着放开（乘数已降到 +2%/层，10 万层也只有 ×2000）
+    function invBestEff() { return Math.max(0, Math.floor((invWorld && invWorld.best) || 0)); }
     function invMilestoneCount() {
-      return Math.floor(Math.max(0, (invWorld && invWorld.best) || 0) / INV_MILESTONE_STEP);
+      return Math.floor(invBestEff() / INV_MILESTONE_STEP);
     }
     function invMilestoneBigCount() {
-      return Math.floor(Math.max(0, (invWorld && invWorld.best) || 0) / INV_MILESTONE_BIG_STEP);
+      return Math.floor(invBestEff() / INV_MILESTONE_BIG_STEP);
     }
     function invMilestoneMegaCount() {
       return Math.floor(Math.max(0, (invWorld && invWorld.best) || 0) / INV_MILESTONE_MEGA_STEP);
@@ -21063,6 +21094,24 @@
       //   导致「尘埃 12 vs 花费 12.000000000000002」判成不够钱、铸级点不动 ✗。
       c.m = Math.round(c.m * 1e6) / 1e6;
       return c;
+    }
+    // V0.145：反解「当前尘埃最多买得起第几级」—— 用于等级异常自愈（不是给界面用的）
+    function invMaxAffordableLevel() {
+      try {
+        if (!invWorld || !invWorld.dust) return 0;
+        const dustE = bigLog10(invWorld.dust);
+        if (!Number.isFinite(dustE) || dustE < -30) return 0;
+        const forgeLv = Math.max(0, invTechEffLv("forge"));
+        const forgeDiscLog = forgeLv * Math.log10(0.94);
+        let growth = (typeof invArkParseCostGrowth === "function") ? Number(invArkParseCostGrowth()) : INV_LEVEL_COST_GROWTH;
+        if (!Number.isFinite(growth) || growth <= 1.0000001) growth = 1.0000001;
+        const per = Math.log10(growth);
+        // 只允许花掉 30% 尘埃
+        const budgetE = dustE + Math.log10(0.3);
+        const L = 1 + (budgetE - Math.log10(INV_LEVEL_COST_BASE) - forgeDiscLog) / per;
+        if (!Number.isFinite(L)) return 0;
+        return Math.max(0, Math.floor(L));
+      } catch (e) { return 0; }
     }
     // 正式开放后的公开入口（自绘确认框 → 进场）。⚠️ 目前只有开发者面板能进，
     //   这条通道先留着 —— 等反转世界做完、去掉开发锁之后，把它接回页签即可。
@@ -21396,6 +21445,9 @@
       const __budget = silent ? 60 : 250;   // 自动铸级每拍最多 60ms，手动一键最大 250ms
       for (let i = 0; i < n; i++) {
         const cost = invLevelCost();
+        // V0.145（玩家反馈：1000 多级突然爆到十几万级）—— 一旦算出「花费 0 / 负数」，立刻停，
+        //   绝不进入「免费无限升」的循环
+        if (!cost || !Number.isFinite(cost.e) || !Number.isFinite(cost.m) || cost.m <= 0) break;
         if (bigCmp(invWorld.dust, bigOf(cost)) < 0) break;
         if ((i & 1023) === 0) {
           const __now = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
@@ -21520,6 +21572,17 @@
       // V0.112：永恒耄耋 —— 半小时到点直接吞噬送出（无视任何衰减 / 减免）
       invEternalStartAt();
       if (!invEternalDone && invEternalLeftMs() <= 0) { invEternalDevour(); return; }
+      // V0.145：尘埃必须是 {m,e} 且指数有限 —— 之前出现过 Infinity，导致造价/上限全部失真、还能免费刷级
+      try {
+        const dd = invWorld.dust;
+        const bad = !dd || typeof dd !== "object" || !Number.isFinite(dd.e) || !Number.isFinite(dd.m) || dd.m <= 0;
+        if (bad) invWorld.dust = bigFromLog10(6);
+      } catch (e) { }
+      // V0.145（作者）：**不再夹等级**。只做「数值坏了才修」的兜底（NaN / 非正数），正常等级随便涨。
+      try {
+        if (!Number.isFinite(Number(invWorld.level)) || Number(invWorld.level) < 0) invWorld.level = 0;
+        if (!Number.isFinite(Number(invWorld.best)) || Number(invWorld.best) < 0) invWorld.best = invWorld.level;
+      } catch (e) { }
       invTechConsumedFlush();   // V0.109：废件汇总按 3 秒节流刷出
       try { if (invCaptureAcc().n && Date.now() - invCaptureLastToastAt >= 2500) invCaptureToastFlush(false); } catch (e) { }   // V0.139：捕获汇总
       // V0.109（作者要求）：能源 —— 在反转世界里的每一秒 +1，**不吃任何加成**（刻意不乘任何倍率）。
@@ -21834,18 +21897,18 @@
       `<div class="ms-rail">` +
       `<div class="ms-node base"><div class="ms-medal">50<small>级</small></div><div class="ms-info">` +
       `<b>基础里程碑 · 每 50 级</b><div class="ms-chips">` +
-      `<span class="ms-chip">反转尘埃 +25%</span><span class="ms-chip">捕获抵抗 +25%</span><span class="ms-chip">无限叠加</span>` +
+      `<span class="ms-chip">反转尘埃 +2%</span><span class="ms-chip">捕获抵抗 +1%</span><span class="ms-chip">无限叠加</span>` +
       `</div></div></div>` +
       `<div class="ms-node big"><div class="ms-medal">500<small>级</small></div><div class="ms-info">` +
       `<b>大里程碑 · 每 500 级 · 巨额奖励</b><div class="ms-chips">` +
-      `<span class="ms-chip gold">尘埃 +100%</span><span class="ms-chip gold">抵抗 +100%</span>` +
+      `<span class="ms-chip gold">尘埃 +10%</span><span class="ms-chip gold">抵抗 +10%</span>` +
       `<span class="ms-chip gold">💥 开局直得 5000 次点击收益</span>` +
-      `<span class="ms-chip gold">🧪 基础科技有效等级 +2% / 座</span>` +
+      `<span class="ms-chip gold">🧪 基础科技有效等级 +1% / 座</span>` +
       `</div></div></div>` +
       `<div class="ms-node mega"><div class="ms-medal">5000<small>级</small></div><div class="ms-info">` +
       `<b>超级里程碑 · 每 5000 级 · 超级巨额</b><div class="ms-chips">` +
-      `<span class="ms-chip red">尘埃 +500%</span><span class="ms-chip red">抵抗 +500%</span>` +
-      `<span class="ms-chip red">🧪 基础科技有效等级 +20% / 座</span>` +
+      `<span class="ms-chip red">尘埃 +50%</span><span class="ms-chip red">抵抗 +50%</span>` +
+      `<span class="ms-chip red">🧪 基础科技有效等级 +10% / 座</span>` +
       `</div></div></div>` +
       `<p class="inventory-note" style="margin: 2px 0 0;">（层数/软上限按本局最高等级实时生效，退出即清零；` +
       `「开局直得」= 历史最高到过 500 级后，<b>此后每开一局</b>都白送 5000 次点击收益的尘埃。）</p></div>`;
@@ -21871,6 +21934,20 @@
         `<p class="inventory-note">成就条件：历史最高尘埃 ${formatNumber(save.bestDust)} ✔ · 苦痛挑战 ${formatNumber(painHave)} / ${formatNumber(painAll)} ✔</p>` +
         `<p class="inventory-note">科技点数 <b style="color: var(--cyan);">${formatNumber(pts)}</b>` +
         `${base > 0 ? ` · 下次结算需要最高反转等级超过 <b>Lv.${formatNumber(base)}</b>` : ""}</p>` +
+        // V0.145（作者要求）：门页也显示铸级增幅 / 解析等级 / 当前造价与尘埃指数，方便直接验证修复
+        (() => {
+          try {
+            const gw = (typeof invArkParseCostGrowth === "function") ? invArkParseCostGrowth() : 1.4;
+            const pl = (typeof invArkParseLv === "function") ? invArkParseLv() : 0;
+            let line = `<p class="inventory-note" style="color: var(--muted);">铸级增幅 <b>×${gw.toFixed(4)}</b>（解析 Lv.${formatNumber(pl)}）`;
+            if (invWorld && invWorld.dust) {
+              const ce = bigLog10(invLevelCost());
+              const de = bigLog10(invWorld.dust);
+              line += ` · 造价 <b>E${ce.toFixed(0)}</b> · 尘埃 <b>E${de.toFixed(0)}</b>（软上限 = 尘埃 −0.5）`;
+            }
+            return line + "</p>";
+          } catch (e) { return ""; }
+        })() +
         `<button class="primary-button" data-inv-enter="1">◑ 进入反转世界</button>` +
         `<p class="inventory-note" style="color: var(--muted);">主动退出会清空本次进度、并按最高等级的增量结算科技点数；` +
         `<b>关掉网页不算退出</b> —— 下次打开会接着玩。</p>`);
@@ -22009,7 +22086,8 @@
         `（本局最高 Lv.${formatNumber(invWorld.best)}，下一层 Lv.${formatNumber((mCount + 1) * INV_MILESTONE_STEP)}） · ` +
         `大里程碑 <b>${formatNumber(invMilestoneBigCount())}</b> 座 · 超级 <b>${formatNumber(invMilestoneMegaCount())}</b> 座 · ` +
         `加成：尘埃 <b>×${invMilestoneDustMult().toFixed(2)}</b> · 抵抗 <b>+${(invMilestoneResist() * 100).toFixed(0)}%</b> · 软上限 <b>×${invMilestoneCapMult().toFixed(3)}</b>` +
-        `　·　铸级增幅 <b>×${(typeof invArkParseCostGrowth === "function" ? invArkParseCostGrowth() : 1.4).toFixed(4)}</b>（解析 Lv.${typeof invArkParseLv === "function" ? invArkParseLv() : 0}）`);
+        `　·　铸级增幅 <b>×${(typeof invArkParseCostGrowth === "function" ? invArkParseCostGrowth() : 1.4).toFixed(4)}</b>（解析 Lv.${typeof invArkParseLv === "function" ? invArkParseLv() : 0}）` +
+        `<br><span style="color:var(--muted);font-size:12px;">造价 E${bigLog10(invLevelCost()).toFixed(0)} · 尘埃 E${bigLog10(invWorld.dust).toFixed(0)}（软上限 = 尘埃 −0.5）</span>`);
       // V0.138（作者要求）：把里程碑的**加成总数**单独列一行，一眼能看全
       try {
         const mBase = mCount, mBig = invMilestoneBigCount(), mMega = invMilestoneMegaCount();
