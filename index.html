@@ -9804,7 +9804,7 @@
       const keepInvPermAuto = Object.assign({}, save.invPermAuto || {});   // V0.134：永久自动化跨重置保留
       const keepToastMute = Object.assign({}, save.toastMute || {});
       const keepSkipWheelAnim = !!save.skipWheelAnim;   // V0.140：跳过转盘动画的偏好要跨重置保留
-      const keepVoyageLog = Array.isArray(save.voyageLog) ? save.voyageLog.slice(0, 80) : [];   // V0.143
+      const keepVoyageLog = [];   // V0.146：航行日志按宇宙隔离，重置即清空
 
       save = normalizeBigFields(structuredCloneSafe(DEFAULT_SAVE));
       save.possibility = p;
@@ -9874,6 +9874,8 @@
     }
 
     function performMultiverseEntry(choice) {
+      let __keepMapPos = null;
+      try { const __p = getMapPos(); __keepMapPos = { a: __p.a, b: __p.b }; } catch (e) { }
       lastCycleAt = Date.now();   // V0.127：每次真正重置都记冷却（连点/双击无效）
       try { voyageLogAdd("🌌 进入新的多元宇宙"); } catch (e) { }
       const p = getPossibility();
@@ -9924,11 +9926,38 @@
       //   正确规则：**重置完成 = 本轮账目清零**。可领的奖励只由「支付 1E1000 领取行动力」
       //   那一步产生（带 fromPurchase 标记），重置本身绝不生成新账。
       mapP0.pendingReward = null;
+      // V0.146（作者）：航行日志按「多元宇宙」隔离 —— 重置后从干净的一份开始
+      try { save.voyageLog = []; renderVoyageLog(); } catch (e) { }
       // 同时发放 1 点行动力（固定上限 1）
       // ⚠️ V0.116 修（作者：能走一格、点领取、再走一格 —— 无限免费循环）——
       //   以前每次多元宇宙重置都会**白送 1 点行动力** ✗，于是「走→领奖→重置」可以无限循环、完全不用付 1E1000 ✗。
       //   现在重置**不再发行动力**：想走就必须自己「支付并领取」✓（和最初的设计一致）。
       mapP0.sta = 0;
+      // V0.146（作者）：**坐标跨宇宙保留** —— 记下重置前的坐标，若被任何逻辑清零就恢复
+      try {
+        if (typeof __keepMapPos === "object" && __keepMapPos) { mapP0.a = __keepMapPos.a; mapP0.b = __keepMapPos.b; }
+      } catch (e) { }
+      // V0.146（作者：重置后回到原点、根本吃不到方舟）——
+      //   新宇宙里把所有还活着的方舟重新放到「玩家当前位置周围 15~80 格」，保证一轮行动力就能摸到。
+      try {
+        const a0 = invArkState();
+        const here = { a: mapP0.a, b: mapP0.b };
+        const n = Math.max(0, Math.floor(Number(a0.launches) || 0));
+        const total = Math.max(1, n);
+        if (Array.isArray(a0.list) && a0.list.length) {
+          a0.list.forEach((l, idx) => {
+            if (!l || !l.pos) return;
+            const dist = 15 + Math.floor((idx / total) * 65);   // 15~80，按顺序铺开
+            const ang = Math.random() * Math.PI * 2;
+            l.pos = {
+              a: here.a + Math.round(Math.cos(ang) * dist),
+              b: here.b + Math.round(Math.sin(ang) * dist)
+            };
+            l.contacted = false;
+          });
+        }
+        a0.pos = a0.list.length ? { a: a0.list[0].pos.a, b: a0.list[0].pos.b } : null;
+      } catch (e) { }
       p.universe = { name: choice.name, mods: choice.mods };
       p.tabUnlocked = true;
       // V0.68：选定一个宇宙之后，**其余候选全部消散**（不能接着挑剩下的）。
@@ -14092,48 +14121,64 @@
       // 新手（猎犬 10 级以下）一眼就能找到那条不会送死的线。
       const orderedLines = save.lines.slice().sort((a, b) =>
         (b.guaranteed ? 1 : 0) - (a.guaranteed ? 1 : 0));
-      setHTML("lineGrid", orderedLines.map(line => {
-        const riskColor = line.difficulty >= 8 ? "var(--red)"
-          : line.difficulty >= 5 ? "var(--gold)" : "var(--green)";
-        const cls = (line.difficulty <= 3 ? "easy" : line.difficulty <= 6 ? "medium" : "hard") +
-          (line.golden ? " golden" : "");
-        const disabled = busy || !selected;
-        const originGain = calcOriginGain(line.originYield);
-        const enemyPower = getEnemyPower(line);
-        const myPower = selected ? houndPower(selected) : 0;
-        const powerColor = !selected ? "var(--muted)"
-          : myPower >= enemyPower ? "var(--green)" : "var(--red)";
-        return `
-          <article class="line-card ${cls}">
-            <h3>
-              ${line.name}
-              <span class="line-risk" style="color:${riskColor}">危险度 ${line.difficulty}</span>
-            </h3>
-            <div class="line-stats">
-              ${line.golden
-                ? `<span style="color: var(--gold); font-weight: 700;">★ 黄金时间线 · 本源 ×${(GOLDEN_ORIGIN_MULT * (line.goldenPower || 1)).toFixed(2)}` +
-                  ` · 额外掉落 ${formatDecimal(getGoldenShardDrop(line), 2)} 块碎片</span><br>`
-                : ""}
-              ${line.guaranteed
-                ? '<span style="color: var(--green); font-weight: 700;">◆ 保底线 · 战力占优（本源收益 40%）</span><br>'
-                : ""}
-              敌人强度：<b>x${line.guaranteed ? "0.01" : line.enemyScale.toFixed(2)}</b>${line.guaranteed ? "（保底）" : ""}<br>
-              本源产出：<b>${formatNumber(originGain)}</b> / 次<br>
-              推荐战力：<b>${formatNumber(enemyPower)}</b>
-              ${selected
-                ? (() => {
-                  // V0.95（方案 B1）：不再用「战力比大小」下判断 —— 直接跑真战斗给结论
-                  const fc = getBattleForecast(selected, line);
-                  return `<br><span style="color:${powerColor}">${selected.name} 战力 ${formatNumber(myPower)}</span>` +
-                    (fc ? `<br><span style="color:${fc.color}; font-weight: 700;">预测：${fc.text}</span>` : "");
-                })()
-                : ""}
-            </div>
-            <button class="primary-button" data-invade="${line.id}" ${disabled ? "disabled" : ""}>
-              ${busy ? "战斗中..." : selected ? `派 ${selected.name} 入侵` : "先选择猎犬"}
-            </button>
-          </article>`;
-      }).join(""));
+      // V0.146（作者：render 100ms 一次，入侵选项也跟着每 100ms 重建 → 卡）
+      //   只有「线路数值 / 出战猎犬 / 交战状态」真正变化时才重建卡片；否则跳过。
+      {
+        const __sig = JSON.stringify({
+          l: save.lines.map(l => [l.id, l.enemyScale, l.refPower, !!l.guaranteed, !!l.golden, l.cleared]),
+          // V0.146 补：本源产出吃「成就/诱饵/超越/碎片/挑战/星图/宇宙/环境/实验室」一堆全局加成，
+          //   这些变化不在 save.lines 里 —— 不带上就会一直显示旧数字，所以把最终显示值也算进签名。
+          g: orderedLines.map(l => formatNumber(calcOriginGain(l.originYield))).join(","),
+          s: selected ? [selected.id, selected.level, selected.atk, selected.hp, selected.def, selected.aspd, selected.lifespan].join("|") : "",
+          b: !!busy
+        });
+        if (__sig === window.__lineGridSig) { /* 数据没变：不重建 */ }
+        else {
+          window.__lineGridSig = __sig;
+        setHTML("lineGrid", orderedLines.map(line => {
+          const riskColor = line.difficulty >= 8 ? "var(--red)"
+            : line.difficulty >= 5 ? "var(--gold)" : "var(--green)";
+          const cls = (line.difficulty <= 3 ? "easy" : line.difficulty <= 6 ? "medium" : "hard") +
+            (line.golden ? " golden" : "");
+          const disabled = busy || !selected;
+          const originGain = calcOriginGain(line.originYield);
+          const enemyPower = getEnemyPower(line);
+          const myPower = selected ? houndPower(selected) : 0;
+          const powerColor = !selected ? "var(--muted)"
+            : myPower >= enemyPower ? "var(--green)" : "var(--red)";
+          return `
+            <article class="line-card ${cls}">
+              <h3>
+                ${line.name}
+                <span class="line-risk" style="color:${riskColor}">危险度 ${line.difficulty}</span>
+              </h3>
+              <div class="line-stats">
+                ${line.golden
+                  ? `<span style="color: var(--gold); font-weight: 700;">★ 黄金时间线 · 本源 ×${(GOLDEN_ORIGIN_MULT * (line.goldenPower || 1)).toFixed(2)}` +
+                    ` · 额外掉落 ${formatDecimal(getGoldenShardDrop(line), 2)} 块碎片</span><br>`
+                  : ""}
+                ${line.guaranteed
+                  ? '<span style="color: var(--green); font-weight: 700;">◆ 保底线 · 战力占优（本源收益 40%）</span><br>'
+                  : ""}
+                敌人强度：<b>x${line.guaranteed ? "0.01" : line.enemyScale.toFixed(2)}</b>${line.guaranteed ? "（保底）" : ""}<br>
+                本源产出：<b>${formatNumber(originGain)}</b> / 次<br>
+                推荐战力：<b>${formatNumber(enemyPower)}</b>
+                ${selected
+                  ? (() => {
+                    // V0.95（方案 B1）：不再用「战力比大小」下判断 —— 直接跑真战斗给结论
+                    const fc = getBattleForecast(selected, line);
+                    return `<br><span style="color:${powerColor}">${selected.name} 战力 ${formatNumber(myPower)}</span>` +
+                      (fc ? `<br><span style="color:${fc.color}; font-weight: 700;">预测：${fc.text}</span>` : "");
+                  })()
+                  : ""}
+              </div>
+              <button class="primary-button" data-invade="${line.id}" ${disabled ? "disabled" : ""}>
+                ${busy ? "战斗中..." : selected ? `派 ${selected.name} 入侵` : "先选择猎犬"}
+              </button>
+            </article>`;
+        }).join(""));
+        }
+      }
     }
 
     function renderBattle() {
