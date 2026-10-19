@@ -3056,7 +3056,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.149l</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.149p</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -5085,7 +5085,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.149l";
+    const GAME_VERSION = "V0.149p";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -14637,6 +14637,9 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.149p", "修蓝图拆零件：只拆点中的那一个，不再连带相邻同类；放置时压到别人整件拒绝（不再产生半块研究室）"],
+      ["V0.149o", "嵌套式装甲现在正确计入能耗（每层 0.5×(1+等级)，扩容格 ×1.5）；旧蓝图若因此超载，拆减装甲或加能源核心"],
+      ["V0.149m", "蓝图数值文案改为按实际等级显示：每个能源核心供能（含核心等级）、零件每级能耗（维修 +2 / 导弹 +3 / 电池 +0.5）"],
       ["V0.149l", "方舟战斗进不去时按真实原因提示（能源不足 / 缺哪件），修按钮重复 id 导致剩余次数不显示"],
       ["V0.149k", "自动导航追残骸改为盯「方框内最近的一格」，不再绕去左上角；接触后正确标记不再复发"],
       ["V0.149j", "全流程体检：生态区改为各自守象限（覆盖率稳定 98%+）；修若干边界态"],
@@ -15848,9 +15851,20 @@
       // V0.139（作者）：结构框架 0 能耗；研究室战斗中不耗电（只有安装/布置时占位）
       let rooms = 0;
       st.grid.forEach((cell, i) => { if (cell) rooms += arkPartEnergy(cell) * (st.expand && st.expand[i] ? 1.5 : 1); });
+      // V0.149o 修（玩家反馈：嵌套式装甲不消耗能量）——
+      //   嵌套装甲存在 **overlay** 数组里、不在 grid 里 ✗，上面这个循环压根看不到它 →
+      //   叠多少层都是 0 能耗。现在按「每层 0.5 × (1 + 等级)」计入，扩容格同样 ×1.5。
+      let nests = 0;
+      if (Array.isArray(st.overlay)) {
+        st.overlay.forEach((ov, i) => {
+          if (ov !== "nest" || !st.grid[i]) return;      // 只能叠在已有零件上
+          nests++;
+          rooms += arkPartEnergy("nest") * (st.expand && st.expand[i] ? 1.5 : 1);
+        });
+      }
       const cap = Math.max(0, core * arkEnergyCap());
       const valid = labs >= 1 && shield >= 1 && core >= 1 && weapon >= 1 && rooms <= cap;
-      return { labs: labs, shields: shield, cores: core, weapons: weapon, frames: frame, rooms: rooms, cap: cap, valid: valid };
+      return { labs: labs, shields: shield, cores: core, weapons: weapon, frames: frame, nests: nests, rooms: rooms, cap: cap, valid: valid };
     }
     // V0.149l 修（玩家反馈：方舟战斗页点「战斗」没反应、进不去）——
     //   根因是提示文案只认「零件缺失」这一种情况：零件齐全但**零件等级高导致能耗超标**时，
@@ -15860,6 +15874,11 @@
       const st = S || invArkIterStats();
       if (st.valid) return "";
       const miss = [];
+      // 半块研究室（只有 1 格）单独说明 —— 玩家看到图标却被告知「缺少研究室」最容易懵
+      const labCells = (invArkIterState().grid || []).filter(x => x === "lab").length;
+      if (st.labs < 1 && labCells > 0) {
+        return "🔧 <b>研究室残缺</b>：它需要完整 <b>1×2 两格</b>，现在只有 <b>" + labCells + " 格</b> —— 点它可以拆掉，重放一对完整的。";
+      }
       if (st.labs < 1) miss.push("1 间研究室（占 1×2）");
       if (st.shields < 1) miss.push("1 个护盾");
       if (st.cores < 1) miss.push("1 个能源核心");
@@ -18731,11 +18750,15 @@
       return { lv: v.lv, exp: v.exp, need: arkPartExpNeed(v.lv), up: up };
     }
     // V0.139：零件能耗唯一来源 —— 研究室战斗中不耗电、结构框架 0 耗能
+    // V0.149m：单级能耗 = 基础能耗（不同零件不一样：维修 2 / 导弹 3 / 电池·巢 0.5 / 其它 1）。
+    //   以前详情卡把「升级后 +1/级」写死 ✗ —— 维修机器人实际每级 +2，玩家按 +1 算会撞上能耗超载。
+    function arkPartEnergyBase(id) {
+      if (id === "lab" || id === "frame" || id === "expand") return 0;
+      return (id === "nest") ? 0.5 : (id === "battery") ? 0.5 : (id === "repair" ? 2 : (id === "missile" ? 3 : 1));
+    }
     function arkPartEnergy(id) {
-      // V0.140（作者）：研究室/结构框架 0 耗电；其余零件**升级后耗能也会提高**（每级 +1）
-      if (id === "lab" || id === "frame") return 0;
-      if (id === "expand") return 0;
-      const baseE = (id === "nest") ? 0.5 : (id === "battery") ? 0.5 : (id === "repair" ? 2 : (id === "missile" ? 3 : 1));
+      // V0.140（作者）：研究室/结构框架 0 耗电；其余零件**升级后耗能也会提高**
+      const baseE = arkPartEnergyBase(id);
       return baseE + arkPartLv(id) * baseE;
     }
     // ===== V0.143：航行日志（多元宇宙页右侧）=====
@@ -18953,7 +18976,8 @@
             '<div>尺寸 <b>' + cm.w + "×" + cm.h + '</b>　能耗 <b>' + arkPartEnergy(cardId) + '</b></div>' +
             '<div>分类 <b>' + (ARK_PART_CLASS[cardId] || "—") + '</b>　等级 <b>Lv.' + lv + '</b>　经验 <b>' + expNow + " / " + expNeed + '</b></div>' +
             '<div>耐久 <b>' + hpNow + '</b>' + (cardId === "frame" ? (lv > 0 ? '（结构框架：每级 +100% 耐久）' : '（可升级加耐久）') : '（固定，不随等级提高）') + '</div>' +
-            '<div>战斗耗能 <b>' + arkPartEnergy(cardId) + '</b>' + (arkPartEnergy(cardId) > 0 && lv > 0 ? '（升级后 +1/级）' : '') + '</div>' +
+            '<div>战斗耗能 <b>' + arkPartEnergy(cardId) + '</b>' +
+              (arkPartEnergyBase(cardId) > 0 ? '（每级 +' + (Math.round(arkPartEnergyBase(cardId) * 100) / 100) + ' 能耗）' : '（不耗电）') + '</div>' +
             '<div>蓝图内已放 <b>' + placed + '</b> 格</div>' +
             '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);">' + eff + '</div>');
         } else {
@@ -18979,11 +19003,48 @@
         }
       }
       setHTML("invArkIterStats", [
-        "房间 " + S.rooms + " / " + S.cap + "（每个能源核心 +" + ARK_ITER_CORE_CAP + " 间）",
-        "🔬 研究室 " + S.labs + "　🛡 护盾 " + S.shields + "　⚡ 能源核心 " + S.cores + "　🔫 武器室 " + S.weapons,
+        "房间 " + S.rooms + " / " + S.cap + "（每个能源核心 +" + arkEnergyCap() + " 间" +
+          (arkPartLv("core") > 0 ? " · 核心 Lv." + arkPartLv("core") : "") + "）",
+        "🔬 研究室 " + S.labs + "　🛡 护盾 " + S.shields + "　⚡ 能源核心 " + S.cores + "　🔫 武器室 " + S.weapons +
+          (S.nests > 0 ? "　🛡️ 嵌套装甲 " + S.nests : ""),
         S.valid ? '<b style="color:var(--green);">蓝图可用 ✓ 达到发射条件</b>' : '<b style="color:var(--red);">' + arkIterInvalidReason(S) + '</b>',
         "传说资格：" + (invArkIterLegendReady() ? '<b style="color:#f5a623;">已解锁 ✓</b>' : "累计发射 " + Math.max(0, Math.floor(Number(invArkState().launches) || 0)) + " / " + ARK_ITER_LEGEND_LAUNCHES + " 艘")
       ].join("<br>") + partInfo);
+    }
+    // V0.149p 修（玩家：点一个零件会把相邻的同类零件一起拆掉 / 偶尔卡出 1 格研究室）——
+    //   根因有两个：
+    //     ① 旧移除逻辑按「同 id + 四邻相连」的连通块整片删 ✗ —— 你把两个研究室摆在一起时，
+    //        它们就变成一整块连通区，点其中一个会把两个都拆掉。
+    //     ② 放置时只检查了**被点的那一格**有没有零件 ✗ —— 如果 1×2 研究室的第二格压着别的零件，
+    //        就会把对方覆盖成半块，留下「1 格研究室」这种残废零件。
+    //   修法：给 grid 重建「零件实例」编号（按放置顺序扫描矩形，扫不出来的残格单独成实例），
+    //        移除时只删同一实例；放置时目标格只要**有一格被占**就拒绝。
+    function arkIterInstances(st) {
+      const N = ARK_ITER_SIZE;
+      const g = st.grid;
+      const inst = new Array(g.length).fill(0);
+      let next = 0;
+      for (let i = 0; i < g.length; i++) {
+        if (!g[i] || inst[i]) continue;
+        const id = g[i];
+        const def = ARK_ITER_MODULES.filter(x => x.id === id)[0] || { w: 1, h: 1 };
+        const w = Math.max(1, Math.floor(def.w) || 1), h = Math.max(1, Math.floor(def.h) || 1);
+        const r = Math.floor(i / N), c = i % N;
+        let ok = (c + w <= N) && (r + h <= N);
+        if (ok) {
+          for (let dr = 0; dr < h && ok; dr++) for (let dc = 0; dc < w; dc++) {
+            const k = (r + dr) * N + (c + dc);
+            if (g[k] !== id || inst[k]) { ok = false; break; }
+          }
+        }
+        next++;
+        if (ok) {
+          for (let dr = 0; dr < h; dr++) for (let dc = 0; dc < w; dc++) inst[(r + dr) * N + (c + dc)] = next;
+        } else {
+          inst[i] = next;      // 兜底：凑不成完整矩形的残格，单独算一个实例（老档遗留的 1 格研究室也能单独拆掉）
+        }
+      }
+      return inst;
     }
     function invArkIterPlace(idx) {
       invArkIterSelCell = Number(idx) || 0;
@@ -19015,6 +19076,21 @@
         st.expand[idx] = true;
         saveGame(true); renderInvArkIter(); return;
       }
+      // V0.149p：点击**已有零件**一律先按「拆除」处理 —— 必须放在放置合法性检查之前，
+      //   否则老档遗留的残格（例如只有 1 格的研究室、1×2 伸到船体外的旧布局）会因为
+      //   「2×2/1×2 放不下」被拦住，永远拆不掉。
+      if (st.grid[idx]) {
+        const inst = arkIterInstances(st);
+        const mine = inst[idx];
+        for (let k = 0; k < st.grid.length; k++) {
+          if (mine && inst[k] === mine) {
+            st.grid[k] = null;
+            if (st.overlay) st.overlay[k] = null;    // 拆零件时把叠在上面的嵌套装甲一起带走
+          }
+        }
+        saveGame(true); renderInvArkIter();
+        return;
+      }
       const r0 = Math.floor(idx / N), c0 = idx % N;
       // V0.140：支持任意 w×h（维修机器人 2×2、动能导弹 1×3 …）
       const cells = [];
@@ -19027,24 +19103,12 @@
       // V0.142（作者）：超出船体（未扩容）的格子不许放，避免零件挂到棋盘外
       const badCell = cells.some(k => !(arkIsBaseCell(k) || (st.expand && st.expand[k])));
       if (badCell) { try { showToast("这里放不下：" + m.name + " 需要 " + m.w + "×" + m.h + " 完整落在船体/扩容区上。", "tech"); } catch (e2) { } return; }
-      if (st.grid[idx]) {
-        // V0.141 修：只拆「和这一格相连的同一块零件」（BFS 连通块），不再删掉地图上所有同名零件
-        const id = st.grid[idx];
-        const seen = new Set([idx]);
-        const queue = [idx];
-        while (queue.length) {
-          const cur = queue.pop();
-          const r = Math.floor(cur / N), c = cur % N;
-          [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc]) => {
-            if (rr < 0 || rr >= N || cc < 0 || cc >= N) return;
-            const k = rr * N + cc;
-            if (!seen.has(k) && st.grid[k] === id) { seen.add(k); queue.push(k); }
-          });
-        }
-        seen.forEach(k => { st.grid[k] = null; });
-      } else {
-        cells.forEach(k => { st.grid[k] = m.id; });
+      // V0.149p：目标格只要有一格被占，就整体拒绝 —— 否则会把对方的零件覆盖掉半块（「1 格研究室」的来源）
+      if (cells.some(k => st.grid[k])) {
+        try { showToast("这里被别的零件占着 —— 先把那件拆掉再放。", "tech"); } catch (e2) { }
+        return;
       }
+      cells.forEach(k => { st.grid[k] = m.id; });
       saveGame(true);
       renderInvArkIter();
     }
