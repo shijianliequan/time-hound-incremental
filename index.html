@@ -3056,7 +3056,7 @@
         <h1 id="gameTitle">时间猎犬增量</h1>
         <p class="subtitle" id="gameSubtitle">在时间猎犬发现你之前，收集尽可能多的时间尘埃。</p>
         <div class="version-row">
-          <span class="version-badge" id="versionBadge" title="游戏版本">V0.149g</span>
+          <span class="version-badge" id="versionBadge" title="游戏版本">V0.149l</span>
           <button class="log-button" id="changelogButton" title="更新日志：最近都改了什么">更新日志</button>
         </div>
       </div>
@@ -4544,7 +4544,9 @@
               </span>
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="primary-button" id="invArkBattleStart" onclick="window.__arkBattleStart && window.__arkBattleStart()" style="padding: 8px 16px; width: auto;" id="invArkBattleStartBtnText">⚔ 开始战斗（发射方舟获得次数）</button>
+              <!-- V0.149l：这个按钮原来写了**两个 id**（invArkBattleStart + invArkBattleStartBtnText）→
+                   浏览器只认第一个，第二个 id 根本不存在，于是「剩余次数」永远更新不出来。现在只用按钮自己的 id。 -->
+              <button class="primary-button" id="invArkBattleStart" onclick="window.__arkBattleStart && window.__arkBattleStart()" style="padding: 8px 16px; width: auto;">⚔ 开始战斗（发射方舟获得次数）</button>
               <button class="secondary-button" id="invArkBattleStop" onclick="window.__arkSurrender && window.__arkSurrender()" style="padding: 8px 16px; width: auto;">投降</button>
             </div>
           </div>
@@ -5083,7 +5085,7 @@
   <script>
     "use strict";
 
-    const GAME_VERSION = "V0.149g";
+    const GAME_VERSION = "V0.149l";
     const SAVE_KEY = "time-hound-incremental-save-v6";
     const TICK_MS = 100;
     const SAVE_INTERVAL_MS = 2000;
@@ -9951,7 +9953,10 @@
       ensureLines();
     }
 
-    function performMultiverseEntry(choice) {
+    function performMultiverseEntry(choice, opts) {
+      // V0.149h：opts.free = **无奖励重置**（苦痛预约用）——
+      //   不算一次「进入多元宇宙」：不加 entries、不走里程碑、也不覆盖当前宇宙（否则宇宙名会变 undefined）。
+      const __free = !!(opts && opts.free);
       let __keepMapPos = null;
       try { const __p = getMapPos(); __keepMapPos = { a: __p.a, b: __p.b }; } catch (e) { }
       lastCycleAt = Date.now();   // V0.127：每次真正重置都记冷却（连点/双击无效）
@@ -9992,7 +9997,7 @@
       }
       // V0.112（作者要求）：本次的基因点数 / 修饰点数**先记账**，等玩家在星图上
       //   **选定方向并确认落脚**之后才真正发放（「选完确定下一个坐标之后才会给予」）。
-      p.entries = (p.entries || 0) + 1;
+      if (!__free) p.entries = (p.entries || 0) + 1;   // V0.149h：无奖励重置不算次数
       mapStamina();
       const mapP0 = getMapPos();
       // ⚠️ V0.128 修 BUG（作者反馈：点一次「确定」会结算两到三次 / 结算卡反复冒出来）——
@@ -10035,7 +10040,7 @@
           });
         }
       } catch (e) { }
-      p.universe = { name: choice.name, mods: choice.mods };
+      if (!__free) p.universe = { name: choice.name, mods: choice.mods };
       p.tabUnlocked = true;
       // V0.68：选定一个宇宙之后，**其余候选全部消散**（不能接着挑剩下的）。
       // 想换宇宙必须重新攒够 1E1000 尘埃、重新开启新的一批四个。
@@ -10072,8 +10077,10 @@
       wipeRunForNewCycle(p);
       // V0.91：里程碑奖励 —— 每 2 次多元宇宙永久通关一关主线挑战。
       //   ⚠️ 必须放在 wipeRunForNewCycle **之后**：那一步会把 save.challenges 清空。
+      // V0.149h：里程碑的「永久通关」必须**补回来**（重置把挑战列表清空了，而它是永久的），
+      //   但 free 模式不推进新进度，也不再刷一条「里程碑通关」日志。
       const milestoneCh = applyMilestoneChallenges();
-      if (milestoneCh > 0) {
+      if (milestoneCh > 0 && !__free) {
         logEvent("🏛", `里程碑：主线挑战「<b>${CHALLENGES[getMilestoneChallengeCount() - 1].name}</b>」永久通关` +
           `（共 ${getMilestoneChallengeCount()} / ${CHALLENGES.length} 关）`, "gold");
       }
@@ -14630,6 +14637,11 @@
     // ===== 更新日志（V0.90）=====
     // 面向玩家：只写「大致改了什么」，细节都在开发笔记里。
     const CHANGELOG = [
+      ["V0.149l", "方舟战斗进不去时按真实原因提示（能源不足 / 缺哪件），修按钮重复 id 导致剩余次数不显示"],
+      ["V0.149k", "自动导航追残骸改为盯「方框内最近的一格」，不再绕去左上角；接触后正确标记不再复发"],
+      ["V0.149j", "全流程体检：生态区改为各自守象限（覆盖率稳定 98%+）；修若干边界态"],
+      ["V0.149i", "反转世界「一键最大」补上自动续跑：一次点击买到真正买不动为止（不再需要连点好几次）"],
+      ["V0.149h", "预约苦痛改成「无奖励重置」：不再被算作一次进入多元宇宙，也不覆盖当前宇宙"],
       ["V0.149g", "修发射后方舟正好落在脚下时自动导航不走（距离 0 会提前退出，必须手动吃第一艘）"],
       ["V0.149f", "四种生态区改为铺在玩家周围 20×20（四种各一个、半径 10~16），不再漂远"],
       ["V0.149e", "自动多元宇宙重置补上前半段：行动力用完会自动付费领行动力；修「钱不够点支付却把本轮标记成已领」的死锁"],
@@ -15727,7 +15739,13 @@
           const da = Math.max(0, x.pos.a - p0.a, p0.a - (x.pos.a + sz - 1));
           const db = Math.max(0, x.pos.b - p0.b, p0.b - (x.pos.b + sz - 1));
           const d = da + db;
-          if (!best || d < best.d) best = { a: x.pos.a, b: x.pos.b, d: d };
+          // V0.149k 修（玩家：追残骸要自己走，不然像卡住）——
+          //   目标点改成「方框内离玩家最近的那一格」，而不是残骸左上角：
+          //   从右下/下方靠近时，左上角可能还有十几步，玩家看着就是不往方框里走；
+          //   而且走进去以后接触判定本来就按方框算，直接盯最近格更短、也更早踩进方框。
+          const ta = Math.max(x.pos.a, Math.min(p0.a, x.pos.a + sz - 1));
+          const tb = Math.max(x.pos.b, Math.min(p0.b, x.pos.b + sz - 1));
+          if (!best || d < best.d) best = { a: ta, b: tb, d: d, cx: x.pos.a, cy: x.pos.b };
         });
         // 兼容老存档：list 里没有条目、但 a.pos 还没接触
         if (!best && a.pos && !a.contacted) {
@@ -15834,6 +15852,28 @@
       const valid = labs >= 1 && shield >= 1 && core >= 1 && weapon >= 1 && rooms <= cap;
       return { labs: labs, shields: shield, cores: core, weapons: weapon, frames: frame, rooms: rooms, cap: cap, valid: valid };
     }
+    // V0.149l 修（玩家反馈：方舟战斗页点「战斗」没反应、进不去）——
+    //   根因是提示文案只认「零件缺失」这一种情况：零件齐全但**零件等级高导致能耗超标**时，
+    //   同样 valid=false，却仍提示「蓝图未完成（至少 1 研究室 / 1 护盾…）」✗
+    //   → 玩家明明四个都有，看起来就像「点了没反应」。现在按真实原因分别说明。
+    function arkIterInvalidReason(S) {
+      const st = S || invArkIterStats();
+      if (st.valid) return "";
+      const miss = [];
+      if (st.labs < 1) miss.push("1 间研究室（占 1×2）");
+      if (st.shields < 1) miss.push("1 个护盾");
+      if (st.cores < 1) miss.push("1 个能源核心");
+      if (st.weapons < 1) miss.push("1 间武器室");
+      if (!miss.length) {
+        if (st.rooms > st.cap) {
+          return "⚡ <b>能源不足</b>：当前占用 <b>" + formatNumber(st.rooms) + "</b> / 上限 <b>" + formatNumber(st.cap) +
+            "</b> —— 零件<b>等级越高越耗电</b>。加装「能源核心」（每个 +" + formatNumber(arkEnergyCap()) +
+            "），或拆掉/降低一些耗电零件再出击。";
+        }
+        return "蓝图还没搭好：至少需要 1 间研究室、1 个护盾、1 个能源核心、1 间武器室。";
+      }
+      return "蓝图还没搭好，缺少：" + miss.join("、") + "。";
+    }
     function invArkIterLegendReady() {
       const launches = Math.max(0, Math.floor(Number(invArkState().launches) || 0));
       return launches >= ARK_ITER_LEGEND_LAUNCHES && invArkIterStats().valid;
@@ -15875,6 +15915,15 @@
         });
       });
     }
+    // 四种生态区各自守住一个象限（玩家周围 ±5 附近），只在原地小幅抖动 ——
+    //   这样「玩家周围 20×20 覆盖率」结构上就有保证，不会再出现「四片一起漂到同一侧」导致某半边全空。
+    const MAP_BIOME_QUAD = [
+      { a: -5, b: -5 }, { a: -5, b: 5 }, { a: 5, b: -5 }, { a: 5, b: 5 }
+    ];
+    function mapBiomeAnchor(id) {
+      const i = MAP_BIOME_DEFS.findIndex(d => d.id === id);
+      return MAP_BIOME_QUAD[i < 0 ? 0 : i % MAP_BIOME_QUAD.length];
+    }
     function mapEvolveBiomes() {
       const p0 = getMapPos();
       const list = mapBiomes();
@@ -15884,27 +15933,26 @@
         if (!bl || !bl.id) return;
         if (seen[bl.id]) return;                         // 同种只留一片（避免重复把位置占满）
         if (Math.random() < 0.25) return;                // 25% 消散（原来 30%，生态区别越来越少）
-        bl.a += Math.floor(Math.random() * 5) - 2;       // 漂流 ±2（原来 ±3，免得一漂就走远）
-        bl.b += Math.floor(Math.random() * 5) - 2;
-        // V0.149f：**不许漂出玩家周围 20×20** —— 否则重置几次之后生态区全跑远了，又变回「吃不到」
-        bl.a = Math.max(p0.a - 10, Math.min(p0.a + 10, bl.a));
-        bl.b = Math.max(p0.b - 10, Math.min(p0.b + 10, bl.b));
-        bl.r = Math.max(10, Math.min(16, (bl.r || 11) + (Math.random() < 0.5 ? -1 : 1) * (1 + Math.floor(Math.random() * 2))));
+        // V0.149j：**回到自己的象限锚点 + 小抖动**（不再纯随机游走 ——
+        //   四片各自乱漂会挤到同一侧，实测覆盖率会掉到 43%，玩家又变成「走好几步吃不到」）
+        const an = mapBiomeAnchor(bl.id);
+        bl.a = p0.a + an.a + (Math.floor(Math.random() * 5) - 2);
+        bl.b = p0.b + an.b + (Math.floor(Math.random() * 5) - 2);
+        bl.r = Math.max(11, Math.min(16, (Number(bl.r) || 12) + (Math.random() < 0.5 ? -1 : 1)));
         seen[bl.id] = true;
         next.push(bl);
       });
-      // V0.149f：缺哪种就补哪种，且**只补在玩家周围 20×20 内**（以前补到 ±40，等于白给）
-      const OFF = [[-6, -6], [-6, 6], [6, -6], [6, 6]];
+      // 缺哪种就补哪种，同样补在它自己的象限里
       let guard = 0;
       while (next.length < MAP_BIOME_DEFS.length && guard++ < 8) {
         const def = MAP_BIOME_DEFS.filter(d => !seen[d.id])[0];
         if (!def) break;
-        const o = OFF[next.length % OFF.length];
+        const an = mapBiomeAnchor(def.id);
         next.push({
           id: def.id,
-          a: p0.a + o[0] + Math.floor(Math.random() * 5) - 2,
-          b: p0.b + o[1] + Math.floor(Math.random() * 5) - 2,
-          r: 11 + Math.floor(Math.random() * 4),
+          a: p0.a + an.a + (Math.floor(Math.random() * 5) - 2),
+          b: p0.b + an.b + (Math.floor(Math.random() * 5) - 2),
+          r: 12 + Math.floor(Math.random() * 4),
           born: Date.now()
         });
         seen[def.id] = true;
@@ -16865,10 +16913,10 @@
       // V0.139（作者）：预约苦痛后**立刻强制重置一次多元宇宙**，让苦痛与回报落在同一轮，
       //   避免「先吃 debuff、下一轮才有回报」的错位；这次重置不计入多元宇宙次数。
       try {
-        const runsBefore = Math.max(0, Math.floor(Number(save.multiverseRuns) || 0));
-        performMultiverseEntry(picks.slice());
-        // 还原次数（performMultiverseEntry 内部若自增，这里抵消）
-        if (Number(save.multiverseRuns) > runsBefore) save.multiverseRuns = runsBefore;
+        // V0.149h 修（玩家：预约苦痛被算成「进入一次多元宇宙」）——
+        //   这里传 { free: true }：重置照做（苦痛与回报落在同一轮），但**不算次数、不发里程碑**。
+        //   以前只抵消了 save.multiverseRuns —— 那是个根本不存在的计数器 ✗，真正的 p.entries 照样 +1。
+        performMultiverseEntry(picks.slice(), { free: true });
         saveGame(true);
       } catch (e) { }
       logEvent("🩸", `预约苦痛之路：<b>${formatNumber(picks.length)}</b> 条苦痛，将在下一次多元宇宙重置时生效`, "red");
@@ -18781,7 +18829,7 @@
     }
     function updateArkBattleBtn() {
       try {
-        const b = el("invArkBattleStartBtnText");
+        const b = el("invArkBattleStart");
         if (!b) return;
         const n = Math.max(0, Math.floor(Number(invArkState().legendBattles) || 0));
         b.textContent = "⚔ 开始战斗（剩余次数 " + n + " · 发射方舟 +1）";
@@ -18933,7 +18981,7 @@
       setHTML("invArkIterStats", [
         "房间 " + S.rooms + " / " + S.cap + "（每个能源核心 +" + ARK_ITER_CORE_CAP + " 间）",
         "🔬 研究室 " + S.labs + "　🛡 护盾 " + S.shields + "　⚡ 能源核心 " + S.cores + "　🔫 武器室 " + S.weapons,
-        S.valid ? '<b style="color:var(--green);">蓝图可用 ✓ 达到发射条件</b>' : '<b style="color:var(--red);">未完成：至少 1 间研究室(1×2)、1 护盾、1 能源核心、1 武器室，且房间数 ≤ 能源上限</b>',
+        S.valid ? '<b style="color:var(--green);">蓝图可用 ✓ 达到发射条件</b>' : '<b style="color:var(--red);">' + arkIterInvalidReason(S) + '</b>',
         "传说资格：" + (invArkIterLegendReady() ? '<b style="color:#f5a623;">已解锁 ✓</b>' : "累计发射 " + Math.max(0, Math.floor(Number(invArkState().launches) || 0)) + " / " + ARK_ITER_LEGEND_LAUNCHES + " 艘")
       ].join("<br>") + partInfo);
     }
@@ -19242,7 +19290,7 @@
     function arkBtlStart() {
       const a = invArkState();
       const S = invArkIterStats();
-      if (!S.valid) { try { showToast("蓝图未完成（至少 1 研究室 / 1 护盾 / 1 能源核心 / 1 武器室）。", "tech"); } catch (e) { } return; }
+      if (!S.valid) { try { showToast(arkIterInvalidReason(S), "tech"); } catch (e) { } return; }
       if ((Number(a.legendBattles) || 0) <= 0) { try { showToast("没有战斗次数了 —— <b>先发射一艘方舟</b>（发射 1 次 = 1 次战斗）。", "tech"); } catch (e) { } return; }
       a.legendBattles = Math.max(0, Math.floor(Number(a.legendBattles) || 0) - 1);
       a.legendBattleUsed = true;
@@ -19650,7 +19698,7 @@
     function invBattleStart() {
       const a = invArkState();
       const S = invArkIterStats();
-      if (!S.valid) { try { showToast("蓝图未完成（至少 1 研究室 / 1 护盾 / 1 能源核心 / 1 武器室）。", "tech"); } catch (e) { } return; }
+      if (!S.valid) { try { showToast(arkIterInvalidReason(S), "tech"); } catch (e) { } return; }
       // V0.139（作者）：战斗 = 用「传说方舟」出击 —— 本回合不能再发普通方舟，每回合只能打一场
       if ((Number(a.legendBattles) || 0) <= 0) { try { showToast("没有战斗次数了 —— <b>先发射一艘方舟</b>（发射 1 次 = 1 次战斗）。", "tech"); } catch (e) { } return; }
       a.legendBattles = Math.max(0, Math.floor(Number(a.legendBattles) || 0) - 1);
@@ -20818,6 +20866,9 @@
       if (Array.isArray(a.list)) {
         a.list.forEach(x => { if (x && x.pos && a.pos && x.pos.a === a.pos.a && x.pos.b === a.pos.b) x.contacted = true; });
       }
+      // V0.149k：残骸是按「方框」踩到的，目标格可能是框内任意一格 —— 这里把真正踩到的那片也标掉，
+      //   否则自动导航会反复把同一片残骸当成「还没接触」的目标，来回走（看起来就是卡住）
+      if (crashBonus) { try { crashBonus.contacted = true; } catch (e) { } }
       // V0.115：主宇宙成就「方舟收藏家」用的累计计数
       save.arkContactsTotal = Math.max(0, Math.floor(Number(save.arkContactsTotal) || 0)) + 1;
       if (crashBonus) {
@@ -21939,17 +21990,24 @@
     // 反转铸级：花反转尘埃换等级（等级越高凝析越快），被捕获时掉的也是它
     // V0.105（作者要求）：支持批量 —— times 次逐级按真实造价扣尘，买不动就自动停下；返回「是否至少升了一级」。
     //   times = Infinity / "max" = 一键最大（配 10000 级保险丝防极端循环）。
-    function invTryLevelUp(silent, times) {
+    // V0.149i 修（玩家：反转世界「一键最大」要点好几下）——
+    //   手动一键最大只跑 **250ms** 就 break 了，注释写「剩下的下一帧继续」，但**根本没有续跑** ✗。
+    //   后期尘埃一多（比如 1E3000），250ms 只够买一万多级 → 玩家必须连点好几次才能真正买到顶。
+    //   现在把续跑补上：一帧没买完就 setTimeout 接着买，直到「真的买不动」为止，最后只报一次汇总。
+    let invMaxJobSeq = 0;
+    function invTryLevelUp(silent, times, __resume) {
       if (!invActive || !invWorld) return false;
+      const __rs = (__resume && typeof __resume === "object") ? __resume : null;
       // V0.140（作者）：以前硬顶 10000 级/次 ✗ —— 现在按「买得起多少就升多少」，
       //   只留一个很大的保险丝（200 万级）+ 250ms 时间预算，避免卡死页面
       let n = Math.floor(times || 1);
       if (!isFinite(n) || n <= 0) n = 2000000;   // 一键最大 / 自动铸级（Infinity）都用这个上限
       n = Math.min(2000000, n);
-      const startLv = invLevelNow();
-      let spent = bigOf(0);                       // V0.115：花费是大数了，累加也要用大数（以前是数字 += ✗）
+      const startLv = __rs ? __rs.startLv : invLevelNow();
+      let spent = __rs ? bigOf(__rs.spent) : bigOf(0);   // V0.115：花费是大数，累加也走大数（续跑时接着累加）
       const __t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
       const __budget = silent ? 60 : 250;   // 自动铸级每拍最多 60ms，手动一键最大 250ms
+      let __hitBudget = false;
       for (let i = 0; i < n; i++) {
         const cost = invLevelCost();
         // V0.145（玩家反馈：1000 多级突然爆到十几万级）—— 一旦算出「花费 0 / 负数」，立刻停，
@@ -21958,7 +22016,7 @@
         if (bigCmp(invWorld.dust, bigOf(cost)) < 0) break;
         if ((i & 1023) === 0) {
           const __now = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
-          if (__now - __t0 > __budget) break;   // 超预算就停，剩下的下一帧继续
+          if (__now - __t0 > __budget) { __hitBudget = true; break; }   // 超预算：先停，下面自动续跑
         }
         invWorld.dust = bigSub(invWorld.dust, bigOf(cost));
         invWorld.level = invLevelNow() + 1;
@@ -21995,6 +22053,28 @@
           `尘埃/抵抗各 <b>+${formatNumber(megaNow * INV_MILESTONE_MEGA_BONUS * 100)}%</b>、基础科技有效等级 <b>×${invMilestoneCapMult().toFixed(3)}</b>。`);
       }
       saveGame();   // V0.105：历史最高（开局福利记账）及时落盘
+      // V0.149i：被时间预算打断、且还买得起 → 自动续跑（最多 200 片，约 50 秒），跑完只报一次汇总
+      if (!silent && __hitBudget) {
+        const slices = (__rs ? Math.floor(__rs.slices || 0) : 0) + 1;
+        const canMore = (() => {
+          try {
+            const c = invLevelCost();
+            return c && Number.isFinite(c.e) && c.m > 0 && bigCmp(invWorld.dust, bigOf(c)) >= 0;
+          } catch (e) { return false; }
+        })();
+        if (canMore && slices < 200) {
+          if (!__rs) invMaxJobSeq++;                       // 新任务：占一个序号
+          const __seq = __rs ? __rs.seq : invMaxJobSeq;
+          try {
+            setTimeout(() => {
+              if (__seq !== invMaxJobSeq) return;           // 有更新的任务了，放弃旧的
+              invTryLevelUp(false, times, { startLv: startLv, spent: spent, slices: slices, seq: __seq });
+            }, 0);
+          } catch (e) { }
+          try { renderInvWorld(); } catch (e) { }           // 先把已买的级数刷出来，玩家能看见在动
+          return done > 0;
+        }
+      }
       if (!silent) {
         if (done > 0) {
           showToast(done > 1
